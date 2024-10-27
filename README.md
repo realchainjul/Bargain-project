@@ -26,11 +26,11 @@ You may also see any lint errors in the console.
 
 2024.10.27 Upload by 김채희
 
-npm i react-router-dom
-npm install @reduxjs/toolkit react-redux
-npm install axios
-npm install swiper
-npm install -g sass
+- npm i react-router-dom
+- npm install @reduxjs/toolkit react-redux
+- npm install axios
+- npm install swiper
+- npm install -g sass
 
 
 메인화면 미리보기 입니다
