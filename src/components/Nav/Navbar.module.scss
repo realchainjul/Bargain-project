@@ -1,0 +1,139 @@
+// Navbar.module.scss
+.header {
+  font-family: 'Pretendard-Regular';
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid lightgray;
+  box-shadow: rgba(0, 0, 0, 0.07) 0px 3px 4px 0px;
+  position: relative;
+  z-index: 300;
+
+  .service {
+    width: 74vw;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    height: 2.6rem;
+    font-size: 13px;
+    
+    a,
+    p {
+      &:first-child {
+        color:#a99773;
+        &::after {
+          content: ' ';
+          display: inline-block;
+          width: 1px;
+          height: 11px;
+          margin-left: 12px;
+          background-color: rgb(217, 217, 217);
+        }
+      }
+      color:  #404040;
+      font-weight: 600;
+      text-decoration: none;
+  }
+}
+
+  .search {
+    width: 74vm;
+    display: flex;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    gap: 23rem;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+
+      .logo {
+        width: 44px;
+        color: #a99773;
+      }
+
+      .title {
+        font-size: 20px;
+        font-weight: 800;
+        color: #a99773;
+      }
+    }
+
+    .inputWrap {
+      position: relative;
+      .searchInput {
+        width: 24rem;
+        font-size: 16px;
+        outline: none;
+        border: 1px solid #a99773;
+        border-radius: 6px;
+        padding: 0.8rem;
+      }
+      .searchBtn {
+        border: none;
+        background-color: transparent;
+        position: absolute;
+        top: 2px;
+        right: 0;
+        padding: 0.6rem;
+        cursor: pointer;
+      }
+    }
+
+    .links {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      .like {
+        position: relative;
+        color: #5a5a5a;
+      }
+      .cart {
+        position: relative;
+        color: #5a5a5a;
+        .count {
+          position: absolute;
+          top: -3px;
+          right: -10px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50px;
+          background-color: #a99773;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 8px;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  nav {
+    width: 74vm;
+    padding-top: 1rem;
+    ul {
+      display: flex;
+      justify-content: space-between;
+      height: 2rem;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      gap: 26rem;
+
+      li {
+        font-weight: 600;
+        a {
+          color: #404040;
+          font-size: 18px;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
