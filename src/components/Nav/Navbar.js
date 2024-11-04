@@ -74,9 +74,7 @@ function Nav() {
           <li>
             <Link to="/category/grain">곡물</Link>
           </li>
-          <li>
-            <Link to="/category/exper">체험 예약</Link>
-          </li>
+
         </ul>
       </nav>
     </header>

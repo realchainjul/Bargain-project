@@ -8,9 +8,13 @@ import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import ExperPage from './Pages/Category/Exper/ExperPage';
 import Signup from './Pages/Signup/Signup';
+import axios from 'axios';
+import { useEffect,useState } from 'react';
+import Product from './Pages/Product/Product';
 
 function App() {
   return (
+   
     <BrowserRouter>
       <div className='App'>
         <Nav />
@@ -20,14 +24,16 @@ function App() {
           <Route path="/" element={<Home />} /> 
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/category/fruits" element={<FruitsPage />} />
+          <Route path="/category/fruits" element={<Product />} />
           <Route path="/category/vegetable" element={<VegetablePage />} /> 
           <Route path="/category/grain" element={<GrainPage />} /> 
-          <Route path="/category/exper" element={<ExperPage />} />
         </Routes>
       </div>
       <div>
         <Footer />
+      </div>
+      <div>
+      
       </div>
     </BrowserRouter>
   );
