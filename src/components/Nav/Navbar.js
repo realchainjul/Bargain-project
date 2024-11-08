@@ -32,7 +32,7 @@ function Nav() {
       <div className={style.navbar}>
       <div className={style.search}>
         <Link to="/" className={style.logoLink}>
-          <img className={style.logo} src="/images/#" alt="logo" />
+          <img className={style.logo} src="/images/logo.png" alt="logo" />
           <h1 className={style.title}>Bargain</h1>
         </Link>
         <div className={style.inputWrap}>

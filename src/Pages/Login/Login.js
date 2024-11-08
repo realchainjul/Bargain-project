@@ -1,22 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Button from '../../components/common/Button';
 import style from './Login.module.scss';
 
-//버튼만 만들어둠 연결은 나중에
+//일반인 로그인 구현
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // 버튼 정보 배열
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('https://bargainus.kr/api/login', { email, password });
+      if (response.data.success) {
+        navigate('/home');
+      } else {
+        setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
+      }
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
+    }
+  };
+
   const buttons = [
     {
       type: 'submit',
       name: '로그인',
-      form: 'login',
       className: style.loginButton,
       isBrown: true,
-      onClick: null,
     },
     {
       name: '회원가입',
@@ -28,19 +44,24 @@ function Login() {
     <section className={style.login}>
       <h1>로그인</h1>
       <section className={style.login_container}>
-        <form id="login" className={style.login_container_inputForm}>
+        <form id="login" className={style.login_container_inputForm} onSubmit={handleLogin}>
           <input
             type="text"
             name="email"
             className={style.input}
             placeholder="이메일을 입력해 주세요"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             name="password"
             className={style.input}
             placeholder="비밀번호를 입력해 주세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
+          {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
             {buttons.map((buttonProps, index) => (
               <Button key={index} {...buttonProps} />

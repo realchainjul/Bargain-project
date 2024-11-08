@@ -18,7 +18,7 @@ function BannerSub() {
       className={style.swiper}
       modules = {[Pagination, Autoplay]}
       pagination={{ clickable : true }}
-      loop={true} // 루프 슬라이드
+      loop={true} // 루프 슬라이드cd
       autoplay={{ delay: 4000 }} // 자동 슬라이드
       spaceBetween={70} // 슬라이드간의 간격
       slidesPerView={4} // 한 번에 보여지는 슬라이드 개수

@@ -1,4 +1,3 @@
-
 import { InfoList } from '../../components/Signup/infoList';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
@@ -13,8 +12,13 @@ export default function Signup() {
   const navigate = useNavigate();
   const [inputs, setInputs] = useState({
     email: '',
-    password: '',
-    displayName: '',
+    pw: '',
+    name: '',
+    nickName: '',
+    phonNum: '',
+    postalCode: '', // 우편번호
+    address: '', // 기본 주소
+    detailAddress: '', // 상세 주소
   });
 
   const [checkPassword, setCheckPassword] = useState('');
@@ -23,7 +27,7 @@ export default function Signup() {
   const [isConfirmPassword, setIsConfirmPassword] = useState(false);
   const [isConfirmCheckPassword, setIsConfirmCheckPassword] = useState(false);
 
-  const { email, password, displayName } = inputs;
+  const { email, pw, name, nickName, phonNum, postalCode, address, detailAddress } = inputs;
 
   const handleChangeInfoInputs = (event) => {
     const { value, name } = event.target;
@@ -31,6 +35,18 @@ export default function Signup() {
       ...inputs,
       [name]: value,
     });
+  };
+
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        setInputs((prevInputs) => ({
+          ...prevInputs,
+          postalCode: data.zonecode, // 우편번호 저장
+          address: data.address, // 기본 주소 저장
+        }));
+      },
+    }).open();
   };
 
   const handleChangeCheckPassword = (event) => {
@@ -66,14 +82,14 @@ export default function Signup() {
   }, [email]);
 
   const handleConfirmPassword = useCallback(() => {
-    if (password.length >= 8 || password.length === 0) setIsConfirmPassword(true);
+    if (pw.length >= 8 || pw.length === 0) setIsConfirmPassword(true);
     else setIsConfirmPassword(false);
-  }, [password]);
+  }, [pw]);
 
   const handleConfirmCheckPassword = useCallback(() => {
-    if (password === checkPassword || checkPassword.length === 0) setIsConfirmCheckPassword(true);
+    if (pw === checkPassword || checkPassword.length === 0) setIsConfirmCheckPassword(true);
     else setIsConfirmCheckPassword(false);
-  }, [password, checkPassword]);
+  }, [pw, checkPassword]);
 
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
@@ -88,8 +104,10 @@ export default function Signup() {
       password: event.target.password.value,
       displayName: event.target.displayName.value,
       profileImgBase64: profileImg ?? undefined,
+      postalCode,
+      address,
+      detailAddress, // 상세 주소 포함
     };
-
   };
 
   useEffect(() => {
@@ -129,8 +147,8 @@ export default function Signup() {
         <InfoList
           label={'비밀번호'}
           input={{
-            name: 'password',
-            value: password,
+            name: 'pw',
+            value: pw,
             type: 'password',
             required: true,
             onChange: handleChangeInfoInputs,
@@ -159,11 +177,69 @@ export default function Signup() {
         <InfoList
           label={'이름'}
           input={{
-            name: 'displayName',
-            value: displayName,
+            name: 'name',
+            value: name,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '이름을 입력해 주세요',
+          }}
+        />
+        <InfoList
+          label={'닉네임'}
+          input={{
+            name: 'nickName',
+            value: nickName,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '닉네임을 입력해 주세요',
+          }}
+        />
+        <InfoList
+          label={'전화번호'}
+          input={{
+            name: 'phonNum',
+            value: phonNum,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '전화번호를 입력해 주세요',
+          }}
+        />
+
+        {/* 주소 검색 필드 */}
+        <InfoList
+          label={'우편번호'}
+          input={{
+            name: 'postalCode',
+            value: postalCode,
+            required: true,
+            readOnly: true,
+            placeholder: '우편번호를 입력해 주세요',
+          }}
+          button={{
+            name: '주소 검색',
+            onClick: (e) => {
+              e.preventDefault();
+              handleAddressSearch();
+            },
+          }}
+        />
+        <InfoList
+          label={'주소'}
+          input={{
+            name: 'address',
+            value: address,
+            required: true,
+            readOnly: true,
+            placeholder: '기본 주소를 입력해 주세요',
+          }}
+        />
+        <InfoList
+          label={'상세주소'}
+          input={{
+            name: 'detailAddress',
+            value: detailAddress,
+            onChange: handleChangeInfoInputs,
+            placeholder: '상세 주소를 입력해 주세요',
           }}
         />
 
