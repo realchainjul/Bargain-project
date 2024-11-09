@@ -26,7 +26,7 @@ export default function Signup() {
   const [isConfirmPassword, setIsConfirmPassword] = useState(false);
   const [isConfirmCheckPassword, setIsConfirmCheckPassword] = useState(false);
 
-  const { email, pw, name, nickName, phonNum, postalCode, address, detailAddress, checkPassword } = inputs;
+  const { email, pw, name, nickname, phoneNumber, postalCode, address, detailAddress, checkPassword } = inputs;
 
   const handleChangeInfoInputs = (event) => {
     const { value, name } = event.target;
@@ -99,7 +99,7 @@ export default function Signup() {
     }
   
     // 닉네임 중복 확인
-    const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickName}`, {
+    const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickname}`, {
       method: "GET",
     });
     const nicknameCheckResult = await nicknameCheckResponse.text();
@@ -113,8 +113,8 @@ export default function Signup() {
     formData.append("email", inputs.email);
     formData.append("password", inputs.pw);
     formData.append("name", inputs.name);
-    formData.append("nickName", inputs.nickName);
-    formData.append("phonNum", inputs.phonNum);
+    formData.append("nickname", inputs.nickname);
+    formData.append("phoneNumber", inputs.phonNum);
     formData.append("postalCode", inputs.postalCode);
     formData.append("address", inputs.address);
     formData.append("detailAddress", inputs.detailAddress);
@@ -208,8 +208,8 @@ export default function Signup() {
         <InfoList
           label={'닉네임'}
           input={{
-            name: 'nickName',
-            value: nickName,
+            name: 'nickname',
+            value: nickname,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '닉네임을 입력해 주세요',
@@ -224,8 +224,8 @@ export default function Signup() {
         <InfoList
           label={'전화번호'}
           input={{
-            name: 'phonNum',
-            value: phonNum,
+            name: 'phoneNumber',
+            value: phoneNumber,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '전화번호를 입력해 주세요',
