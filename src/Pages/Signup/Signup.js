@@ -104,7 +104,7 @@ export default function Signup() {
     }
   
     // 이메일 중복 확인
-    const emailCheckResponse = await fetch(`https://bargainus.kr/check-email?email=${inputs.email}`, {
+    const emailCheckResponse = await fetch(`https://api.bargainus.kr/check-email?email=${inputs.email}`, {
       method: "GET",
     });
     const emailCheckResult = await emailCheckResponse.text();
@@ -114,7 +114,7 @@ export default function Signup() {
     }
   
     // 닉네임 중복 확인
-    const nicknameCheckResponse = await fetch(`https://bargainus.kr/check-nickname?nickname=${inputs.nickName}`, {
+    const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickName}`, {
       method: "GET",
     });
     const nicknameCheckResult = await nicknameCheckResponse.text();
