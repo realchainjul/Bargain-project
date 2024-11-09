@@ -1,7 +1,5 @@
 import { InfoList } from '../../components/Signup/infoList';
 import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom/dist';
 import Button from '../../components/common/Button';
 import style from './Signup.module.scss';
@@ -20,22 +18,30 @@ export default function Signup() {
     postalCode: '', // 우편번호
     address: '', // 기본 주소
     detailAddress: '', // 상세 주소
+    checkPassword: '' // 비밀번호 확인 추가
   });
 
-  const [checkPassword, setCheckPassword] = useState('');
   const [profileImg, setProfileImg] = useState(null);
   const [isConfirmEmail, setIsConfirmEmail] = useState(true);
   const [isConfirmPassword, setIsConfirmPassword] = useState(false);
   const [isConfirmCheckPassword, setIsConfirmCheckPassword] = useState(false);
 
-  const { email, pw, name, nickName, phonNum, postalCode, address, detailAddress } = inputs;
+  const { email, pw, name, nickName, phonNum, postalCode, address, detailAddress, checkPassword } = inputs;
 
   const handleChangeInfoInputs = (event) => {
     const { value, name } = event.target;
-    setInputs({
-      ...inputs,
+    setInputs((prevInputs) => ({
+      ...prevInputs,
       [name]: value,
-    });
+    }));
+
+    // 비밀번호 유효성 및 비밀번호 확인 유효성 확인 업데이트
+    if (name === 'pw') {
+      setIsConfirmPassword(value.length >= 8); // 비밀번호 8자 이상 확인
+      setIsConfirmCheckPassword(value === inputs.checkPassword); // 비밀번호 확인 일치 여부 확인
+    } else if (name === 'checkPassword') {
+      setIsConfirmCheckPassword(inputs.pw === value); // 비밀번호와 확인값 일치 여부
+    }
   };
 
   const handleAddressSearch = () => {
@@ -48,10 +54,6 @@ export default function Signup() {
         }));
       },
     }).open();
-  };
-
-  const handleChangeCheckPassword = (event) => {
-    setCheckPassword(event.currentTarget.value);
   };
 
   const handleChangeProfileImg = (event) => {
@@ -76,23 +78,6 @@ export default function Signup() {
     }
     return true;
   };
-
-  const handleConfirmEmail = useCallback(() => {
-    if (email.length > 0) setIsConfirmEmail(true);
-    else setIsConfirmEmail(false);
-  }, [email]);
-
-  const handleConfirmPassword = useCallback(() => {
-    if (pw.length >= 8 || pw.length === 0) setIsConfirmPassword(true);
-    else setIsConfirmPassword(false);
-  }, [pw]);
-
-  const handleConfirmCheckPassword = useCallback(() => {
-    if (pw === checkPassword || checkPassword.length === 0) setIsConfirmCheckPassword(true);
-    else setIsConfirmCheckPassword(false);
-  }, [pw, checkPassword]);
-
-  
 
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
@@ -158,8 +143,6 @@ export default function Signup() {
     }
   };
   
-  
-
   return (
     <div className={style.signup}>
       <div className={style.header}>
@@ -204,7 +187,7 @@ export default function Signup() {
             value: checkPassword,
             type: 'password',
             required: true,
-            onChange: handleChangeCheckPassword,
+            onChange: handleChangeInfoInputs,
             placeholder: '비밀번호를 다시 입력해 주세요',
             checkInput: {
               isConfirm: isConfirmCheckPassword,
@@ -230,6 +213,12 @@ export default function Signup() {
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '닉네임을 입력해 주세요',
+          }}
+          button={{
+            name: '중복 확인',
+            onClick: (e) => {
+              e.preventDefault();
+            },
           }}
         />
         <InfoList
