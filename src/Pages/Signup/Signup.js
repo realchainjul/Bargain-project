@@ -13,7 +13,7 @@ export default function Signup() {
     email: '',
     pw: '',
     name: '',
-    nickName: '',
+    nickname: '',
     phoneNumber: '',
     postalCode: '', // 우편번호
     address: '', // 기본 주소
@@ -57,17 +57,13 @@ export default function Signup() {
   };
 
   const handleChangeProfileImg = (event) => {
-    if (event.target.files) {
+    if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
 
       if (!isCheckProfileSize(file.size)) return;
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = () => {
-        setProfileImg(reader.result);
-      };
+      // 파일 객체를 profileImg 상태에 그대로 저장
+      setProfileImg(file);
     }
   };
 
@@ -102,7 +98,7 @@ export default function Signup() {
     const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickname}`, {
       method: "GET",
     });
-    const nicknameCheckResult = await nicknameCheckResponse.text();
+    const nicknameCheckResult = await emailCheckResponse.text();
     if (nicknameCheckResult === "중복된 닉네임입니다.") {
       alert(nicknameCheckResult);
       return; // 중복된 닉네임이면 회원가입 진행하지 않음
@@ -120,7 +116,7 @@ export default function Signup() {
     formData.append("detailAddress", inputs.detailAddress);
   
     if (profileImg) {
-      formData.append("photo", profileImg);
+      formData.append("photo", profileImg); // 파일 객체로 추가
     }
   
     // 회원가입 요청 보내기
@@ -279,7 +275,7 @@ export default function Signup() {
               onChange={handleChangeProfileImg}
             />
             <figure className={style.profile_inputContainer_img}>
-              {profileImg && <img alt="프로필" width={150} height={150} src={profileImg} />}
+              {profileImg && <img alt="프로필" width={150} height={150} src={URL.createObjectURL(profileImg)} />}
             </figure>
           </article>
         </section>
