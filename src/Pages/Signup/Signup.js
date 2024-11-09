@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom/dist';
 import Button from '../../components/common/Button';
 import style from './Signup.module.scss';
+import axios from 'axios';
 
 const MAX_PROFILE_IMAGE_SIZE = 1024 * 1024;
 
@@ -91,36 +92,73 @@ export default function Signup() {
     else setIsConfirmCheckPassword(false);
   }, [pw, checkPassword]);
 
+  
+
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
-
+  
+    // 유효성 검사
     if (!(isConfirmEmail && isConfirmPassword && isConfirmCheckPassword)) {
       alert('필수 사항을 조건에 맞게 모두 입력해주세요.');
       return;
     }
-
-    const signData = {
-      email: event.target.email.value,
-      password: event.target.password.value,
-      displayName: event.target.displayName.value,
-      profileImgBase64: profileImg ?? undefined,
-      postalCode,
-      address,
-      detailAddress, // 상세 주소 포함
-    };
+  
+    // 이메일 중복 확인
+    const emailCheckResponse = await fetch(`https://bargainus.kr/check-email?email=${inputs.email}`, {
+      method: "GET",
+    });
+    const emailCheckResult = await emailCheckResponse.text();
+    if (emailCheckResult === "중복된 이메일입니다.") {
+      alert(emailCheckResult);
+      return; // 중복된 이메일이면 회원가입 진행하지 않음
+    }
+  
+    // 닉네임 중복 확인
+    const nicknameCheckResponse = await fetch(`https://bargainus.kr/check-nickname?nickname=${inputs.nickName}`, {
+      method: "GET",
+    });
+    const nicknameCheckResult = await nicknameCheckResponse.text();
+    if (nicknameCheckResult === "중복된 닉네임입니다.") {
+      alert(nicknameCheckResult);
+      return; // 중복된 닉네임이면 회원가입 진행하지 않음
+    }
+  
+    // FormData 생성
+    const formData = new FormData();
+    formData.append("email", inputs.email);
+    formData.append("password", inputs.pw);
+    formData.append("name", inputs.name);
+    formData.append("nickName", inputs.nickName);
+    formData.append("phonNum", inputs.phonNum);
+    formData.append("postalCode", inputs.postalCode);
+    formData.append("address", inputs.address);
+    formData.append("detailAddress", inputs.detailAddress);
+  
+    if (profileImg) {
+      formData.append("photo", profileImg);
+    }
+  
+    // 회원가입 요청 보내기
+    try {
+      const response = await fetch("https://api.bargainus.kr/join", { // 서버 주소를 명확히 입력
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await response.json();
+      if (result.status === "success") {
+        alert(result.message); // 성공 메시지 표시
+        navigate("/login"); // 성공 시 로그인 페이지로 이동
+      } else {
+        alert(result.message); // 실패 메시지 표시
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
-
-  useEffect(() => {
-    handleConfirmEmail();
-  }, [handleConfirmEmail]);
-
-  useEffect(() => {
-    handleConfirmPassword();
-  }, [handleConfirmPassword]);
-
-  useEffect(() => {
-    handleConfirmCheckPassword();
-  }, [handleConfirmCheckPassword]);
+  
+  
 
   return (
     <div className={style.signup}>
