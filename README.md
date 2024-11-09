@@ -32,7 +32,8 @@ You may also see any lint errors in the console.
 - npm install swiper
 - npm install -g sass
 
-리액트 설치 후 터미널에서 위에 install 해주세요
+2024.11.04 Upload by 김채희
+- 상품 상세 페이지 추가
 
 메인화면 미리보기 입니다
 ![image](https://github.com/user-attachments/assets/cb04474c-1fde-4005-b501-a2d211fea959)

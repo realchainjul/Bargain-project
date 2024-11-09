@@ -19,6 +19,8 @@
     "swiper": "^11.1.14",
     "web-vitals": "^2.1.4"
   },
+    "proxy": "https://bargainus.kr",
+
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
