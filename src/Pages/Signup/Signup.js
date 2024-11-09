@@ -59,8 +59,11 @@ export default function Signup() {
   const handleChangeProfileImg = (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+
       if (!isCheckProfileSize(file.size)) return;
-      setProfileImg(file); // 파일 객체로 profileImg 저장
+
+      // 파일 객체를 profileImg 상태에 그대로 저장
+      setProfileImg(file);
     }
   };
 
@@ -74,7 +77,7 @@ export default function Signup() {
 
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
-  
+
     // 유효성 검사
     if (!(isConfirmEmail && isConfirmPassword && isConfirmCheckPassword)) {
       alert('필수 사항을 조건에 맞게 모두 입력해주세요.');
@@ -86,20 +89,20 @@ export default function Signup() {
       const emailCheckResponse = await fetch(`https://api.bargainus.kr/check-email?email=${inputs.email}`, {
         method: "GET",
       });
-      const emailCheckResult = await emailCheckResponse.json();
-      if (emailCheckResult.message === "중복된 이메일입니다.") {
-        alert(emailCheckResult.message);
-        return;
+      const emailCheckResult = await emailCheckResponse.text();
+      if (emailCheckResult === "중복된 이메일입니다.") {
+        alert(emailCheckResult);
+        return; // 중복된 이메일이면 회원가입 진행하지 않음
       }
 
       // 닉네임 중복 확인
       const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickname}`, {
         method: "GET",
       });
-      const nicknameCheckResult = await nicknameCheckResponse.json();
-      if (nicknameCheckResult.message === "중복된 닉네임입니다.") {
-        alert(nicknameCheckResult.message);
-        return;
+      const nicknameCheckResult = await nicknameCheckResponse.text();
+      if (nicknameCheckResult === "중복된 닉네임입니다.") {
+        alert(nicknameCheckResult);
+        return; // 중복된 닉네임이면 회원가입 진행하지 않음
       }
 
       // FormData 생성
@@ -112,6 +115,7 @@ export default function Signup() {
       formData.append("postalCode", inputs.postalCode);
       formData.append("address", inputs.address);
       formData.append("detailAddress", inputs.detailAddress);
+
       if (profileImg) {
         formData.append("photo", profileImg); // 파일 객체로 추가
       }
@@ -121,20 +125,20 @@ export default function Signup() {
         method: "POST",
         body: formData,
       });
-  
+
       const result = await response.json();
       if (result.status === "success") {
-        alert(result.message);
-        navigate("/login");
+        alert(result.message); // 성공 메시지 표시
+        navigate("/login"); // 성공 시 로그인 페이지로 이동
       } else {
-        alert(result.message);
+        alert(result.message); // 실패 메시지 표시
       }
     } catch (error) {
       console.error("Error:", error);
       alert("회원가입 중 오류가 발생했습니다.");
     }
   };
-  
+
   return (
     <div className={style.signup}>
       <div className={style.header}>
@@ -149,6 +153,12 @@ export default function Signup() {
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '이메일을 입력해 주세요',
+          }}
+          button={{
+            name: '중복 확인',
+            onClick: (e) => {
+              e.preventDefault();
+            },
           }}
         />
         <InfoList
@@ -199,6 +209,12 @@ export default function Signup() {
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '닉네임을 입력해 주세요',
+          }}
+          button={{
+            name: '중복 확인',
+            onClick: (e) => {
+              e.preventDefault();
+            },
           }}
         />
         <InfoList
