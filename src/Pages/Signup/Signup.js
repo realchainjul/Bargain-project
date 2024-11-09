@@ -114,7 +114,7 @@ export default function Signup() {
     formData.append("password", inputs.pw);
     formData.append("name", inputs.name);
     formData.append("nickname", inputs.nickname);
-    formData.append("phoneNumber", inputs.phonNumber);
+    formData.append("phoneNumber", inputs.phoneNumber);
     formData.append("postalCode", inputs.postalCode);
     formData.append("address", inputs.address);
     formData.append("detailAddress", inputs.detailAddress);
