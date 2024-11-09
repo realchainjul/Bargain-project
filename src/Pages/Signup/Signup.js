@@ -77,13 +77,13 @@ export default function Signup() {
 
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
-
+  
     // 유효성 검사
     if (!(isConfirmEmail && isConfirmPassword && isConfirmCheckPassword)) {
       alert('필수 사항을 조건에 맞게 모두 입력해주세요.');
       return;
     }
-
+  
     try {
       // 이메일 중복 확인
       const emailCheckResponse = await fetch(`https://api.bargainus.kr/check-email?email=${inputs.email}`, {
@@ -94,7 +94,7 @@ export default function Signup() {
         alert(emailCheckResult);
         return; // 중복된 이메일이면 회원가입 진행하지 않음
       }
-
+  
       // 닉네임 중복 확인
       const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickname}`, {
         method: "GET",
@@ -104,7 +104,7 @@ export default function Signup() {
         alert(nicknameCheckResult);
         return; // 중복된 닉네임이면 회원가입 진행하지 않음
       }
-
+  
       // FormData 생성
       const formData = new FormData();
       formData.append("email", inputs.email);
@@ -115,23 +115,35 @@ export default function Signup() {
       formData.append("postalCode", inputs.postalCode);
       formData.append("address", inputs.address);
       formData.append("detailAddress", inputs.detailAddress);
-
+  
       if (profileImg) {
         formData.append("photo", profileImg); // 파일 객체로 추가
       }
-
+  
       // 회원가입 요청 보내기
       const response = await fetch("https://api.bargainus.kr/join", {
         method: "POST",
         body: formData,
       });
-
-      const result = await response.json();
-      if (result.status === "success") {
-        alert(result.message); // 성공 메시지 표시
-        navigate("/login"); // 성공 시 로그인 페이지로 이동
+  
+      // Content-Type 확인 후 응답 처리
+      const contentType = response.headers.get("content-type");
+      let result;
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
       } else {
-        alert(result.message); // 실패 메시지 표시
+        result = await response.text();
+      }
+  
+      if (response.ok) {
+        if (result.status === "success") {
+          alert(result.message || result); // 성공 메시지 표시
+          navigate("/login"); // 성공 시 로그인 페이지로 이동
+        } else {
+          alert(result.message || result); // 실패 메시지 표시
+        }
+      } else {
+        alert(result.message || result); // 실패 메시지 표시
       }
     } catch (error) {
       console.error("Error:", error);
