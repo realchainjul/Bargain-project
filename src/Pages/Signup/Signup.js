@@ -14,7 +14,7 @@ export default function Signup() {
     pw: '',
     name: '',
     nickName: '',
-    phonNum: '',
+    phoneNumber: '',
     postalCode: '', // 우편번호
     address: '', // 기본 주소
     detailAddress: '', // 상세 주소
