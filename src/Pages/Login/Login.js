@@ -4,8 +4,6 @@ import axios from 'axios';
 import Button from '../../components/common/Button';
 import style from './Login.module.scss';
 
-//일반인 로그인 구현
-
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -16,14 +14,17 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://bargainus.kr/api/login', { email, password });
-      if (response.data.success) {
+      const response = await axios.post('/login', { email, password });
+      
+      if (response.data.status) {
+        // 로그인 성공
         navigate('/home');
       } else {
-        setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
+        // 로그인 실패
+        setErrorMessage(response.data.message);
       }
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
+      setErrorMessage('로그인 실패: 서버 오류');
     }
   };
 
@@ -54,7 +55,7 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
-            type="password"
+            type="password" // 보안성 강화를 위해 type을 password로 변경
             name="password"
             className={style.input}
             placeholder="비밀번호를 입력해 주세요"
