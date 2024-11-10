@@ -1,5 +1,7 @@
 package com.harvest.bagain.users;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,6 +34,11 @@ public class UsersController {
         @Validated @ModelAttribute UserJoinReq req,
         @RequestParam(required = false) MultipartFile photo) {
         String result = usersDAO.join(req, photo);
+        return ResponseEntity.ok(result);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestParam String email, @RequestParam String password, HttpServletRequest req) {
+        Map<String, Object> result = usersDAO.login(email, password, req);
         return ResponseEntity.ok(result);
     }
 }

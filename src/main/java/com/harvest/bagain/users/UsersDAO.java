@@ -1,6 +1,9 @@
 package com.harvest.bagain.users;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.harvest.bagain.BagainFileNameGenerator;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UsersDAO {
@@ -66,5 +71,31 @@ public class UsersDAO {
             }
             return "가입 실패";
         }
+    }
+    public Map<String, Object> login(String email, String password, HttpServletRequest req) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Users> userOptional = usersRepo.findByEmail(email);
+            if (userOptional.isPresent()) {
+                Users user = userOptional.get();
+                if (bcpe.matches(password, user.getPassword())) {
+                    req.getSession().setAttribute("loginUser", user);
+                    req.getSession().setMaxInactiveInterval(10 * 60); // 세션 유효 시간 설정 (10분)
+                    response.put("status", true);
+                    response.put("message", "로그인 성공");
+                } else {
+                    response.put("status", false);
+                    response.put("message", "로그인 실패: 비밀번호 오류");
+                }
+            } else {
+                response.put("status", false);
+                response.put("message", "로그인 실패: 가입되지 않은 이메일");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", false);
+            response.put("message", "로그인 실패: 서버 오류");
+        }
+        return response;
     }
 }
