@@ -7,14 +7,14 @@ import style from './Login.module.scss';
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [pw, setPw] = useState('');  // password 대신 pw로 변경
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', { email, password });
+      const response = await axios.post('https://api.bargainus.kr/login', { email, pw });
       
       if (response.data.status) {
         // 로그인 성공
@@ -55,12 +55,12 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
-            type="password" // 보안성 강화를 위해 type을 password로 변경
-            name="password"
+            type="password" // 보안성 강화를 위해 type을 password로 유지
+            name="pw" // name을 pw로 변경
             className={style.input}
             placeholder="비밀번호를 입력해 주세요"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={pw}
+            onChange={(e) => setPw(e.target.value)} // setPassword 대신 setPw로 변경
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
