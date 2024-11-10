@@ -3,17 +3,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BsCart2, BsFillPersonFill } from "react-icons/bs";
 import { VscHeart } from "react-icons/vsc";
 import { BiSearch } from 'react-icons/bi';
+import axios from 'axios';
 import style from '../Nav/Navbar.module.scss';
 
 function Nav() {
   const navigate = useNavigate();
   const [value, setValue] = useState('');
   const [nickname, setNickname] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // 페이지 로드 시 localStorage에서 nickname 확인
     const storedNickname = localStorage.getItem('nickname');
     if (storedNickname) {
+      setIsLoggedIn(true);
       setNickname(storedNickname);
     }
   }, []);
@@ -32,15 +35,43 @@ function Nav() {
 
   const handleLogout = () => {
     // 로그아웃 시 localStorage에서 nickname 제거
-    localStorage.removeItem('nickname');
-    setNickname('');
-    navigate('/');
+    axios.post('https://api.bargainus.kr/logout', {}, { withCredentials: true })
+      .then(() => {
+        localStorage.removeItem('nickname');
+        setIsLoggedIn(false);
+        setNickname('');
+        navigate('/');
+      })
+      .catch(error => {
+        console.error("로그아웃 실패:", error);
+      });
+  };
+
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await axios.post('https://api.bargainus.kr/login', { email, password }, { withCredentials: true });
+
+      if (response.data.status) {
+        // 로그인 성공
+        setIsLoggedIn(true);
+        setNickname(response.data.nickname);
+        localStorage.setItem('nickname', response.data.nickname);
+        navigate('/home');
+      } else {
+        // 로그인 실패
+        alert(response.data.message);
+      }
+    } catch (error) {
+      // 서버 연결 오류 등 예외 처리
+      console.error("로그인 실패:", error);
+      alert('로그인 실패: 서버 오류');
+    }
   };
 
   return (
     <header className={style.header}>
       <section className={style.service}>
-        {nickname ? (
+        {isLoggedIn ? (
           <>
             <span>{nickname}님</span>
             <button onClick={handleLogout} className={style.logoutButton}>로그아웃</button>
