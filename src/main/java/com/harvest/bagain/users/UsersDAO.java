@@ -37,6 +37,17 @@ public class UsersDAO {
     public String checkNicknameDuplicate(String nickname) {
         return usersRepo.existsByNickname(nickname) ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다.";
     }
+    public Map<String, Object> isLogined(HttpServletRequest req) {
+        Users user = (Users) req.getSession().getAttribute("loginUser");
+        Map<String, Object> response = new HashMap<>();
+        if (user != null) {
+            response.put("isLoggedIn", true);
+            response.put("nickname", user.getNickname());
+        } else {
+            response.put("isLoggedIn", false);
+        }
+        return response;
+    }
 
     public String join(UserJoinReq req, MultipartFile photo) {
         String fileName = null;
