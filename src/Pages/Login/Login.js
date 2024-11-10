@@ -14,7 +14,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('/login', { email, password });
+      const response = await axios.post('https://api.bargainus.kr/login', { email, password });
       
       if (response.data.status) {
         // 로그인 성공
