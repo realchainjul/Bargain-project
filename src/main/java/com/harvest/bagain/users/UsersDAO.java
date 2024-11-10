@@ -72,6 +72,7 @@ public class UsersDAO {
             return "가입 실패";
         }
     }
+    // 로그인
     public Map<String, Object> login(String email, String password, HttpServletRequest req) {
         Map<String, Object> response = new HashMap<>();
         try {
