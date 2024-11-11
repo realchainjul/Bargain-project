@@ -110,4 +110,8 @@ public class UsersDAO {
         }
         return response;
     }
+    public void logout(HttpServletRequest req) {
+        req.getSession().setAttribute("loginUser", null);
+        req.getSession().invalidate();
+    }
 }

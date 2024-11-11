@@ -1,5 +1,6 @@
 package com.harvest.bagain.users;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +52,14 @@ public class UsersController {
 		result.putAll(loginStatus);
 		return ResponseEntity.ok(result);
 	}
+	@PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest req) {
+        usersDAO.logout(req);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", true);
+        response.put("message", "로그아웃 성공");
+        return ResponseEntity.ok(response);
+    }
+	
+	
 }
