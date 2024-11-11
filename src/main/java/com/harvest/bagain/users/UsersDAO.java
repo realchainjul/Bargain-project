@@ -1,6 +1,7 @@
 package com.harvest.bagain.users;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -13,12 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.harvest.bagain.BagainFileNameGenerator;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UsersDAO {
-
     private BCryptPasswordEncoder bcpe;
+    private static final String SECRET_KEY = "secretKey";
 
     @Autowired
     private UsersRepository usersRepo;
@@ -36,17 +39,6 @@ public class UsersDAO {
 
     public String checkNicknameDuplicate(String nickname) {
         return usersRepo.existsByNickname(nickname) ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다.";
-    }
-    public Map<String, Object> isLogined(HttpServletRequest req) {
-        Users user = (Users) req.getSession().getAttribute("loginUser");
-        Map<String, Object> response = new HashMap<>();
-        if (user != null) {
-            response.put("isLoggedIn", true);
-            response.put("nickname", user.getNickname());
-        } else {
-            response.put("isLoggedIn", false);
-        }
-        return response;
     }
 
     public String join(UserJoinReq req, MultipartFile photo) {
@@ -83,18 +75,27 @@ public class UsersDAO {
             return "가입 실패";
         }
     }
-    // 로그인
-    public Map<String, Object> login(String email, String password, HttpServletRequest req) {
+    
+    public Map<String, Object> login(String email, String password) {
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<Users> userOptional = usersRepo.findByEmail(email);
             if (userOptional.isPresent()) {
                 Users user = userOptional.get();
                 if (bcpe.matches(password, user.getPassword())) {
-                    req.getSession().setAttribute("loginUser", user);
-                    req.getSession().setMaxInactiveInterval(10 * 60); // 세션 유효 시간 설정 (10분)
+                    // JWT 생성
+                    String jwt = Jwts.builder()
+                            .setSubject(email)
+                            .claim("nickname", user.getNickname())
+                            .setIssuedAt(new Date())
+                            .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10분 유효
+                            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                            .compact();
+
                     response.put("status", true);
                     response.put("message", "로그인 성공");
+                    response.put("token", jwt); // JWT 반환
+                    response.put("nickname", user.getNickname());
                 } else {
                     response.put("status", false);
                     response.put("message", "로그인 실패: 비밀번호 오류");
@@ -110,8 +111,18 @@ public class UsersDAO {
         }
         return response;
     }
+    
     public void logout(HttpServletRequest req) {
         req.getSession().setAttribute("loginUser", null);
         req.getSession().invalidate();
+    }
+    
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

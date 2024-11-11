@@ -18,13 +18,13 @@
 *.zip
 *.tar.gz
 *.rar
-#.gradle/*
+.gradle/*
 .dbeaver/*
 .settings/*
 .classpath
 .gitattributes
 .project
-#gradle/*
+gradle/*
 bin/*
 build/*
 
