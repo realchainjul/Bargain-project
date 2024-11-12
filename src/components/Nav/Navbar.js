@@ -48,7 +48,7 @@ function Nav() {
           </>
         ) : (
           <>
-            <Link to="/join">회원가입</Link>
+            <Link to="/Signup">회원가입</Link>
             <Link to="/login">로그인</Link>
           </>
         )}
