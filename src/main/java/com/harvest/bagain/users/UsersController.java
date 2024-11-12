@@ -70,6 +70,4 @@ public class UsersController {
         response.put("message", "로그아웃 성공");
         return ResponseEntity.ok(response);
     }
-	
-	
 }

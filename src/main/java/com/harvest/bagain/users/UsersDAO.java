@@ -21,13 +21,19 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class UsersDAO {
     private BCryptPasswordEncoder bcpe;
-    private static final String SECRET_KEY = "secretKey";
 
     @Autowired
     private UsersRepository usersRepo;
 
     @Value("${users.images.directory}")
     private String usersImagesDirectory;
+    
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
+
 
     public UsersDAO() {
         this.bcpe = new BCryptPasswordEncoder();
@@ -88,8 +94,8 @@ public class UsersDAO {
                             .setSubject(email)
                             .claim("nickname", user.getNickname())
                             .setIssuedAt(new Date())
-                            .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10분 유효
-                            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                            .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                            .signWith(SignatureAlgorithm.HS256, secretKey)
                             .compact();
 
                     response.put("status", true);
@@ -112,14 +118,9 @@ public class UsersDAO {
         return response;
     }
     
-    public void logout(HttpServletRequest req) {
-        req.getSession().setAttribute("loginUser", null);
-        req.getSession().invalidate();
-    }
-    
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
