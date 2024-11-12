@@ -34,7 +34,6 @@ public class UsersDAO {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-
     public UsersDAO() {
         this.bcpe = new BCryptPasswordEncoder();
     }
@@ -47,6 +46,11 @@ public class UsersDAO {
         return usersRepo.existsByNickname(nickname) ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다.";
     }
 
+    public Users getLoginUserByEmail(String email) {
+        Optional<Users> userOptional = usersRepo.findByEmail(email);
+        return userOptional.orElse(null);
+    }
+  
     public String join(UserJoinReq req, MultipartFile photo) {
         String fileName = null;
         try {
@@ -74,7 +78,7 @@ public class UsersDAO {
             return "가입 성공";
 
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
             if (fileName != null) {
                 new File(usersImagesDirectory + "/" + fileName).delete();
             }
