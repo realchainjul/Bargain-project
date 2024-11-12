@@ -38,6 +38,7 @@ function Nav() {
     axios.post('https://api.bargainus.kr/logout', {}, { withCredentials: true })
       .then(() => {
         localStorage.removeItem('nickname');
+        localStorage.removeItem('token'); // 토큰 제거
         setIsLoggedIn(false);
         setNickname('');
         navigate('/');
@@ -45,27 +46,6 @@ function Nav() {
       .catch(error => {
         console.error("로그아웃 실패:", error);
       });
-  };
-
-  const handleLogin = async (email, password) => {
-    try {
-      const response = await axios.post('https://api.bargainus.kr/login', { email, password }, { withCredentials: true });
-
-      if (response.data.status) {
-        // 로그인 성공
-        setIsLoggedIn(true);
-        setNickname(response.data.nickname);
-        localStorage.setItem('nickname', response.data.nickname);
-        navigate('/home');
-      } else {
-        // 로그인 실패
-        alert(response.data.message);
-      }
-    } catch (error) {
-      // 서버 연결 오류 등 예외 처리
-      console.error("로그인 실패:", error);
-      alert('로그인 실패: 서버 오류');
-    }
   };
 
   return (

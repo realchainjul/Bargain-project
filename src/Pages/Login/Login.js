@@ -23,6 +23,8 @@ function Login() {
 
       if (response.data.status) {
         // 로그인 성공
+        localStorage.setItem('nickname', response.data.nickname); // 닉네임 로컬 스토리지에 저장
+        localStorage.setItem('token', response.data.token); // 토큰 로컬 스토리지에 저장
         navigate('/home');
       } else {
         // 로그인 실패 시 서버에서 전달한 메시지 사용
