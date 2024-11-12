@@ -3,6 +3,7 @@ package com.harvest.bagain.security;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -32,12 +36,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String token = authorizationHeader.split(" ")[1];
 
-        if (JwtTokenUtil.isExpired(token, secretKey)) {
+        if (jwtTokenUtil.isExpired(token, secretKey)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String email = JwtTokenUtil.getEmail(token, secretKey);
+        String email = jwtTokenUtil.getEmail(token, secretKey);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 email, null, List.of(new SimpleGrantedAuthority("USER")));
