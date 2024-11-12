@@ -10,13 +10,10 @@ function Nav() {
   const navigate = useNavigate();
   const [value, setValue] = useState('');
   const [nickname, setNickname] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // 페이지 로드 시 localStorage에서 nickname 확인
     const storedNickname = localStorage.getItem('nickname');
     if (storedNickname) {
-      setIsLoggedIn(true);
       setNickname(storedNickname);
     }
   }, []);
@@ -34,31 +31,24 @@ function Nav() {
   };
 
   const handleLogout = () => {
-    // 로그아웃 시 localStorage에서 nickname 제거
-    axios.post('https://api.bargainus.kr/logout', {}, { withCredentials: true })
-      .then(() => {
-        localStorage.removeItem('nickname');
-        localStorage.removeItem('token'); // 토큰 제거
-        setIsLoggedIn(false);
-        setNickname('');
-        navigate('/');
-      })
-      .catch(error => {
-        console.error("로그아웃 실패:", error);
-      });
+    localStorage.removeItem('token');
+    localStorage.removeItem('nickname');
+    delete axios.defaults.headers.common['Authorization'];
+    setNickname('');
+    navigate('/');
   };
 
   return (
     <header className={style.header}>
       <section className={style.service}>
-        {isLoggedIn ? (
+        {nickname ? (
           <>
             <span>{nickname}님</span>
             <button onClick={handleLogout} className={style.logoutButton}>로그아웃</button>
           </>
         ) : (
           <>
-            <Link to="/signup">회원가입</Link>
+            <Link to="/join">회원가입</Link>
             <Link to="/login">로그인</Link>
           </>
         )}

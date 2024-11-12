@@ -14,17 +14,13 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', null, {
-        params: {
-          email,
-          password,
-        },
-      });
-
+      const response = await axios.post('https://bargainus.kr/login', { email, password });
       if (response.data.status) {
-        // 로그인 성공
-        localStorage.setItem('nickname', response.data.nickname); // 닉네임 로컬 스토리지에 저장
-        localStorage.setItem('token', response.data.token); // 토큰 로컬 스토리지에 저장
+        // 로그인 성공 시 JWT 토큰 저장
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('nickname', response.data.nickname);
+        // axios의 기본 헤더에 토큰 설정
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
         navigate('/home');
       } else {
         // 로그인 실패 시 서버에서 전달한 메시지 사용
@@ -45,7 +41,7 @@ function Login() {
     },
     {
       name: '회원가입',
-      onClick: () => navigate('/signup'),
+      onClick: () => navigate('/join'),
     },
   ];
 
