@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,10 +59,12 @@ public class UsersController {
 
 	// 로그인
 	@PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestParam String email, @RequestParam String password) {
-        Map<String, Object> result = usersDAO.login(email, password);
-        return ResponseEntity.ok(result);
-    }
+	public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
+	    String email = credentials.get("email");
+	    String password = credentials.get("password");
+	    Map<String, Object> result = usersDAO.login(email, password);
+	    return ResponseEntity.ok(result);
+	}
 	
 	@PostMapping("/logout")
     public ResponseEntity<Map<String, Object>> logout() {
