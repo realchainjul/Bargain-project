@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.harvest.bagain.BagainFileNameGenerator;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Service
@@ -76,17 +77,24 @@ public class UsersDAO {
         }
     }
 
-    public Map<String, Object> login(String email, String password, HttpSession session) {
+    public Map<String, Object> login(String email, String password, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        session = request.getSession(true);
         Map<String, Object> response = new HashMap<>();
         try {
             Optional<Users> userOptional = usersRepo.findByEmail(email);
             if (userOptional.isPresent()) {
                 Users user = userOptional.get();
                 if (bcpe.matches(password, user.getPassword())) {
-                    // 세션에 사용자 ID와 닉네임만 저장
+                    // 세션에 사용자 이메일 저장
                     session.setAttribute("userEmail", user.getEmail());
+                    session.setAttribute("loginMember", user);
                     response.put("status", true);
                     response.put("message", "로그인 성공");
+                    response.put("sessionId", session.getId());
                     response.put("nickname", user.getNickname());
                 } else {
                     response.put("status", false);
@@ -104,7 +112,79 @@ public class UsersDAO {
         return response;
     }
 
+    
     public void logout(HttpSession session) {
         session.invalidate();
     }
+    
+    public Map<String, String> splitAddress(HttpSession session) {
+        Users loginMember = (Users) session.getAttribute("loginMember");
+        Map<String, String> addressMap = new HashMap<>();
+        if (loginMember != null && loginMember.getAddress() != null) {
+            String[] addr = loginMember.getAddress().split("!");
+            addressMap.put("postalCode", addr.length > 0 ? addr[0] : "");
+            addressMap.put("address", addr.length > 1 ? addr[1] : "");
+            addressMap.put("detailAddress", addr.length > 2 ? addr[2] : "");
+        } else {
+            addressMap.put("postalCode", "");
+            addressMap.put("address", "");
+            addressMap.put("detailAddress", "");
+        }
+        return addressMap;
+    }
+    
+    public Map<String, Object> update(UserJoinReq req, MultipartFile photo, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        Users loginMember = (Users) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            response.put("status", false);
+            response.put("message", "로그인이 필요합니다.");
+            return response;
+        }
+
+        String oldFile = loginMember.getPhoto();
+        String newFile = null;
+        try {
+            if (photo != null && !photo.isEmpty()) {
+                newFile = BagainFileNameGenerator.generate(photo);
+                photo.transferTo(new File(usersImagesDirectory + "/" + newFile));
+            } else {
+                newFile = oldFile;
+            }
+        } catch (Exception e) {
+            response.put("status", false);
+            response.put("message", "수정 실패(파일)");
+            return response;
+        }
+
+        try {
+            if (req.getPassword() != null && !req.getPassword().isEmpty()) {
+                loginMember.setPassword(bcpe.encode(req.getPassword()));
+            }
+            loginMember.setName(req.getName());
+            loginMember.setNickname(req.getNickname());
+            loginMember.setPhoneNumber(req.getPhoneNumber());
+            loginMember.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
+            loginMember.setPhoto(newFile);
+
+            usersRepo.save(loginMember);
+            session.setAttribute("loginMember", loginMember);
+
+            if (!newFile.equals(oldFile) && oldFile != null) {
+                new File(usersImagesDirectory + "/" + oldFile).delete();
+            }
+
+            response.put("status", true);
+            response.put("message", "수정 성공");
+            return response;
+        } catch (Exception e) {
+            if (newFile != null && !newFile.equals(oldFile)) {
+                new File(usersImagesDirectory + "/" + newFile).delete();
+            }
+            response.put("status", false);
+            response.put("message", "수정 실패(DB)");
+            return response;
+        }
+    }
+
 }
