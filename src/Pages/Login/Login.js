@@ -14,16 +14,17 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', {
-        email,
-        password,
+      const response = await axios.post('https://api.bargainus.kr/login', null, {
+        params: {
+          email,
+          password,
+        },
+        withCredentials: true,
       });
+
       if (response.data.status) {
-        // 토큰 저장 및 로그인 상태 전환
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('nickname', response.data.nickname);
         alert('로그인 성공!');
-        navigate('/'); // 메인 페이지로 이동
+        navigate('/');
       } else {
         setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
       }
@@ -31,19 +32,6 @@ function Login() {
       setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
     }
   };
-
-  const buttons = [
-    {
-      type: 'submit',
-      name: '로그인',
-      className: style.loginButton,
-      isBrown: true,
-    },
-    {
-      name: '회원가입',
-      onClick: () => navigate('/signup'),
-    },
-  ];
 
   return (
     <section className={style.login}>
@@ -68,9 +56,16 @@ function Login() {
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
-            {buttons.map((buttonProps, index) => (
-              <Button key={index} {...buttonProps} />
-            ))}
+            <Button
+              type="submit"
+              name="로그인"
+              className={style.loginButton}
+              isBrown={true}
+            />
+            <Button
+              name="회원가입"
+              onClick={() => navigate('/signup')}
+            />
           </section>
         </form>
       </section>

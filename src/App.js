@@ -7,7 +7,7 @@ import Login from './Pages/Login/Login';
 import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 function App() {
@@ -15,20 +15,33 @@ function App() {
   const [nickname, setNickname] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedNickname = localStorage.getItem('nickname');
-    if (token && savedNickname) {
-      setIsLoggedIn(true);
-      setNickname(savedNickname);
-    }
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200) {
+          setIsLoggedIn(true);
+          setNickname(response.data.nickname);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+        setNickname('');
+      }
+    };
+
+    fetchUserInfo();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('nickname');
-    setIsLoggedIn(false);
-    setNickname('');
-    alert('로그아웃 되었습니다.');
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post('https://api.bargainus.kr/logout', null, { withCredentials: true });
+      if (response.status === 200) {
+        setIsLoggedIn(false);
+        setNickname('');
+        alert('로그아웃 되었습니다.');
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
   return (

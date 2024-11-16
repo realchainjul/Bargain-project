@@ -1,29 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BsCart2, BsFillPersonFill } from "react-icons/bs";
-import { VscHeart } from "react-icons/vsc";
+import { BsCart2, BsFillPersonFill } from 'react-icons/bs';
+import { VscHeart } from 'react-icons/vsc';
 import { BiSearch } from 'react-icons/bi';
+import axios from 'axios';
 import style from '../Nav/Navbar.module.scss';
 
+function Nav() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
-function Nav({ isLoggedIn, nickname, onLogout }) {
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200) {
+          setIsLoggedIn(true);
+          setNickname(response.data.nickname);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+        setNickname('');
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post('https://api.bargainus.kr/logout', null, { withCredentials: true });
+      if (response.status === 200) {
+        setIsLoggedIn(false);
+        setNickname('');
+        alert('로그아웃 되었습니다.');
+      }
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    if (searchValue.trim()) {
+      window.location.href = `/search/${searchValue}`;
+      setSearchValue('');
+    }
+  };
+
   const handleRestrictedClick = (event) => {
     event.preventDefault();
     alert('로그인 후 이용 가능합니다.');
-  };
-
-  const [value, setValue] = React.useState('');
-
-  const handleChange = (event) => {
-    setValue(event.target.value);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (value.trim()) {
-      window.location.href = `/search/${value}`;
-      setValue('');
-    }
   };
 
   return (
@@ -32,7 +64,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
         {isLoggedIn ? (
           <>
             <span>{nickname}님 환영합니다!</span>
-            <button onClick={onLogout} className={style.logoutButton}>
+            <button onClick={handleLogout} className={style.logoutButton}>
               로그아웃
             </button>
           </>
@@ -50,14 +82,14 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
             <h1 className={style.title}>Bargain</h1>
           </Link>
           <div className={style.inputWrap}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSearchSubmit}>
               <input
                 id="search-input"
                 className={style.searchInput}
                 type="text"
-                value={value}
+                value={searchValue}
                 placeholder="검색어를 입력해 주세요"
-                onChange={handleChange}
+                onChange={handleSearchChange}
               />
               <button className={style.searchBtn} type="submit" aria-label="search">
                 <BiSearch size="24" color="#a99773" />
@@ -67,13 +99,13 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
           <div className={style.links}>
             {isLoggedIn ? (
               <>
-                <Link to="/Like/likepage" className={style.like}>
+                <Link to="/mypage/like" className={style.like}>
                   <VscHeart size="30" title="찜목록" />
                 </Link>
-                <Link to="/Cart/cartpage" className={style.cart}>
+                <Link to="/mypage/cart" className={style.cart}>
                   <BsCart2 size="30" title="장바구니" />
                 </Link>
-                <Link to="/Mypage/mypage">
+                <Link to="/mypage/order">
                   <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
                 </Link>
               </>
