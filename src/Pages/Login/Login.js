@@ -14,7 +14,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://bargainus.kr/login', null, {
+      const response = await axios.post('https://api.bargainus.kr/login', null, {
         params: {
           email,
           password,
@@ -36,7 +36,7 @@ function Login() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('https://bargainus.kr/logout', null, {
+      const response = await axios.post('https://api.bargainus.kr/logout', null, {
         withCredentials: true, // 세션 쿠키를 사용하기 위해 설정
       });
       if (response.data.status) {

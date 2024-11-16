@@ -16,7 +16,7 @@ function Nav() {
     // 로그인 상태 확인
     const checkLoginStatus = async () => {
       try {
-        const response = await axios.get('https://bargainus.kr/info', {
+        const response = await axios.get('https://api.bargainus.kr/info', {
           withCredentials: true,
         });
         if (response.status === 200) {
@@ -44,7 +44,7 @@ function Nav() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('https://bargainus.kr/logout', null, {
+      const response = await axios.post('https://api.bargainus.kr/logout', null, {
         withCredentials: true,
       });
       if (response.data.status) {
