@@ -14,7 +14,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [nickname, setNickname] = useState('');
 
-  // 세션 정보를 확인하여 로그인 상태 설정
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -30,7 +29,7 @@ function App() {
       }
     };
     fetchUserInfo();
-  }, [isLoggedIn]);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -66,7 +65,7 @@ function App() {
         <Route
           path="/cartpage"
           element={isLoggedIn ? <div>장바구니 준비 중</div> : <Navigate to="/login" />}
-        /> 
+        />
       </Routes>
       <Footer />
     </BrowserRouter>

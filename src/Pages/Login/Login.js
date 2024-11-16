@@ -14,19 +14,21 @@ function Login({ setIsLoggedIn, setNickname }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', { email, password }, { withCredentials: true });
+      const response = await axios.post('https://api.bargainus.kr/login', null, {
+        params: { email, password },
+        withCredentials: true,
+      });
+
       if (response.data.status) {
         alert('로그인 성공!');
-        // /info 호출하여 사용자 상태를 즉시 업데이트
-        const userInfoResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
         setIsLoggedIn(true);
-        setNickname(userInfoResponse.data.nickname);
+        setNickname(response.data.nickname);
         navigate('/');
       } else {
-        setErrorMessage('로그인 실패: ' + response.data.message);
+        setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
       }
     } catch (error) {
-      setErrorMessage('서버 오류 발생');
+      setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
     }
   };
 
@@ -53,7 +55,7 @@ function Login({ setIsLoggedIn, setNickname }) {
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
-            <Button name="로그인" type="submit" isBrown={true} />
+            <Button type="submit" name="로그인" isBrown={true} />
             <Button name="회원가입" onClick={() => navigate('/signup')} />
           </section>
         </form>
@@ -63,4 +65,3 @@ function Login({ setIsLoggedIn, setNickname }) {
 }
 
 export default Login;
-

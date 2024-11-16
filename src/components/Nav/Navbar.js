@@ -1,46 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { BsCart2, BsFillPersonFill } from 'react-icons/bs';
 import { VscHeart } from 'react-icons/vsc';
 import { BiSearch } from 'react-icons/bi';
-import axios from 'axios';
 import style from '../Nav/Navbar.module.scss';
 
-function Nav() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [nickname, setNickname] = useState('');
-  const [searchValue, setSearchValue] = useState('');
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
-        if (response.status === 200) {
-          setIsLoggedIn(true);
-          setNickname(response.data.nickname);
-        }
-      } catch (error) {
-        console.error('로그인 상태 확인 실패:', error);
-        setIsLoggedIn(false);
-        setNickname('');
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post('https://api.bargainus.kr/logout', null, { withCredentials: true });
-      if (response.status === 200) {
-        setIsLoggedIn(false);
-        setNickname('');
-        alert('로그아웃 되었습니다.');
-      }
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-    }
-  };
+function Nav({ isLoggedIn, nickname, onLogout }) {
+  const [searchValue, setSearchValue] = React.useState('');
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -65,7 +31,7 @@ function Nav() {
         {isLoggedIn ? (
           <>
             <span>{nickname}님 환영합니다!</span>
-            <button onClick={handleLogout} className={style.logoutButton}>
+            <button onClick={onLogout} className={style.logoutButton}>
               로그아웃
             </button>
           </>
