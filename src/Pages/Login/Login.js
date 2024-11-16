@@ -14,21 +14,37 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://bargainus.kr/login', { email, password });
+      const response = await axios.post('https://bargainus.kr/login', null, {
+        params: {
+          email,
+          password,
+        },
+        withCredentials: true, // 세션 쿠키를 받기 위해 설정
+      });
+      
       if (response.data.status) {
-        // 로그인 성공 시 JWT 토큰 저장
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('nickname', response.data.nickname);
-        // axios의 기본 헤더에 토큰 설정
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        navigate('/home');
+        // 로그인 성공 시
+        navigate('/home'); // 메인 화면으로 이동
       } else {
-        // 로그인 실패 시 서버에서 전달한 메시지 사용
-        setErrorMessage(response.data.message);
+        // 로그인 실패 시 오류 메시지 설정
+        setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
       }
     } catch (error) {
-      // 서버 연결 오류 등 예외 처리
-      setErrorMessage('로그인 실패: 서버 오류');
+      setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post('https://bargainus.kr/logout', null, {
+        withCredentials: true, // 세션 쿠키를 사용하기 위해 설정
+      });
+      if (response.data.status) {
+        // 로그아웃 성공 시 로그인 페이지로 이동
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생', error);
     }
   };
 
@@ -41,7 +57,7 @@ function Login() {
     },
     {
       name: '회원가입',
-      onClick: () => navigate('/join'),
+      onClick: () => navigate('/signup'),
     },
   ];
 
