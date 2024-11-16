@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BsCart2, BsFillPersonFill } from "react-icons/bs";
 import { VscHeart } from "react-icons/vsc";
 import { BiSearch } from 'react-icons/bi';
 import style from '../Nav/Navbar.module.scss';
 
+
 function Nav({ isLoggedIn, nickname, onLogout }) {
+  useEffect(() => {
+    console.log('isLoggedIn:', isLoggedIn);
+    console.log('nickname:', nickname);
+  }, [isLoggedIn, nickname]); // Prop 변화 감지
+
   const [value, setValue] = React.useState('');
 
   const handleChange = (event) => {

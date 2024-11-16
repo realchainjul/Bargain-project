@@ -19,23 +19,29 @@ function App() {
   const Placeholder = ({ message }) => <div>{message}</div>;
 
   useEffect(() => {
-    // 로그인 상태 확인
-    const checkLoginStatus = async () => {
-      try {
-        const response = await axios.get('https://api.bargainus.kr/info', {
-          withCredentials: true,
-        });
-        if (response.status === 200 && response.data.status) {
-          setIsLoggedIn(true);
-          setNickname(response.data.nickname);
-        }
-      } catch (error) {
+    console.log('isLoggedIn:', isLoggedIn);
+    console.log('nickname:', nickname);
+  }, [isLoggedIn, nickname]); // 상태 변화 감지
+
+ useEffect(() => {
+  const checkLoginStatus = async () => {
+    try {
+      const response = await axios.get('https://api.bargainus.kr/info', {
+        withCredentials: true,
+      });
+      if (response.status === 200 && response.data.status) {
+        setIsLoggedIn(true);
+        setNickname(response.data.nickname);
+      } else {
         setIsLoggedIn(false);
       }
-    };
+    } catch (error) {
+      setIsLoggedIn(false);
+    }
+  };
 
-    checkLoginStatus();
-  }, []);
+  checkLoginStatus();
+}, []);
 
   const handleLogout = async () => {
     try {
