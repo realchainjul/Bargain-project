@@ -139,10 +139,31 @@ export default function Signup() {
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
 
-    if (!(isConfirmEmail && isConfirmNickname && isConfirmPassword && isConfirmCheckPassword)) {
-      alert('필수 사항을 조건에 맞게 모두 입력해주세요.');
-      return;
-    }
+    // 입력 필드 유효성 검사
+  if (!inputs.email || !isConfirmEmail) {
+    alert('이메일 중복 확인을 완료해주세요.');
+    return;
+  }
+
+  if (!inputs.nickname || !isConfirmNickname) {
+    alert('닉네임 중복 확인을 완료해주세요.');
+    return;
+  }
+
+  if (!inputs.pw || !isConfirmPassword) {
+    alert('비밀번호는 8자 이상이어야 합니다.');
+    return;
+  }
+
+  if (!inputs.checkPassword || !isConfirmCheckPassword) {
+    alert('비밀번호가 일치하지 않습니다.');
+    return;
+  }
+
+  if (!inputs.name || !inputs.phoneNumber || !inputs.postalCode || !inputs.address) {
+    alert('모든 필수 입력 사항을 입력해주세요.');
+    return;
+  }
 
     try {
       const formData = new FormData();

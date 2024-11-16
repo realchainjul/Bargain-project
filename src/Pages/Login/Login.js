@@ -24,7 +24,7 @@ function Login() {
       
       if (response.data.status) {
         // 로그인 성공 시
-        navigate('/home'); // 메인 화면으로 이동
+        navigate('/'); // 메인 화면으로 이동
       } else {
         // 로그인 실패 시 오류 메시지 설정
         setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
