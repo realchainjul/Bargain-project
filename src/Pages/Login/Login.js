@@ -4,7 +4,7 @@ import axios from 'axios';
 import Button from '../../components/common/Button';
 import style from './Login.module.scss';
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,15 +15,13 @@ function Login() {
 
     try {
       const response = await axios.post('https://api.bargainus.kr/login', null, {
-        params: {
-          email,
-          password,
-        },
+        params: { email, password },
         withCredentials: true,
       });
 
-      if (response.data.status) {
+      if (response.data.status && response.data.nickname) {
         alert('로그인 성공!');
+        onLoginSuccess(response.data.nickname); // App에 닉네임 전달
         navigate('/');
       } else {
         setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
@@ -56,16 +54,8 @@ function Login() {
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
-            <Button
-              type="submit"
-              name="로그인"
-              className={style.loginButton}
-              isBrown={true}
-            />
-            <Button
-              name="회원가입"
-              onClick={() => navigate('/signup')}
-            />
+            <Button type="submit" name="로그인" isBrown={true} />
+            <Button name="회원가입" onClick={() => navigate('/signup')} />
           </section>
         </form>
       </section>

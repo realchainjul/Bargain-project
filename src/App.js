@@ -7,34 +7,35 @@ import Login from './Pages/Login/Login';
 import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [nickname, setNickname] = useState('');
 
+  // 세션 정보를 확인하여 로그인 상태 설정
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.nickname) {
           setIsLoggedIn(true);
           setNickname(response.data.nickname);
         }
       } catch (error) {
+        console.error('로그인 상태 확인 실패:', error);
         setIsLoggedIn(false);
         setNickname('');
       }
     };
-
     fetchUserInfo();
-  }, []);
+  }, [isLoggedIn]);
 
   const handleLogout = async () => {
     try {
       const response = await axios.post('https://api.bargainus.kr/logout', null, { withCredentials: true });
-      if (response.status === 200) {
+      if (response.data.status) {
         setIsLoggedIn(false);
         setNickname('');
         alert('로그아웃 되었습니다.');
@@ -49,7 +50,7 @@ function App() {
       <Nav isLoggedIn={isLoggedIn} nickname={nickname} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onLoginSuccess={setIsLoggedIn} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
@@ -65,7 +66,7 @@ function App() {
         <Route
           path="/cartpage"
           element={isLoggedIn ? <div>장바구니 준비 중</div> : <Navigate to="/login" />}
-        />
+        /> 
       </Routes>
       <Footer />
     </BrowserRouter>

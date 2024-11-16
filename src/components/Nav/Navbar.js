@@ -20,6 +20,7 @@ function Nav() {
           setNickname(response.data.nickname);
         }
       } catch (error) {
+        console.error('로그인 상태 확인 실패:', error);
         setIsLoggedIn(false);
         setNickname('');
       }
