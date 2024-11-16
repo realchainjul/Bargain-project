@@ -20,16 +20,25 @@ function Nav() {
         });
         if (response.status === 200 && response.data.status) {
           setIsLoggedIn(true);
-          setNickname(response.data.nickname); // 서버에서 닉네임 반환
+          setNickname(response.data.nickname || response.data.email); // 서버에서 반환하는 필드 확인
         } else {
           setIsLoggedIn(false);
         }
       } catch (error) {
+        console.error('로그인 상태 확인 오류:', error);
         setIsLoggedIn(false);
       }
     };
+  
     checkLoginStatus();
   }, []);
+  
+  // 디버깅 로그 추가
+  useEffect(() => {
+    console.log('isLoggedIn:', isLoggedIn);
+    console.log('nickname:', nickname);
+  }, [isLoggedIn, nickname]);
+  
   
   const handleChange = (event) => {
     setValue(event.target.value);
