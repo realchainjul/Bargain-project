@@ -17,7 +17,8 @@ function Login() {
       const response = await axios.post('https://api.bargainus.kr/login', {
         email,
         password,
-      });catch (error) {
+      });
+    }catch (error) {
         console.error('Error:', error.response?.data || error.message);
       }
       if (response.data.status) {
