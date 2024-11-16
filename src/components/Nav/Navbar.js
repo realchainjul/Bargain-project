@@ -13,15 +13,16 @@ function Nav() {
   const [nickname, setNickname] = useState('');
 
   useEffect(() => {
-    // 로그인 상태 확인
     const checkLoginStatus = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/info', {
           withCredentials: true,
         });
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.status) {
           setIsLoggedIn(true);
-          setNickname(response.data.email); // 서버에서 닉네임이 아닌 이메일을 반환하는 경우
+          setNickname(response.data.nickname); // 서버에서 닉네임 반환
+        } else {
+          setIsLoggedIn(false);
         }
       } catch (error) {
         setIsLoggedIn(false);
@@ -29,7 +30,7 @@ function Nav() {
     };
     checkLoginStatus();
   }, []);
-
+  
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -62,20 +63,21 @@ function Nav() {
   return (
     <header className={style.header}>
       <section className={style.service}>
-        {isLoggedIn ? (
-          <>
-            <span>{nickname}님 환영합니다!</span>
-            <button onClick={handleLogout} className={style.logoutButton}>
-              로그아웃
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/signup">회원가입</Link>
-            <Link to="/login">로그인</Link>
-          </>
-        )}
-      </section>
+  {isLoggedIn ? (
+    <>
+      <span>{nickname}님 환영합니다!</span>
+      <button onClick={handleLogout} className={style.logoutButton}>
+        로그아웃
+      </button>
+    </>
+  ) : (
+    <>
+      <Link to="/signup">회원가입</Link>
+      <Link to="/login">로그인</Link>
+    </>
+  )}
+</section>
+
       <div className={style.navbar}>
         <div className={style.search}>
           <Link to="/" className={style.logoLink}>
