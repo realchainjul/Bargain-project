@@ -30,7 +30,8 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
       <section className={style.service}>
         {isLoggedIn ? (
           <>
-            <span>{nickname}님 환영합니다!</span>
+            <span className={style.welcomeText}>{nickname}님 환영합니다!</span>
+            <span className={style.separator}>|</span>
             <button onClick={onLogout} className={style.logoutButton}>
               로그아웃
             </button>
