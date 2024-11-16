@@ -232,6 +232,37 @@ export default function Signup() {
         {nicknameError && <p className={style.error}>{nicknameError}</p>}
 
         <InfoList
+          label={'비밀번호'}
+          input={{
+            name: 'pw',
+            value: inputs.pw,
+            type: 'password',
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '비밀번호를 입력해 주세요',
+            checkInput: {
+              isConfirm: isConfirmPassword,
+              errorMessage: '비밀번호는 8자 이상이어야 합니다.',
+            },
+          }}
+        />
+
+        <InfoList
+          label={'비밀번호 확인'}
+          input={{
+            name: 'checkPassword',
+            value: inputs.checkPassword,
+            type: 'password',
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '비밀번호를 다시 입력해 주세요',
+            checkInput: {
+              isConfirm: isConfirmCheckPassword,
+              errorMessage: '비밀번호가 일치하지 않습니다.',
+            },
+          }}
+        />
+        <InfoList
           label={'이름'}
           input={{
             name: 'name',
