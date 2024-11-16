@@ -4,7 +4,7 @@ import axios from 'axios';
 import Button from '../../components/common/Button';
 import style from './Login.module.scss';
 
-function Login({ onLoginSuccess }) {
+function Login({ setIsLoggedIn, setNickname }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,20 +14,19 @@ function Login({ onLoginSuccess }) {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', null, {
-        params: { email, password },
-        withCredentials: true,
-      });
-
-      if (response.data.status && response.data.nickname) {
+      const response = await axios.post('https://api.bargainus.kr/login', { email, password }, { withCredentials: true });
+      if (response.data.status) {
         alert('로그인 성공!');
-        onLoginSuccess(response.data.nickname); // App에 닉네임 전달
+        // /info 호출하여 사용자 상태를 즉시 업데이트
+        const userInfoResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        setIsLoggedIn(true);
+        setNickname(userInfoResponse.data.nickname);
         navigate('/');
       } else {
-        setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
+        setErrorMessage('로그인 실패: ' + response.data.message);
       }
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
+      setErrorMessage('서버 오류 발생');
     }
   };
 
@@ -54,7 +53,7 @@ function Login({ onLoginSuccess }) {
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
-            <Button type="submit" name="로그인" isBrown={true} />
+            <Button name="로그인" type="submit" isBrown={true} />
             <Button name="회원가입" onClick={() => navigate('/signup')} />
           </section>
         </form>
@@ -64,3 +63,4 @@ function Login({ onLoginSuccess }) {
 }
 
 export default Login;
+

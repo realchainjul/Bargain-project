@@ -50,7 +50,7 @@ function App() {
       <Nav isLoggedIn={isLoggedIn} nickname={nickname} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login onLoginSuccess={setIsLoggedIn} />} />
+        <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setNickname={setNickname} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
