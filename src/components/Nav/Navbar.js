@@ -20,6 +20,11 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
     }
   };
 
+  const handleRestrictedClick = (event) => {
+    event.preventDefault();
+    alert('로그인 후 이용 가능합니다.');
+  };
+
   return (
     <header className={style.header}>
       <section className={style.service}>
@@ -59,7 +64,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
             </form>
           </div>
           <div className={style.links}>
-            {isLoggedIn && (
+            {isLoggedIn ? (
               <>
                 <Link to="/mypage/like" className={style.like}>
                   <VscHeart size="30" title="찜목록" />
@@ -71,10 +76,35 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
                   <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
                 </Link>
               </>
+            ) : (
+              <>
+                <a href="#" onClick={handleRestrictedClick} className={style.like}>
+                  <VscHeart size="30" title="찜목록" />
+                </a>
+                <a href="#" onClick={handleRestrictedClick} className={style.cart}>
+                  <BsCart2 size="30" title="장바구니" />
+                </a>
+                <a href="#" onClick={handleRestrictedClick}>
+                  <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
+                </a>
+              </>
             )}
           </div>
         </div>
       </div>
+      <nav>
+        <ul className={style.categories}>
+          <li>
+            <Link to="/category/fruits">과일</Link>
+          </li>
+          <li>
+            <Link to="/category/vegetable">채소</Link>
+          </li>
+          <li>
+            <Link to="/category/grain">곡물</Link>
+          </li>
+        </ul>
+      </nav>
     </header>
   );
 }

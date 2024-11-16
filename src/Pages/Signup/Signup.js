@@ -284,8 +284,7 @@ export default function Signup() {
             </figure>
           </article>
         </section>
-
-        <Button name="가입하기" form="signup" type="submit" isPurple={true} width="100%" />
+        <Button name="가입하기" form="signup" type="submit" isBrown={true}/>
       </form>
     </div>
   );

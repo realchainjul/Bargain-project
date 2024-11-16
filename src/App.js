@@ -7,7 +7,7 @@ import Login from './Pages/Login/Login';
 import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
-import MyPage from './Pages/MyPage/MyPage';
+import MyPage from './Pages/Mypage/Mypage';
 import LikePage from './Pages/Like/LikePage';
 import CartPage from './Pages/Cart/CartPage';
 import { useState, useEffect } from 'react';
@@ -16,6 +16,7 @@ import axios from 'axios';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [nickname, setNickname] = useState('');
+  const Placeholder = ({ message }) => <div>{message}</div>;
 
   useEffect(() => {
     // 로그인 상태 확인
@@ -64,15 +65,15 @@ function App() {
         {/* 로그인한 사용자만 접근 가능한 페이지 */}
         <Route
           path="/mypage"
-          element={isLoggedIn ? <MyPage /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <Placeholder message="마이페이지가 준비 중입니다." /> : <Navigate to="/login" />}
         />
         <Route
-          path="/mypage/like"
-          element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}
+         path="/mypage/like"
+          element={isLoggedIn ? <Placeholder message="찜목록 페이지 준비 중입니다." /> : <Navigate to="/login" />}
         />
         <Route
           path="/mypage/cart"
-          element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <Placeholder message="장바구니 페이지 준비 중입니다." /> : <Navigate to="/login" />}
         />
       </Routes>
       <Footer />
