@@ -1,6 +1,6 @@
 import { InfoList } from '../../components/Signup/infoList';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom/dist';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import style from './Signup.module.scss';
 import axios from 'axios';
@@ -15,54 +15,49 @@ export default function Signup() {
     name: '',
     nickname: '',
     phoneNumber: '',
-    postalCode: '', // 우편번호
-    address: '', // 기본 주소
-    detailAddress: '', // 상세 주소
-    checkPassword: '' // 비밀번호 확인 추가
+    postalCode: '',
+    address: '',
+    detailAddress: '',
+    checkPassword: '',
   });
 
   const [profileImg, setProfileImg] = useState(null);
-  const [isConfirmEmail, setIsConfirmEmail] = useState(true);
+  const [isConfirmEmail, setIsConfirmEmail] = useState(false);
+  const [isConfirmNickname, setIsConfirmNickname] = useState(false);
   const [isConfirmPassword, setIsConfirmPassword] = useState(false);
   const [isConfirmCheckPassword, setIsConfirmCheckPassword] = useState(false);
 
-  const { email, pw, name, nickname, phoneNumber, postalCode, address, detailAddress, checkPassword } = inputs;
+  const [emailError, setEmailError] = useState('');
+  const [nicknameError, setNicknameError] = useState('');
 
   const handleChangeInfoInputs = (event) => {
-    const { value, name } = event.target;
+    const { name, value } = event.target;
+
+    if (name === 'email') {
+      setIsConfirmEmail(false);
+      setEmailError('');
+    } else if (name === 'nickname') {
+      setIsConfirmNickname(false);
+      setNicknameError('');
+    }
+
     setInputs((prevInputs) => ({
       ...prevInputs,
       [name]: value,
     }));
 
-    // 비밀번호 유효성 및 비밀번호 확인 유효성 확인 업데이트
     if (name === 'pw') {
-      setIsConfirmPassword(value.length >= 8); // 비밀번호 8자 이상 확인
-      setIsConfirmCheckPassword(value === inputs.checkPassword); // 비밀번호 확인 일치 여부 확인
+      setIsConfirmPassword(value.length >= 8);
+      setIsConfirmCheckPassword(value === inputs.checkPassword);
     } else if (name === 'checkPassword') {
-      setIsConfirmCheckPassword(inputs.pw === value); // 비밀번호와 확인값 일치 여부
+      setIsConfirmCheckPassword(inputs.pw === value);
     }
-  };
-
-  const handleAddressSearch = () => {
-    new window.daum.Postcode({
-      oncomplete: function (data) {
-        setInputs((prevInputs) => ({
-          ...prevInputs,
-          postalCode: data.zonecode, // 우편번호 저장
-          address: data.address, // 기본 주소 저장
-        }));
-      },
-    }).open();
   };
 
   const handleChangeProfileImg = (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-
       if (!isCheckProfileSize(file.size)) return;
-
-      // 파일 객체를 profileImg 상태에 그대로 저장
       setProfileImg(file);
     }
   };
@@ -75,79 +70,105 @@ export default function Signup() {
     return true;
   };
 
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        setInputs((prevInputs) => ({
+          ...prevInputs,
+          postalCode: data.zonecode,
+          address: data.address,
+        }));
+      },
+    }).open();
+  };
+
+  const handleCheckEmail = async () => {
+    if (!inputs.email) {
+      setEmailError('이메일을 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.get('https://api.bargainus.kr/check-email', {
+        params: { email: inputs.email },
+      });
+
+      if (response.data === '사용 가능한 이메일입니다.') {
+        setIsConfirmEmail(true);
+        setEmailError('사용 가능한 이메일입니다.');
+      } else if (response.data === '중복된 이메일입니다.') {
+        setIsConfirmEmail(false);
+        setEmailError('중복된 이메일입니다.');
+      } else {
+        setIsConfirmEmail(false);
+        setEmailError('이메일 확인 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      setIsConfirmEmail(false);
+      setEmailError('서버 연결에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleCheckNickname = async () => {
+    if (!inputs.nickname) {
+      setNicknameError('닉네임을 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.get('https://api.bargainus.kr/check-nickname', {
+        params: { nickname: inputs.nickname },
+      });
+
+      if (response.data === '사용 가능한 닉네임입니다.') {
+        setIsConfirmNickname(true);
+        setNicknameError('사용 가능한 닉네임입니다.');
+      } else if (response.data === '중복된 닉네임입니다.') {
+        setIsConfirmNickname(false);
+        setNicknameError('중복된 닉네임입니다.');
+      } else {
+        setIsConfirmNickname(false);
+        setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      setIsConfirmNickname(false);
+      setNicknameError('서버 연결에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
-  
-    // 유효성 검사
-    if (!(isConfirmEmail && isConfirmPassword && isConfirmCheckPassword)) {
+
+    if (!(isConfirmEmail && isConfirmNickname && isConfirmPassword && isConfirmCheckPassword)) {
       alert('필수 사항을 조건에 맞게 모두 입력해주세요.');
       return;
     }
-  
+
     try {
-      // 이메일 중복 확인
-      const emailCheckResponse = await fetch(`https://api.bargainus.kr/check-email?email=${inputs.email}`, {
-        method: "GET",
-      });
-      const emailCheckResult = await emailCheckResponse.text();
-      if (emailCheckResult === "중복된 이메일입니다.") {
-        alert(emailCheckResult);
-        return; // 중복된 이메일이면 회원가입 진행하지 않음
-      }
-  
-      // 닉네임 중복 확인
-      const nicknameCheckResponse = await fetch(`https://api.bargainus.kr/check-nickname?nickname=${inputs.nickname}`, {
-        method: "GET",
-      });
-      const nicknameCheckResult = await nicknameCheckResponse.text();
-      if (nicknameCheckResult === "중복된 닉네임입니다.") {
-        alert(nicknameCheckResult);
-        return; // 중복된 닉네임이면 회원가입 진행하지 않음
-      }
-  
-      // FormData 생성
       const formData = new FormData();
-      formData.append("email", inputs.email);
-      formData.append("password", inputs.pw);
-      formData.append("name", inputs.name);
-      formData.append("nickname", inputs.nickname);
-      formData.append("phoneNumber", inputs.phoneNumber);
-      formData.append("postalCode", inputs.postalCode);
-      formData.append("address", inputs.address);
-      formData.append("detailAddress", inputs.detailAddress);
-  
+      formData.append('email', inputs.email);
+      formData.append('password', inputs.pw);
+      formData.append('name', inputs.name);
+      formData.append('nickname', inputs.nickname);
+      formData.append('phoneNumber', inputs.phoneNumber);
+      formData.append('postalCode', inputs.postalCode);
+      formData.append('address', inputs.address);
+      formData.append('detailAddress', inputs.detailAddress);
+
       if (profileImg) {
-        formData.append("photo", profileImg); // 파일 객체로 추가
+        formData.append('photo', profileImg);
       }
-  
-      // 회원가입 요청 보내기
-      const response = await fetch("https://api.bargainus.kr/join", {
-        method: "POST",
-        body: formData,
-      });
-  
-      // Content-Type 확인 후 응답 처리
-      const contentType = response.headers.get("content-type");
-      let result;
-      if (contentType && contentType.includes("application/json")) {
-        result = await response.json();
+
+      const response = await axios.post('https://api.bargainus.kr/join', formData);
+
+      if (response.data === '회원가입 성공') {
+        alert('회원가입이 완료되었습니다.');
+        navigate('/login');
       } else {
-        result = await response.text();
-      }
-  
-      if (response.ok) {
-        if (result.status === "success") {
-          alert(result.message || result); // 성공 메시지 표시
-          navigate("/login"); // 성공 시 로그인 페이지로 이동
-        } else {
-          alert(result.message || result); // 실패 메시지 표시
-        }
-      } else {
-        alert(result.message || result); // 실패 메시지 표시
+        alert(response.data);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("회원가입 중 오류가 발생했습니다.");
+      alert('회원가입 중 오류가 발생했습니다.');
     }
   };
 
@@ -161,91 +182,61 @@ export default function Signup() {
           label={'이메일'}
           input={{
             name: 'email',
-            value: email,
+            value: inputs.email,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '이메일을 입력해 주세요',
           }}
           button={{
             name: '중복 확인',
-            onClick: (e) => {
-              e.preventDefault();
-            },
+            onClick: handleCheckEmail,
           }}
         />
-        <InfoList
-          label={'비밀번호'}
-          input={{
-            name: 'pw',
-            value: pw,
-            type: 'password',
-            required: true,
-            onChange: handleChangeInfoInputs,
-            placeholder: '비밀번호를 입력해 주세요',
-            checkInput: {
-              isConfirm: isConfirmPassword,
-              errorMessage: '비밀번호는 8자 이상이어야 합니다.',
-            },
-          }}
-        />
-        <InfoList
-          label={'비밀번호 확인'}
-          input={{
-            name: 'checkPassword',
-            value: checkPassword,
-            type: 'password',
-            required: true,
-            onChange: handleChangeInfoInputs,
-            placeholder: '비밀번호를 다시 입력해 주세요',
-            checkInput: {
-              isConfirm: isConfirmCheckPassword,
-              errorMessage: ' 비밀번호가 일치하지 않습니다.',
-            },
-          }}
-        />
-        <InfoList
-          label={'이름'}
-          input={{
-            name: 'name',
-            value: name,
-            required: true,
-            onChange: handleChangeInfoInputs,
-            placeholder: '이름을 입력해 주세요',
-          }}
-        />
+        {emailError && <p className={style.error}>{emailError}</p>}
+
         <InfoList
           label={'닉네임'}
           input={{
             name: 'nickname',
-            value: nickname,
+            value: inputs.nickname,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '닉네임을 입력해 주세요',
           }}
           button={{
             name: '중복 확인',
-            onClick: (e) => {
-              e.preventDefault();
-            },
+            onClick: handleCheckNickname,
           }}
         />
+        {nicknameError && <p className={style.error}>{nicknameError}</p>}
+
+        <InfoList
+          label={'이름'}
+          input={{
+            name: 'name',
+            value: inputs.name,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '이름을 입력해 주세요',
+          }}
+        />
+
         <InfoList
           label={'전화번호'}
           input={{
             name: 'phoneNumber',
-            value: phoneNumber,
+            value: inputs.phoneNumber,
             required: true,
             onChange: handleChangeInfoInputs,
             placeholder: '전화번호를 입력해 주세요',
           }}
         />
 
-        {/* 주소 검색 필드 */}
         <InfoList
           label={'우편번호'}
           input={{
             name: 'postalCode',
-            value: postalCode,
+            value: inputs.postalCode,
             required: true,
             readOnly: true,
             placeholder: '우편번호를 입력해 주세요',
@@ -258,21 +249,23 @@ export default function Signup() {
             },
           }}
         />
+
         <InfoList
           label={'주소'}
           input={{
             name: 'address',
-            value: address,
+            value: inputs.address,
             required: true,
             readOnly: true,
             placeholder: '기본 주소를 입력해 주세요',
           }}
         />
+
         <InfoList
           label={'상세주소'}
           input={{
             name: 'detailAddress',
-            value: detailAddress,
+            value: inputs.detailAddress,
             onChange: handleChangeInfoInputs,
             placeholder: '상세 주소를 입력해 주세요',
           }}
@@ -291,9 +284,8 @@ export default function Signup() {
             </figure>
           </article>
         </section>
-        <section className={style.btn}>
-          <Button name="가입하기" form="signup" type="submit" isPurple={true} width="100%" />
-        </section>
+
+        <Button name="가입하기" form="signup" type="submit" isPurple={true} width="100%" />
       </form>
     </div>
   );
