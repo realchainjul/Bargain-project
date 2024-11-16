@@ -7,80 +7,51 @@ import Login from './Pages/Login/Login';
 import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
-import MyPage from './Pages/Mypage/Mypage';
-import LikePage from './Pages/Like/LikePage';
-import CartPage from './Pages/Cart/CartPage';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [nickname, setNickname] = useState('');
-  const Placeholder = ({ message }) => <div>{message}</div>;
 
   useEffect(() => {
-    console.log('isLoggedIn:', isLoggedIn);
-    console.log('nickname:', nickname);
-  }, [isLoggedIn, nickname]); // 상태 변화 감지
-
- useEffect(() => {
-  const checkLoginStatus = async () => {
-    try {
-      const response = await axios.get('https://api.bargainus.kr/info', {
-        withCredentials: true,
-      });
-      if (response.status === 200 && response.data.status) {
-        setIsLoggedIn(true);
-        setNickname(response.data.nickname);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      setIsLoggedIn(false);
+    const token = localStorage.getItem('token');
+    const savedNickname = localStorage.getItem('nickname');
+    if (token && savedNickname) {
+      setIsLoggedIn(true);
+      setNickname(savedNickname);
     }
-  };
+  }, []);
 
-  checkLoginStatus();
-}, []);
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post('https://api.bargainus.kr/logout', null, {
-        withCredentials: true,
-      });
-      if (response.data.status) {
-        setIsLoggedIn(false);
-        setNickname('');
-      }
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('nickname');
+    setIsLoggedIn(false);
+    setNickname('');
+    alert('로그아웃 되었습니다.');
   };
 
   return (
     <BrowserRouter>
-      {/* NavBar에 로그인 상태와 로그아웃 함수 전달 */}
       <Nav isLoggedIn={isLoggedIn} nickname={nickname} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />}/>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
-        {/* 로그인한 사용자만 접근 가능한 페이지 */}
         <Route
           path="/mypage"
-          element={isLoggedIn ? <Placeholder message="마이페이지가 준비 중입니다." /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <div>마이페이지 준비 중</div> : <Navigate to="/login" />}
         />
         <Route
-         path="/mypage/like"
-          element={isLoggedIn ? <Placeholder message="찜목록 페이지 준비 중입니다." /> : <Navigate to="/login" />}
+          path="/likepage"
+          element={isLoggedIn ? <div>찜 목록 준비 중</div> : <Navigate to="/login" />}
         />
         <Route
-          path="/mypage/cart"
-          element={isLoggedIn ? <Placeholder message="장바구니 페이지 준비 중입니다." /> : <Navigate to="/login" />}
+          path="/cartpage"
+          element={isLoggedIn ? <div>장바구니 준비 중</div> : <Navigate to="/login" />}
         />
       </Routes>
       <Footer />

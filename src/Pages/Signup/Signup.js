@@ -184,7 +184,7 @@ export default function Signup() {
 
       if (response.data === '회원가입 성공') {
         alert('회원가입이 완료되었습니다.');
-        navigate('/login');
+         window.location.href = '/login';
       } else {
         alert(response.data);
       }

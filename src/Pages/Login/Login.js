@@ -14,37 +14,22 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/login', null, {
-        params: {
-          email,
-          password,
-        },
-        withCredentials: true, // 세션 쿠키를 받기 위해 설정
+      const response = await axios.post('https://api.bargainus.kr/login', {
+        email,
+        password,
       });
-      
+
       if (response.data.status) {
-        // 로그인 성공 시
-        navigate('/'); // 메인 화면으로 이동
+        // 토큰 저장 및 로그인 상태 전환
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('nickname', response.data.nickname);
+        alert('로그인 성공!');
+        navigate('/'); // 메인 페이지로 이동
       } else {
-        // 로그인 실패 시 오류 메시지 설정
         setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.post('https://api.bargainus.kr/logout', null, {
-        withCredentials: true, // 세션 쿠키를 사용하기 위해 설정
-      });
-      if (response.data.status) {
-        // 로그아웃 성공 시 로그인 페이지로 이동
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('로그아웃 중 오류 발생', error);
     }
   };
 

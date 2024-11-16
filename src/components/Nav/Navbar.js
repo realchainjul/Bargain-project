@@ -7,10 +7,10 @@ import style from '../Nav/Navbar.module.scss';
 
 
 function Nav({ isLoggedIn, nickname, onLogout }) {
-  useEffect(() => {
-    console.log('isLoggedIn:', isLoggedIn);
-    console.log('nickname:', nickname);
-  }, [isLoggedIn, nickname]); // Prop 변화 감지
+  const handleRestrictedClick = (event) => {
+    event.preventDefault();
+    alert('로그인 후 이용 가능합니다.');
+  };
 
   const [value, setValue] = React.useState('');
 
@@ -24,11 +24,6 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
       window.location.href = `/search/${value}`;
       setValue('');
     }
-  };
-
-  const handleRestrictedClick = (event) => {
-    event.preventDefault();
-    alert('로그인 후 이용 가능합니다.');
   };
 
   return (
@@ -72,13 +67,13 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
           <div className={style.links}>
             {isLoggedIn ? (
               <>
-                <Link to="/mypage/like" className={style.like}>
+                <Link to="/Like/likepage" className={style.like}>
                   <VscHeart size="30" title="찜목록" />
                 </Link>
-                <Link to="/mypage/cart" className={style.cart}>
+                <Link to="/Cart/cartpage" className={style.cart}>
                   <BsCart2 size="30" title="장바구니" />
                 </Link>
-                <Link to="/mypage/order">
+                <Link to="/Mypage/mypage">
                   <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
                 </Link>
               </>
