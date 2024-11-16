@@ -18,6 +18,10 @@
     height: 2.6rem;
     font-size: 13px;
     
+    span {
+      font-family: 'Pretendard-Regular';
+    }
+      
     a,
     p {
       &:first-child {
@@ -36,6 +40,31 @@
       text-decoration: none;
   }
 }
+
+.logoutButton {
+  font-family: 'Pretendard-Regular';
+  background-color: white;
+  color: #404040;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background-color: #f8f8f8;
+    border-color: #a99773;
+    color: #a99773;
+  }
+
+  &:active {
+    background-color: #ececec;
+    color: #a99773;
+  }
+}
+
 
   .search {
     width: 74vm;
