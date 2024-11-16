@@ -57,6 +57,7 @@ function App() {
       <Nav isLoggedIn={isLoggedIn} nickname={nickname} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />}/>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/category/fruits" element={<FruitsPage />} />
