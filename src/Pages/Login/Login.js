@@ -18,9 +18,6 @@ function Login() {
         email,
         password,
       });
-    }catch (error) {
-        console.error('Error:', error.response?.data || error.message);
-      }
       if (response.data.status) {
         // 토큰 저장 및 로그인 상태 전환
         localStorage.setItem('token', response.data.token);
