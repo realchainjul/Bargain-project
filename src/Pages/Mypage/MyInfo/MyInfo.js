@@ -112,12 +112,14 @@ const MyInfo = () => {
     event.preventDefault();
   
     const formData = new FormData();
-    formData.append('nickname', inputs.nickname); // 닉네임 필드
-formData.append('phoneNumber', inputs.phoneNumber); // 전화번호 필드
-if (profileImg) {
-  formData.append('photo', profileImg); // 프로필 이미지 파일
-}
-console.log([...formData.entries()]);
+    formData.append('nickname', inputs.nickname); // 닉네임
+    formData.append('phoneNumber', inputs.phoneNumber); // 전화번호
+    if (profileImg) {
+      formData.append('photo', profileImg); // 프로필 이미지 파일
+    }
+  
+    console.log("폼 데이터:", [...formData.entries()]);
+  
     try {
       const response = await axios.post('https://api.bargainus.kr/update', formData, {
         headers: {
@@ -125,18 +127,20 @@ console.log([...formData.entries()]);
         },
         withCredentials: true,
       });
-      console.log(response.data);
+  
+      console.log("응답 데이터:", response.data);
+  
       if (response.status === 200 && response.data.status) {
         alert('회원 정보가 성공적으로 수정되었습니다.');
       } else {
-        alert('회원 정보 수정에 실패했습니다.');
+        alert('회원 정보 수정에 실패했습니다. 이유: ' + response.data.message);
       }
     } catch (error) {
-        console.error('오류 데이터:', error.response?.data || error.message);
-        console.error('응답 상태:', error.response?.status);
-        alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
+      console.error('오류 데이터:', error.response?.data || error.message);
+      alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
     }
   };
+  
 
   return (
     <div>
