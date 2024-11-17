@@ -9,14 +9,14 @@ const MyInfo = () => {
   const [inputs, setInputs] = useState({
     email: '',
     name: '',
-    displayName: '',
+    nickname: '',
     phoneNumber: '',
   });
   const [profileImg, setProfileImg] = useState(null);
   const [nicknameError, setNicknameError] = useState('');
   const [isConfirmNickname, setIsConfirmNickname] = useState(false);
 
-  const { email, name, displayName, phoneNumber } = inputs;
+  const { email, name, nickname, phoneNumber } = inputs;
 
   // 사용자 로그인 데이터 가져오기
   useEffect(() => {
@@ -29,7 +29,7 @@ const MyInfo = () => {
           setInputs({
             email: data.email,
             name: data.name,
-            displayName: data.nickname,
+            nickname: data.nickname,
             phoneNumber: data.phoneNumber,
           });
           setProfileImg(data.photoFilename || null);
@@ -49,7 +49,7 @@ const MyInfo = () => {
   const handleChangeInputs = (event) => {
     const { value, name } = event.target;
 
-    if (name === 'displayName') {
+    if (name === 'nickname') {
       setIsConfirmNickname(false); // 닉네임 변경 시 중복 확인 상태 초기화
       setNicknameError('');
     }
@@ -62,14 +62,14 @@ const MyInfo = () => {
 
   // 닉네임 중복 확인
   const handleCheckNickname = async () => {
-    if (!inputs.displayName) {
+    if (!inputs.nickname) {
       setNicknameError('닉네임을 입력해주세요.');
       return;
     }
 
     try {
       const response = await axios.get('https://api.bargainus.kr/check-nickname', {
-        params: { nickname: inputs.displayName },
+        params: { nickname: inputs.nickname },
       });
 
       if (response.data === '사용 가능한 닉네임입니다.') {
@@ -110,16 +110,16 @@ const MyInfo = () => {
   // 회원정보 수정 요청 처리
   const handleSubmitUpdate = async (event) => {
     event.preventDefault();
-
+  
     const formData = new FormData();
-    formData.append('email', email);
-    formData.append('name', name);
-    formData.append('nickname', displayName);
-    formData.append('phoneNumber', phoneNumber);
+    formData.append('email', inputs.email); // 이메일
+    formData.append('name', inputs.name); // 이름
+    formData.append('nickname', inputs.nickname); // 닉네임
+    formData.append('phoneNumber', inputs.phoneNumber); // 전화번호
     if (profileImg) {
-      formData.append('photo', profileImg);
+      formData.append('photo', profileImg); // 프로필 이미지
     }
-
+  
     try {
       const response = await axios.post('https://api.bargainus.kr/update', formData, {
         headers: {
@@ -127,14 +127,14 @@ const MyInfo = () => {
         },
         withCredentials: true,
       });
-
+  
       if (response.status === 200 && response.data.status) {
         alert('회원 정보가 성공적으로 수정되었습니다.');
       } else {
         alert('회원 정보 수정에 실패했습니다.');
       }
     } catch (error) {
-      console.error('회원 정보 수정 중 오류 발생:', error);
+      console.error('회원 정보 수정 중 오류 발생:', error.response?.data || error);
       alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
     }
   };
@@ -172,8 +172,8 @@ const MyInfo = () => {
           <div className={style.inputWithButton2}>
             <input
               type="text"
-              name="displayName"
-              value={displayName}
+              name="nickname" 
+              value={inputs.nickname} 
               onChange={handleChangeInputs}
               placeholder="닉네임을 입력해 주세요"
             />
