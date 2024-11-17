@@ -112,13 +112,11 @@ const MyInfo = () => {
     event.preventDefault();
   
     const formData = new FormData();
-    formData.append('email', inputs.email); // 이메일
-    formData.append('name', inputs.name); // 이름
-    formData.append('nickname', inputs.nickname); // 닉네임
-    formData.append('phoneNumber', inputs.phoneNumber); // 전화번호
-    if (profileImg) {
-      formData.append('photo', profileImg); // 프로필 이미지
-    }
+    formData.append('nickname', inputs.nickname); // 닉네임 필드
+formData.append('phoneNumber', inputs.phoneNumber); // 전화번호 필드
+if (profileImg) {
+  formData.append('photo', profileImg); // 프로필 이미지 파일
+}
   
     try {
       const response = await axios.post('https://api.bargainus.kr/update', formData, {
