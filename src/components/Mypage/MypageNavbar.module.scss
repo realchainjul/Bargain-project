@@ -1,0 +1,45 @@
+.mypage {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    margin-left: 17rem;
+    font-family: 'Pretendard-Regular';
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: rgb(51, 51, 51);
+      margin-left: 0; /* h1의 추가 여백 제거 */
+    }
+    .mypageNav {
+      display: flex;
+      flex-direction: column;
+      
+      ul {
+        list-style: none;
+        padding: 0;
+        li {
+          font-size: 0.9rem;
+          border: 1px solid #eeeeee;
+          border-bottom: none;
+          a {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            &:hover {
+              background-color: rgb(250, 250, 250);
+              color: #a99773;
+              font-weight: 600;
+            }
+          }
+          &:last-child {
+            border-bottom: 1px solid #eeeeee;
+          }
+        }
+      }
+    }
+  }

@@ -73,7 +73,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
                 <Link to="/mypage/cart" className={style.cart}>
                   <BsCart2 size="30" title="장바구니" />
                 </Link>
-                <Link to="/mypage/order">
+                <Link to="/mypage/user">
                   <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
                 </Link>
               </>
@@ -96,7 +96,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
       <nav>
         <ul className={style.categories}>
           <li>
-            <Link to="/category/fruits">과일</Link>
+            <Link to="/mypage/userpage">과일</Link>
           </li>
           <li>
             <Link to="/category/vegetable">채소</Link>

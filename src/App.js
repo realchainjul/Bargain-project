@@ -7,6 +7,10 @@ import Login from './Pages/Login/Login';
 import VegetablePage from './Pages/Category/Vegetable/VegetablePage';
 import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
+import LikePage from './Pages/Like/LikePage';
+import CartPage from './Pages/Cart/CartPage';
+import MyPage from './Pages/Mypage/UserPage';
+import MyInfo from './Pages/Mypage/MyInfo/MyInfo';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -55,17 +59,24 @@ function App() {
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
         <Route
-          path="/mypage"
-          element={isLoggedIn ? <div>마이페이지 준비 중</div> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/likepage"
-          element={isLoggedIn ? <div>찜 목록 준비 중</div> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/cartpage"
-          element={isLoggedIn ? <div>장바구니 준비 중</div> : <Navigate to="/login" />}
-        />
+  path="/mypage/like"
+  element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}
+/>
+<Route
+  path="/mypage/cart"
+  element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}
+/>
+<Route
+  path="/mypage/userpage"
+  element={ <MyPage /> }
+>
+  {/* 기본 경로에서 /info로 리다이렉트 */}
+  <Route index element={<Navigate to="/mypage/userpage/info" />} />
+  {/* 하위 경로 */}
+  <Route path="info" element={<MyInfo
+  />} />
+</Route>
+
       </Routes>
       <Footer />
     </BrowserRouter>
