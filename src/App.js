@@ -12,6 +12,7 @@ import CartPage from './Pages/Cart/CartPage';
 import UserPage from './Pages/Mypage/UserPage';
 import MyInfo from './Pages/Mypage/MyInfo/MyInfo';
 import { useState, useEffect } from 'react';
+import ProductAdd from './Pages/Mypage/ProductAdd/ProductAdd';
 import axios from 'axios';
 
 function App() {
@@ -61,10 +62,10 @@ function App() {
         <Route path="/mypage/like" element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
-          <Route index element={<Navigate to="/mypage/userpage/info" />} /> {/* 기본 경로 리다이렉트 */}
-          <Route path="info" element={<MyInfo />} /> {/* /mypage/userpage/info */}
+          <Route index element={<Navigate to="/mypage/userpage/info" />} />
+          <Route path="info" element={<MyInfo />} />
+          <Route path="productadd" element={<ProductAdd />} />
         </Route>
-
 
 
       </Routes>
