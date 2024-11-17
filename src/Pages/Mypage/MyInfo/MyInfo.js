@@ -94,11 +94,7 @@ const MyInfo = () => {
       const file = event.target.files[0];
       if (!isCheckProfileSize(file.size)) return;
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setProfileImg(reader.result);
-      };
+      setProfileImg(file);
     }
   };
 
@@ -114,13 +110,25 @@ const MyInfo = () => {
   // 회원정보 수정 요청 처리
   const handleSubmitUpdate = async (event) => {
     event.preventDefault();
-  
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('name', name);
+    formData.append('nickname', displayName);
+    formData.append('phoneNumber', phoneNumber);
+    if (profileImg) {
+      formData.append('photo', profileImg);
+    }
+
     try {
-      const response = await axios.put('https://api.bargainus.kr/info', inputs, {
-        withCredentials: true, // 세션 쿠키 포함
+      const response = await axios.post('https://api.bargainus.kr/update', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
       });
-  
-      if (response.status === 200) {
+
+      if (response.status === 200 && response.data.status) {
         alert('회원 정보가 성공적으로 수정되었습니다.');
       } else {
         alert('회원 정보 수정에 실패했습니다.');
@@ -130,7 +138,6 @@ const MyInfo = () => {
       alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
     }
   };
-  
 
   return (
     <div>
@@ -197,7 +204,7 @@ const MyInfo = () => {
               onChange={handleChangeProfileImg}
             />
             <figure className={style.profile_inputContainer_img}>
-              {profileImg && <img alt="프로필" width={150} height={150} src={profileImg} />}
+              {profileImg && <img alt="프로필" width={150} height={150} src={URL.createObjectURL(profileImg)} />}
             </figure>
           </article>
         </section>
