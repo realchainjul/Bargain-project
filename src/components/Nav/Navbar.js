@@ -96,7 +96,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
       <nav>
         <ul className={style.categories}>
           <li>
-            <Link to="/mypage/userpage">과일</Link>
+            <Link to="/category/fruits">과일</Link>
           </li>
           <li>
             <Link to="/category/vegetable">채소</Link>

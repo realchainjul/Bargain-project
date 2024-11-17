@@ -68,7 +68,7 @@ function App() {
 />
 <Route
   path="/mypage/userpage"
-  element={ <MyPage /> }
+  element={isLoggedIn ? <MyInfo /> : <Navigate to="/login" />}
 >
   {/* 기본 경로에서 /info로 리다이렉트 */}
   <Route index element={<Navigate to="/mypage/userpage/info" />} />
