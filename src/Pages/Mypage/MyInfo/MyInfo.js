@@ -117,7 +117,7 @@ formData.append('phoneNumber', inputs.phoneNumber); // 전화번호 필드
 if (profileImg) {
   formData.append('photo', profileImg); // 프로필 이미지 파일
 }
-  
+console.log([...formData.entries()]);
     try {
       const response = await axios.post('https://api.bargainus.kr/update', formData, {
         headers: {
@@ -125,15 +125,16 @@ if (profileImg) {
         },
         withCredentials: true,
       });
-  
+      console.log(response.data);
       if (response.status === 200 && response.data.status) {
         alert('회원 정보가 성공적으로 수정되었습니다.');
       } else {
         alert('회원 정보 수정에 실패했습니다.');
       }
     } catch (error) {
-      console.error('회원 정보 수정 중 오류 발생:', error.response?.data || error);
-      alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
+        console.error('오류 데이터:', error.response?.data || error.message);
+        console.error('응답 상태:', error.response?.status);
+        alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
