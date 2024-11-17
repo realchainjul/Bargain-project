@@ -9,7 +9,7 @@ import GrainPage from './Pages/Category/Grain/GrainPage';
 import Signup from './Pages/Signup/Signup';
 import LikePage from './Pages/Like/LikePage';
 import CartPage from './Pages/Cart/CartPage';
-import MyPage from './Pages/Mypage/UserPage';
+import UserPage from './Pages/Mypage/UserPage';
 import MyInfo from './Pages/Mypage/MyInfo/MyInfo';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -69,13 +69,13 @@ function App() {
 <Route
   path="/mypage/userpage"
   element={isLoggedIn ? <MyInfo /> : <Navigate to="/login" />}
->
-  {/* 기본 경로에서 /info로 리다이렉트 */}
-  <Route index element={<Navigate to="/mypage/userpage/info" />} />
-  {/* 하위 경로 */}
-  <Route path="info" element={<MyInfo
-  />} />
-</Route>
+/>
+<Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
+          {/* 기본 경로를 info로 리다이렉트 */}
+          <Route index element={<Navigate to="/mypage/userpage/info" />} />
+          {/* 하위 경로 info */}
+          <Route path="info" element={<MyInfo />} />
+        </Route>
 
       </Routes>
       <Footer />
