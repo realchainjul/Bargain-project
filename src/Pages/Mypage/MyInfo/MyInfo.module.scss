@@ -20,7 +20,7 @@
   min-width: 600px;
 
   .ListForm {
-    padding: 10px 20px;
+    padding: 10px 0;
 
     input {
       width: 100%;
@@ -34,10 +34,12 @@
       color: rgb(51, 51, 51);
       outline: none;
       box-sizing: border-box;
+      margin-top: 10px;
     }
 
     label {
       width: 140px;
+      font-weight: bold;
     }
 
     .inputWithButton2 {
