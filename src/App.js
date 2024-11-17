@@ -58,24 +58,14 @@ function App() {
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
-        <Route
-  path="/mypage/like"
-  element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}
-/>
-<Route
-  path="/mypage/cart"
-  element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}
-/>
-<Route
-  path="/mypage/userpage"
-  element={isLoggedIn ? <MyInfo /> : <Navigate to="/login" />}
-/>
-<Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
-          {/* 기본 경로를 info로 리다이렉트 */}
-          <Route index element={<Navigate to="/mypage/userpage/info" />} />
-          {/* 하위 경로 info */}
-          <Route path="info" element={<MyInfo />} />
+        <Route path="/mypage/like" element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}/>
+        <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
+        <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
+          <Route index element={<Navigate to="/mypage/userpage/info" />} /> {/* 기본 경로 리다이렉트 */}
+          <Route path="info" element={<MyInfo />} /> {/* /mypage/userpage/info */}
         </Route>
+
+
 
       </Routes>
       <Footer />

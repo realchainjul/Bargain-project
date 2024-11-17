@@ -162,7 +162,7 @@ const MyInfo = () => {
         </section>
         <section className={style.ListForm}>
           <label>닉네임</label>
-          <div className={style.inputWithButton}>
+          <div className={style.inputWithButton2}>
             <input
               type="text"
               name="displayName"
