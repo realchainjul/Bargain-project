@@ -20,171 +20,165 @@ import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UsersDAO {
-    private static final Logger logger = LoggerFactory.getLogger(UsersDAO.class);
-    private BCryptPasswordEncoder bcpe;
+	private static final Logger logger = LoggerFactory.getLogger(UsersDAO.class);
+	private BCryptPasswordEncoder bcpe;
 
-    @Autowired
-    private UsersRepository usersRepo;
+	@Autowired
+	private UsersRepository usersRepo;
 
-    @Value("${users.images.directory}")
-    private String usersImagesDirectory;
+	@Value("${users.images.directory}")
+	private String usersImagesDirectory;
 
-    public UsersDAO() {
-        this.bcpe = new BCryptPasswordEncoder();
-    }
+	public UsersDAO() {
+		this.bcpe = new BCryptPasswordEncoder();
+	}
 
-    public String checkEmailDuplicate(String email) {
-        return usersRepo.existsByEmail(email) ? "중복된 이메일입니다." : "사용 가능한 이메일입니다.";
-    }
+	public String checkEmailDuplicate(String email) {
+		return usersRepo.existsByEmail(email) ? "중복된 이메일입니다." : "사용 가능한 이메일입니다.";
+	}
 
-    public String checkNicknameDuplicate(String nickname) {
-        return usersRepo.existsByNickname(nickname) ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다.";
-    }
+	public String checkNicknameDuplicate(String nickname) {
+		return usersRepo.existsByNickname(nickname) ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다.";
+	}
 
-    public Users getLoginUserByEmail(String email) {
-        Optional<Users> userOptional = usersRepo.findByEmail(email);
-        return userOptional.orElse(null);
-    }
+	public Users getLoginUserByEmail(String email) {
+		Optional<Users> userOptional = usersRepo.findByEmail(email);
+		return userOptional.orElse(null);
+	}
 
-    public String join(UserJoinReq req, MultipartFile photo) {
-        String fileName = null;
-        try {
-            // 프로필 사진 저장
-            if (photo != null && !photo.isEmpty()) {
-                fileName = BagainFileNameGenerator.generate(photo);
-                photo.transferTo(new File(usersImagesDirectory + "/" + fileName));
-                req.setPhotoFilename(fileName); // DTO에 파일명만 저장
-            }
-            // 비밀번호 암호화
-            req.setPassword(bcpe.encode(req.getPassword()));
-            Users user = new Users();
-            user.setEmail(req.getEmail());
-            user.setPassword(req.getPassword());
-            user.setName(req.getName());
-            user.setNickname(req.getNickname());
-            user.setPhoneNumber(req.getPhoneNumber());
-            user.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
-            user.setPhoto(fileName);
-            usersRepo.save(user);
+	public String join(UserJoinReq req, MultipartFile photo) {
+		String fileName = null;
+		try {
+			// 프로필 사진 저장
+			if (photo != null && !photo.isEmpty()) {
+				fileName = BagainFileNameGenerator.generate(photo);
+				photo.transferTo(new File(usersImagesDirectory + "/" + fileName));
+				req.setPhotoFilename(fileName); // DTO에 파일명만 저장
+			}
+			// 비밀번호 암호화
+			req.setPassword(bcpe.encode(req.getPassword()));
+			Users user = new Users();
+			user.setEmail(req.getEmail());
+			user.setPassword(req.getPassword());
+			user.setName(req.getName());
+			user.setNickname(req.getNickname());
+			user.setPhoneNumber(req.getPhoneNumber());
+			user.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
+			user.setPhoto(fileName);
+			usersRepo.save(user);
 
-            return "가입 성공";
+			return "가입 성공";
 
-        } catch (Exception e) {
-            if (fileName != null) {
-                new File(usersImagesDirectory + "/" + fileName).delete();
-            }
-            return "가입 실패";
-        }
-    }
+		} catch (Exception e) {
+			if (fileName != null) {
+				new File(usersImagesDirectory + "/" + fileName).delete();
+			}
+			return "가입 실패";
+		}
+	}
 
-    public Map<String, Object> login(String email, String password, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        session = request.getSession(true);
-        Map<String, Object> response = new HashMap<>();
-        try {
-            Optional<Users> userOptional = usersRepo.findByEmail(email);
-            if (userOptional.isPresent()) {
-                Users user = userOptional.get();
-                if (bcpe.matches(password, user.getPassword())) {
-                    // 세션에 사용자 이메일 저장
-                    session.setAttribute("userEmail", user.getEmail());
-                    session.setAttribute("loginMember", user);
-                    response.put("status", true);
-                    response.put("message", "로그인 성공");
-                    response.put("sessionId", session.getId());
-                    response.put("nickname", user.getNickname());
-                } else {
-                    response.put("status", false);
-                    response.put("message", "로그인 실패: 비밀번호 오류");
-                }
-            } else {
-                response.put("status", false);
-                response.put("message", "로그인 실패: 가입되지 않은 이메일");
-            }
-        } catch (Exception e) {
-            logger.error("로그인 중 오류 발생", e);
-            response.put("status", false);
-            response.put("message", "로그인 실패: 서버 오류");
-        }
-        return response;
-    }
+	public Map<String, Object> login(String email, String password, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			session.invalidate();
+		}
+		session = request.getSession(true);
+		Map<String, Object> response = new HashMap<>();
+		try {
+			Optional<Users> userOptional = usersRepo.findByEmail(email);
+			if (userOptional.isPresent()) {
+				Users user = userOptional.get();
+				if (bcpe.matches(password, user.getPassword())) {
+					// 세션에 사용자 이메일 저장
+					session.setAttribute("userEmail", user.getEmail());
+					session.setAttribute("loginMember", user);
+					response.put("status", true);
+					response.put("message", "로그인 성공");
+					response.put("sessionId", session.getId());
+					response.put("nickname", user.getNickname());
+				} else {
+					response.put("status", false);
+					response.put("message", "로그인 실패: 비밀번호 오류");
+				}
+			} else {
+				response.put("status", false);
+				response.put("message", "로그인 실패: 가입되지 않은 이메일");
+			}
+		} catch (Exception e) {
+			logger.error("로그인 중 오류 발생", e);
+			response.put("status", false);
+			response.put("message", "로그인 실패: 서버 오류");
+		}
+		return response;
+	}
 
-    
-    public void logout(HttpSession session) {
-        session.invalidate();
-    }
-    
-    public Map<String, String> splitAddress(HttpSession session) {
-        Users loginMember = (Users) session.getAttribute("loginMember");
-        Map<String, String> addressMap = new HashMap<>();
-        if (loginMember != null && loginMember.getAddress() != null) {
-            String[] addr = loginMember.getAddress().split("!");
-            addressMap.put("postalCode", addr.length > 0 ? addr[0] : "");
-            addressMap.put("address", addr.length > 1 ? addr[1] : "");
-            addressMap.put("detailAddress", addr.length > 2 ? addr[2] : "");
-        } else {
-            addressMap.put("postalCode", "");
-            addressMap.put("address", "");
-            addressMap.put("detailAddress", "");
-        }
-        return addressMap;
-    }
-    
-    public Map<String, Object> update(UserJoinReq req, MultipartFile photo, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        Users loginMember = (Users) session.getAttribute("loginMember");
-        if (loginMember == null) {
-            response.put("status", false);
-            response.put("message", "로그인이 필요합니다.");
-            return response;
-        }
+	public void logout(HttpSession session) {
+		session.invalidate();
+	}
 
-        String oldFile = loginMember.getPhoto();
-        String newFile = null;
-        try {
-            if (photo != null && !photo.isEmpty()) {
-                newFile = BagainFileNameGenerator.generate(photo);
-                photo.transferTo(new File(usersImagesDirectory + "/" + newFile));
-            } else {
-                newFile = oldFile;
-            }
-        } catch (Exception e) {
-            response.put("status", false);
-            response.put("message", "수정 실패(파일)");
-            return response;
-        }
+	public Map<String, String> splitAddress(HttpSession session) {
+		Users loginMember = (Users) session.getAttribute("loginMember");
+		Map<String, String> addressMap = new HashMap<>();
+		if (loginMember != null && loginMember.getAddress() != null) {
+			String[] addr = loginMember.getAddress().split("!");
+			addressMap.put("postalCode", addr.length > 0 ? addr[0] : "");
+			addressMap.put("address", addr.length > 1 ? addr[1] : "");
+			addressMap.put("detailAddress", addr.length > 2 ? addr[2] : "");
+		} else {
+			addressMap.put("postalCode", "");
+			addressMap.put("address", "");
+			addressMap.put("detailAddress", "");
+		}
+		return addressMap;
+	}
 
-        try {
-            if (req.getPassword() != null && !req.getPassword().isEmpty()) {
-                loginMember.setPassword(bcpe.encode(req.getPassword()));
-            }
-            loginMember.setName(req.getName());
-            loginMember.setNickname(req.getNickname());
-            loginMember.setPhoneNumber(req.getPhoneNumber());
-            loginMember.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
-            loginMember.setPhoto(newFile);
+	public Map<String, Object> update(String nickname, String phoneNumber, MultipartFile photo, HttpSession session) {
+		Map<String, Object> response = new HashMap<>();
+		Users loginMember = (Users) session.getAttribute("loginMember");
+		if (loginMember == null) {
+			response.put("status", false);
+			response.put("message", "로그인이 필요합니다.");
+			return response;
+		}
 
-            usersRepo.save(loginMember);
-            session.setAttribute("loginMember", loginMember);
+		String oldFile = loginMember.getPhoto();
+		String newFile = null;
+		try {
+			if (photo != null && !photo.isEmpty()) {
+				newFile = BagainFileNameGenerator.generate(photo);
+				photo.transferTo(new File(usersImagesDirectory + "/" + newFile));
+			} else {
+				newFile = oldFile;
+			}
+		} catch (Exception e) {
+			response.put("status", false);
+			response.put("message", "수정 실패(파일)");
+			return response;
+		}
 
-            if (!newFile.equals(oldFile) && oldFile != null) {
-                new File(usersImagesDirectory + "/" + oldFile).delete();
-            }
+		try {
+			loginMember.setNickname(nickname);
+			loginMember.setPhoneNumber(phoneNumber);
+			loginMember.setPhoto(newFile);
 
-            response.put("status", true);
-            response.put("message", "수정 성공");
-            return response;
-        } catch (Exception e) {
-            if (newFile != null && !newFile.equals(oldFile)) {
-                new File(usersImagesDirectory + "/" + newFile).delete();
-            }
-            response.put("status", false);
-            response.put("message", "수정 실패(DB)");
-            return response;
-        }
-    }
+			usersRepo.save(loginMember);
+			session.setAttribute("loginMember", loginMember);
+
+			if (!newFile.equals(oldFile) && oldFile != null) {
+				new File(usersImagesDirectory + "/" + oldFile).delete();
+			}
+
+			response.put("status", true);
+			response.put("message", "수정 성공");
+			return response;
+		} catch (Exception e) {
+			if (newFile != null && !newFile.equals(oldFile)) {
+				new File(usersImagesDirectory + "/" + newFile).delete();
+			}
+			response.put("status", false);
+			response.put("message", "수정 실패(DB)");
+			return response;
+		}
+	}
 
 }
