@@ -73,7 +73,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
                 <Link to="/mypage/cart" className={style.cart}>
                   <BsCart2 size="30" title="장바구니" />
                 </Link>
-                <Link to="/mypage/userpage">
+                <Link to="/mypage/userpage/info">
                   <BsFillPersonFill size="30" title="마이페이지" color="#a99773" />
                 </Link>
               </>
