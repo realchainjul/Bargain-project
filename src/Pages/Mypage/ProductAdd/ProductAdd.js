@@ -112,7 +112,9 @@ const ProductAdd = () => {
           <label>상품 이미지</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
         </div>
+        <section className={style.btn}>
         <Button name="등록하기" type="submit" isBrown={true} />
+        </section>
       </form>
     </div>
   );
