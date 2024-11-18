@@ -1,6 +1,5 @@
 package com.harvest.bagain.users;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,23 +45,10 @@ public class UsersController {
 
 	// 사용자 정보 확인(수정)
 	@GetMapping("/info")
-	public ResponseEntity<Map<String, Object>> userInfo(HttpSession session) {
-		String userEmail = (String) session.getAttribute("userEmail");
-		if (userEmail != null) {
-			Users user = usersDAO.getLoginUserByEmail(userEmail);
-			if (user != null) {
-				Map<String, String> addressMap = usersDAO.splitAddress(session);
-				Map<String, Object> response = new HashMap<>();
-				response.put("email", user.getEmail());
-				response.put("name", user.getName());
-				response.put("nickname", user.getNickname());
-				response.put("phoneNumber", user.getPhoneNumber());
-				response.putAll(addressMap);
-				response.put("photoFilename", user.getPhoto() != null ? user.getPhoto() : "");
-				return ResponseEntity.ok(response);
-			} else {
-				return ResponseEntity.status(404).body(null);
-			}
+	public ResponseEntity<Map<String, Object>> info(HttpSession session) {
+		Map<String, Object> response = usersDAO.info(session);
+		if (response != null) {
+			return ResponseEntity.ok(response);
 		} else {
 			return ResponseEntity.status(401).body(null);
 		}
@@ -73,22 +59,13 @@ public class UsersController {
 	public ResponseEntity<Map<String, Object>> login(@RequestParam String email, @RequestParam String password,
 			HttpServletRequest request) {
 		Map<String, Object> result = usersDAO.login(email, password, request);
-		if (result.get("status").equals(true)) {
-			result.put("message", "로그인 성공");
-			result.put("email", request.getSession().getAttribute("userEmail"));
-		} else {
-			result.put("message", result.get("message"));
-		}
 		return ResponseEntity.ok(result);
 	}
 
 	// 로그아웃
 	@PostMapping("/logout")
 	public ResponseEntity<Map<String, Object>> logout(HttpSession session) {
-		usersDAO.logout(session);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", true);
-		response.put("message", "로그아웃 성공");
+		Map<String, Object> response = usersDAO.logout(session);
 		return ResponseEntity.ok(response);
 	}
 

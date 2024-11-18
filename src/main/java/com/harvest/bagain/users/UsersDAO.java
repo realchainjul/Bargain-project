@@ -45,37 +45,57 @@ public class UsersDAO {
 		Optional<Users> userOptional = usersRepo.findByEmail(email);
 		return userOptional.orElse(null);
 	}
-
-	public String join(UserJoinReq req, MultipartFile photo) {
-		String fileName = null;
-		try {
-			// 프로필 사진 저장
-			if (photo != null && !photo.isEmpty()) {
-				fileName = BagainFileNameGenerator.generate(photo);
-				photo.transferTo(new File(usersImagesDirectory + "/" + fileName));
-				req.setPhotoFilename(fileName); // DTO에 파일명만 저장
+	
+	public Map<String, Object> info(HttpSession session) {
+		String userEmail = (String) session.getAttribute("userEmail");
+		if (userEmail != null) {
+			Users user = getLoginUserByEmail(userEmail);
+			if (user != null) {
+				Map<String, String> addressMap = splitAddress(user);
+				Map<String, Object> response = new HashMap<>();
+				response.put("email", user.getEmail());
+				response.put("name", user.getName());
+				response.put("nickname", user.getNickname());
+				response.put("phoneNumber", user.getPhoneNumber());
+				response.putAll(addressMap);
+				String photoUrl = user.getPhoto() != null ? "https://file.bargainus.kr/users/images/" + user.getPhoto() : "";
+				response.put("photoFilename", photoUrl);
+				return response;
 			}
-			// 비밀번호 암호화
-			req.setPassword(bcpe.encode(req.getPassword()));
-			Users user = new Users();
-			user.setEmail(req.getEmail());
-			user.setPassword(req.getPassword());
-			user.setName(req.getName());
-			user.setNickname(req.getNickname());
-			user.setPhoneNumber(req.getPhoneNumber());
-			user.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
-			user.setPhoto(fileName);
-			usersRepo.save(user);
-
-			return "가입 성공";
-
-		} catch (Exception e) {
-			if (fileName != null) {
-				new File(usersImagesDirectory + "/" + fileName).delete();
-			}
-			return "가입 실패";
 		}
+		return null;
 	}
+	
+	public String join(UserJoinReq req, MultipartFile photo) {
+        String fileName = null;
+        try {
+            // 프로필 사진 저장
+            if (photo != null && !photo.isEmpty()) {
+                fileName = BagainFileNameGenerator.generate(photo);
+                photo.transferTo(new File(usersImagesDirectory + "/" + fileName));
+                req.setPhotoFilename(fileName); // DTO에 파일명만 저장
+            }
+            // 비밀번호 암호화
+            req.setPassword(bcpe.encode(req.getPassword()));
+            Users user = new Users();
+            user.setEmail(req.getEmail());
+            user.setPassword(req.getPassword());
+            user.setName(req.getName());
+            user.setNickname(req.getNickname());
+            user.setPhoneNumber(req.getPhoneNumber());
+            user.setAddress(req.getPostalCode() + "!" + req.getAddress() + "!" + req.getDetailAddress());
+            user.setPhoto(fileName);
+            usersRepo.save(user);
+
+            return "가입 성공";
+
+        } catch (Exception e) {
+            if (fileName != null) {
+                new File(usersImagesDirectory + "/" + fileName).delete();
+            }
+            return "가입 실패";
+        }
+    }
 
 	public Map<String, Object> login(String email, String password, HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
@@ -112,15 +132,18 @@ public class UsersDAO {
 		return response;
 	}
 
-	public void logout(HttpSession session) {
+	public Map<String, Object> logout(HttpSession session) {
 		session.invalidate();
+		Map<String, Object> response = new HashMap<>();
+		response.put("status", true);
+		response.put("message", "로그아웃 성공");
+		return response;
 	}
 
-	public Map<String, String> splitAddress(HttpSession session) {
-		Users loginMember = (Users) session.getAttribute("loginMember");
+	public Map<String, String> splitAddress(Users user) {
 		Map<String, String> addressMap = new HashMap<>();
-		if (loginMember != null && loginMember.getAddress() != null) {
-			String[] addr = loginMember.getAddress().split("!");
+		if (user != null && user.getAddress() != null) {
+			String[] addr = user.getAddress().split("!");
 			addressMap.put("postalCode", addr.length > 0 ? addr[0] : "");
 			addressMap.put("address", addr.length > 1 ? addr[1] : "");
 			addressMap.put("detailAddress", addr.length > 2 ? addr[2] : "");
@@ -163,6 +186,7 @@ public class UsersDAO {
 
 			usersRepo.save(loginMember);
 			session.setAttribute("loginMember", loginMember);
+			session.setAttribute("userEmail", loginMember.getEmail());
 
 			if (!newFile.equals(oldFile) && oldFile != null) {
 				new File(usersImagesDirectory + "/" + oldFile).delete();

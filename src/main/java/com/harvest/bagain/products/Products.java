@@ -3,12 +3,15 @@ package com.harvest.bagain.products;
 import java.util.List;
 
 import com.harvest.bagain.bucket.Bucket;
+import com.harvest.bagain.category.Category;
 import com.harvest.bagain.liked.Liked;
 import com.harvest.bagain.reviews.Reviews;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Products {
     @Id
     @Column(name = "products_code")
-    private String code;
+    private Integer pcode;
 
     @Column(name = "products_name")
     private String name;
@@ -40,6 +43,10 @@ public class Products {
 
     @Column(name = "products_likes_count")
     private Integer likesCount;
+    
+    @ManyToOne
+    @JoinColumn(name = "category_code", referencedColumnName = "category_code")
+    private Category category;
 
     @OneToMany(mappedBy = "product")
     private List<Bucket> buckets;
