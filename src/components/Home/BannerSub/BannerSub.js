@@ -23,9 +23,9 @@ function BannerSub() {
       spaceBetween={70} // 슬라이드간의 간격
       slidesPerView={4} // 한 번에 보여지는 슬라이드 개수
       style={{
-        "--swiper-navigation-color": "#43007c",
+        "--swiper-navigation-color": "#383810",
         "--swiper-navigation-size": "40px",
-        "--swiper-pagination-color": "#43007c"
+        "--swiper-pagination-color": "#383810"
       }}
       breakpoints= {{
         1800:{
