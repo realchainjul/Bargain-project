@@ -114,7 +114,7 @@ const ProductAdd = () => {
           <input type="file" accept="image/*" onChange={handleFileChange} />
         </div>
         <div>
-          <label>카테고리</label>
+          <label>분류 카테고리</label>
           <select
             name="category"
             value={product.category}
