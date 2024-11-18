@@ -6,7 +6,7 @@
         border-bottom: 2px solid rgb(51, 51, 51);
         padding-bottom: 1rem;
         z-index: 200;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
         h1 {
           font-size: 1.4rem;
           font-weight: 800;
@@ -18,7 +18,6 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      max-width: 800px;
   
       label {
         font-weight: bold;
