@@ -9,6 +9,7 @@ const ProductAdd = () => {
     price: '',
     inventory: '',
     comment: '',
+    category: '과일',
     image: null,
   });
 
@@ -111,6 +112,19 @@ const ProductAdd = () => {
         <div>
           <label>상품 이미지</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
+        </div>
+        <div>
+          <label>카테고리</label>
+          <select
+            name="category"
+            value={product.category}
+            onChange={handleChange}
+            required
+          >
+            <option value="과일">과일</option>
+            <option value="채소">채소</option>
+            <option value="곡물">곡물</option>
+          </select>
         </div>
         <section className={style.btn}>
         <Button name="등록하기" type="submit" isBrown={true} />
