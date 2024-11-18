@@ -29,7 +29,7 @@ export default function MyLike() {
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  // 찜 목록에서 삭제하는 함수 (UI에서만 삭제)
+  // 찜 목록에서 삭제하는 함수 (UI에서만 삭제 , 주소 추가되면 데이터에서 삭제 되게)
   const handleDeleteLike = (productCode) => {
     if (window.confirm('찜 목록에서 삭제하시겠습니까?')) {
       setLikes((prevLikes) => prevLikes.filter((like) => like.product_code !== productCode));

@@ -67,7 +67,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
           <div className={style.links}>
             {isLoggedIn ? (
               <>
-                <Link to="/mypage/like" className={style.like}>
+                <Link to="/mypage/userpage/like" className={style.like}>
                   <VscHeart size="30" title="찜목록" />
                 </Link>
                 <Link to="/mypage/cart" className={style.cart}>
