@@ -140,7 +140,6 @@ const MyInfo = () => {
       alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
     }
   };
-  
 
   return (
     <div>
@@ -207,7 +206,11 @@ const MyInfo = () => {
               onChange={handleChangeProfileImg}
             />
             <figure className={style.profile_inputContainer_img}>
-              {profileImg && <img alt="프로필" width={150} height={150} src={URL.createObjectURL(profileImg)} />}
+              {profileImg && (typeof profileImg === 'string' ? (
+                <img alt="프로필" width={150} height={150} src={profileImg} />
+              ) : (
+                <img alt="프로필" width={150} height={150} src={URL.createObjectURL(profileImg)} />
+              ))}
             </figure>
           </article>
         </section>
