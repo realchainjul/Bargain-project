@@ -59,12 +59,13 @@ function App() {
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
-        <Route path="/mypage/like" element={isLoggedIn ? <LikePage /> : <Navigate to="/login" />}/>
+        <Route path="/mypage/like" element={<LikePage /> }/>
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
           <Route index element={<Navigate to="/mypage/userpage/info" />} />
           <Route path="info" element={<MyInfo />} />
           <Route path="productadd" element={<ProductAdd />} />
+          <Route path="like" element={<LikePage /> }/>
         </Route>
 
 
