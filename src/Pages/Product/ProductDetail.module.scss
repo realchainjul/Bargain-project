@@ -37,6 +37,11 @@
           width: 100%;
           height: 100%;
           object-fit: cover;
+          max-width: 100%; /* 이미지 크기 제한 */
+  max-height: 100%; /* 이미지 크기 제한 */
+  object-fit: cover; /* 이미지가 영역에 맞게 표시되도록 설정 */
+  position: relative; /* 기본 위치를 유지 */
+  z-index: 0; /* footer 아래로 배치되지 않도록 설정 */
         }
       }
     }
