@@ -83,9 +83,9 @@ public class ProductsDAO {
 		case "과일":
 			return "fruits";
 		case "채소":
-			return "vegetables";
-		case "곡식":
-			return "grains";
+			return "vegetable";
+		case "곡물":
+			return "grain";
 		default:
 			throw new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + koreanCategoryName);
 		}

@@ -2,6 +2,9 @@ package com.harvest.bagain.products;
 
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.category.Category;
@@ -51,6 +54,14 @@ public class Products {
     
     @Column(name = "products_photo")
     private String photo;
+    
+    @CreationTimestamp
+    @Column(name = "products_createat")
+    private java.sql.Timestamp createAt;
+
+    @UpdateTimestamp
+    @Column(name = "products_updateat")
+    private java.sql.Timestamp updateAt;
     
     @ManyToOne
     @JoinColumn(name = "category_code", referencedColumnName = "category_code")
