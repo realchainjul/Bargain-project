@@ -10,6 +10,7 @@ const ProductDetailG = () => {
   const [product, setProduct] = useState(null); // 상품 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [count, setCount] = useState(1); // 구매 수량
+  const [liked, setLiked] = useState(false); // 찜 여부
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -30,6 +31,26 @@ const ProductDetailG = () => {
 
     fetchProduct();
   }, [id]);
+
+  // 찜 버튼 클릭 핸들러
+  const handleLike = async () => {
+    try {
+      const response = await axios.post(
+        `https://api.bargainus.kr/products/${id}/liked`, // 변경된 API 주소
+        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 `null`로 설정
+        { withCredentials: true } // 인증 정보 포함
+      );
+      if (response.status === 200) {
+        alert('찜 목록에 추가되었습니다!');
+        setLiked(true); // 찜 상태 업데이트
+      } else {
+        alert('찜 목록 추가에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('찜 추가 오류:', error);
+      alert('서버와 연결할 수 없습니다.');
+    }
+  };
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -70,17 +91,18 @@ const ProductDetailG = () => {
 
         {/* 상품 정보 영역 */}
         <div className={style.menu}>
-        <div className={style.zzim}>
-          <div>
-            <h2 className={style.title}>{product.name}</h2>
-            <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
-          </div>
-          <button
-            className={style.likeButton}
-            onClick={() => alert('찜 목록에 추가되었습니다!')}
-          >
-            <VscHeart />
-          </button>
+          <div className={style.zzim}>
+            <div>
+              <h2 className={style.title}>{product.name}</h2>
+              <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
+            </div>
+            <button
+              className={style.likeButton}
+              onClick={handleLike}
+              disabled={liked} // 이미 찜한 경우 버튼 비활성화
+            >
+              <VscHeart style={{ color: liked ? '#ff4757' : '#000' }} />
+            </button>
           </div>
 
           <div className={style.total}>
