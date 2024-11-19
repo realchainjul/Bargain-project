@@ -26,7 +26,7 @@ public class ProductsAddReq {
     private Integer inventory;
     
     private String comment;
-    private Integer categoryCode;
+    private String categoryName; 
     private String photoFilename;
     private String[] commentPhotoFilenames;
     private List<ProductPhoto> productPhotos;
