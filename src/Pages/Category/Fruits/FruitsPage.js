@@ -32,16 +32,16 @@ const FruitsPage = () => {
   }, []);
 
   // 찜 버튼 클릭 핸들러
-  const handleLike = async (fruit) => {
+  const handleLike = async (fruits) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/liked',
-        { product_code: fruit.pcode },
-        { withCredentials: true }
+        `https://api.bargainus.kr/products/${fruits.pcode}/liked`, // 변경된 주소
+        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
+        { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
-        alert(`${fruit.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLikedItems((prev) => [...prev, fruit.pcode]); // 찜한 상품 ID 저장
+        alert(`${fruits.name}이(가) 찜 목록에 추가되었습니다!`);
+        setLikedItems((prev) => [...prev, fruits.pcode]); // 찜한 상품 ID 저장
       } else {
         alert('찜 목록 추가에 실패했습니다.');
       }
@@ -50,6 +50,7 @@ const FruitsPage = () => {
       alert('서버와 연결할 수 없습니다.');
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -80,7 +81,6 @@ const FruitsPage = () => {
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(fruit.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>

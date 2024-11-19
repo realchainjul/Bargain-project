@@ -35,9 +35,9 @@ const GrainPage = () => { // GrainPage로 이름 변경
   const handleLike = async (grain) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/liked',
-        { product_code: grain.pcode },
-        { withCredentials: true }
+        `https://api.bargainus.kr/products/${grain.pcode}/liked`, // 변경된 주소
+        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
+        { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
         alert(`${grain.name}이(가) 찜 목록에 추가되었습니다!`);
@@ -50,6 +50,7 @@ const GrainPage = () => { // GrainPage로 이름 변경
       alert('서버와 연결할 수 없습니다.');
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -80,7 +81,6 @@ const GrainPage = () => { // GrainPage로 이름 변경
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(grain.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>

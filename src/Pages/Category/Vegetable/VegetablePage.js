@@ -35,9 +35,9 @@ const VegetablePage = () => {
   const handleLike = async (vegetable) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/liked',
-        { product_code: vegetable.pcode },
-        { withCredentials: true }
+        `https://api.bargainus.kr/products/${vegetable.pcode}/liked`, // 변경된 주소
+        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
+        { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
         alert(`${vegetable.name}이(가) 찜 목록에 추가되었습니다!`);
@@ -50,6 +50,7 @@ const VegetablePage = () => {
       alert('서버와 연결할 수 없습니다.');
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -58,7 +59,7 @@ const VegetablePage = () => {
   return (
     <div className={style.fruitsPage}>
       <h1>채소</h1>
-      <div className={style.fruitsPage}>
+      <div className={style.fruitsList}>
         {vegetables.map((vegetable) => (
           <div key={vegetable.pcode} className={style.fruitCard}>
             <img
@@ -80,7 +81,6 @@ const VegetablePage = () => {
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(vegetable.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>

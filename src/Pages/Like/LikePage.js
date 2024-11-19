@@ -41,7 +41,7 @@ export default function MyLike() {
     if (!window.confirm('찜 목록에서 삭제하시겠습니까?')) return;
 
     try {
-      const response = await axios.delete(`https://api.bargainus.kr/liked/${productCode}`, {
+      const response = await axios.delete(`https://api.bargainus.kr/products/${productCode}/liked`, {
         withCredentials: true,
       });
       if (response.status === 200) {
