@@ -76,11 +76,6 @@ public class ProductsDAO {
             product.setComment(req.getComment());
             product.setPhoto(productImageFileName);
             Optional<Category> categoryOpt = cateRepo.findByName(req.getCategoryName());
-            if (!categoryOpt.isPresent()) {
-                response.put("status", false);
-                response.put("message", "유효하지 않은 카테고리 코드입니다.");
-                return response;
-            }
             product.setCategory(categoryOpt.get());
             prodRepo.save(product);
             
