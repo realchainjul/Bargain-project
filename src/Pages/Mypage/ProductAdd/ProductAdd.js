@@ -9,27 +9,27 @@ const ProductAdd = () => {
     name: '',
     price: '',
     inventory: '',
-    comment: '', // 상세 정보 텍스트
-    category: '',
-    photo: null, // 대표 상품 이미지
-    commentPhotos: [], // 상세 정보 이미지 파일들
+    comment: '',
+    category_code: '', // 선택한 카테고리 코드 저장
+    photo: null,
+    commentPhotos: [],
   });
 
   // 서버에서 카테고리 리스트 가져오기
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await axios.get('https://api.bargainus.kr/category');
+        const response = await axios.get('https://api.bargainus.kr/categories'); // 카테고리 API 주소
         if (response.status === 200 && response.data) {
-          setCategories(response.data);
+          setCategories(response.data); // 서버에서 가져온 카테고리 리스트 설정
           setProduct((prev) => ({
             ...prev,
-            category: response.data[0]?.category_name || '', // 기본값 설정
+            category_code: response.data[0]?.category_code || '', // 첫 번째 카테고리를 기본값으로 설정
           }));
         }
       } catch (error) {
         console.error('카테고리 리스트 불러오기 실패:', error);
-        alert('카테고리를 불러오는 데 실패했습니다.');
+        alert('카테고리를 불러오는 데 실패했습니다. 다시 시도해주세요.');
       }
     }
     fetchCategories();
@@ -46,16 +46,16 @@ const ProductAdd = () => {
 
   // 파일 변경 처리
   const handleFileChange = (e) => {
-    const { name, files } = e.target;
+    const { name } = e.target;
     if (name === 'photo') {
       setProduct({
         ...product,
-        photo: files[0],
+        photo: e.target.files[0],
       });
     } else if (name === 'commentPhotos') {
       setProduct({
         ...product,
-        commentPhotos: [...files], // 여러 개 파일 선택 가능
+        commentPhotos: [...e.target.files],
       });
     }
   };
@@ -66,15 +66,15 @@ const ProductAdd = () => {
 
     const formData = new FormData();
     formData.append('name', product.name);
-    formData.append('price', product.price.replace(/,/g, '')); // 콤마 제거
+    formData.append('price', product.price);
     formData.append('inventory', product.inventory);
-    formData.append('comment', product.comment); // 텍스트 상세 정보
-    formData.append('category', product.category);
+    formData.append('comment', product.comment);
+    formData.append('category_code', product.category_code); // 선택된 카테고리 코드 전송
     if (product.photo) {
       formData.append('photo', product.photo);
     }
     if (product.commentPhotos.length > 0) {
-      product.commentPhotos.forEach((file) => formData.append('commentPhotos', file)); // 다중 이미지
+      product.commentPhotos.forEach((file) => formData.append('commentPhotos', file));
     }
 
     try {
@@ -116,7 +116,7 @@ const ProductAdd = () => {
         <div>
           <label>가격</label>
           <input
-            type="text"
+            type="number"
             name="price"
             value={product.price}
             onChange={handleChange}
@@ -136,7 +136,7 @@ const ProductAdd = () => {
           />
         </div>
         <div>
-          <label>상세 정보 텍스트</label>
+          <label>상세 정보</label>
           <textarea
             name="comment"
             value={product.comment}
@@ -144,6 +144,15 @@ const ProductAdd = () => {
             placeholder="상세 정보를 입력하세요"
             rows="4"
             required
+          />
+        </div>
+        <div>
+          <label>대표 상품 이미지</label>
+          <input
+            type="file"
+            name="photo"
+            accept="image/*"
+            onChange={handleFileChange}
           />
         </div>
         <div>
@@ -157,25 +166,16 @@ const ProductAdd = () => {
           />
         </div>
         <div>
-          <label>대표 상품 이미지</label>
-          <input
-            type="file"
-            name="photo"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-        </div>
-        <div>
           <label>분류 카테고리</label>
           <select
-            name="category"
-            value={product.category}
+            name="category_code"
+            value={product.category_code}
             onChange={handleChange}
             required
           >
-            {categories.map((cat, idx) => (
-              <option key={idx} value={cat.category_name}>
-                {cat.category_name}
+            {categories.map((cat) => (
+              <option key={cat.category_code} value={cat.category_code}>
+                {cat.category_name} ({cat.category_code})
               </option>
             ))}
           </select>
