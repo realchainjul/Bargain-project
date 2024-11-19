@@ -1,4 +1,3 @@
-// Liked.java
 package com.harvest.bagain.liked;
 
 import com.harvest.bagain.products.Products;
@@ -11,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity(name = "liked")
+@Entity
+@Table(name = "liked")
 public class Liked {
 
     @Id
@@ -27,13 +28,13 @@ public class Liked {
     private Integer likedNo;
 
     @ManyToOne
-    @JoinColumn(name = "products_code")
+    @JoinColumn(name = "products_code", referencedColumnName = "products_code")
     private Products product;
 
     @ManyToOne
-    @JoinColumn(name = "users_code")
+    @JoinColumn(name = "users_code", referencedColumnName = "users_code")
     private Users user;
 
     @Column(name = "liked_status")
-    private Byte likedStatus;
+    private Boolean likedStatus = false;
 }

@@ -16,20 +16,21 @@ import com.harvest.bagain.products.ProductsDAO;
 
 public class CategoryController {
 
-    @Autowired
-    private ProductsDAO productsDAO;
+	@Autowired
+	private ProductsDAO productsDAO;
 
-    // 카테고리 이름으로 상품 목록 조회
-    @GetMapping("/category/{categoryName}")
-    public ResponseEntity<List<Products>> getProductsByCategory(@PathVariable String categoryName) {
-        List<Products> productsList = productsDAO.getProductsByCategoryName(categoryName);
-        return ResponseEntity.ok(productsList);
-    }
-    
- // 카테고리 이름과 상품 코드로 단일 상품 조회
-    @GetMapping("/{categoryName}/products/{pcode}")
-    public ResponseEntity<Products> getProductByCategoryAndPcode(@PathVariable String categoryName, @PathVariable Integer pcode) {
-        Optional<Products> product = productsDAO.getProductByCategoryAndPcode(categoryName, pcode);
-        return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
+	// 카테고리 이름으로 상품 목록 조회
+	@GetMapping("/category/{categoryName}")
+	public ResponseEntity<List<Products>> getProductsByCategory(@PathVariable String categoryName) {
+		List<Products> productsList = productsDAO.getProductsByCategoryName(categoryName);
+		return ResponseEntity.ok(productsList);
+	}
+
+	// 카테고리 이름과 상품 코드로 단일 상품 조회
+	@GetMapping("/{categoryName}/products/{pcode}")
+	public ResponseEntity<Products> getProductByCategoryAndPcode(@PathVariable String categoryName,
+			@PathVariable Integer pcode) {
+		Optional<Products> product = productsDAO.getProductByCategoryAndPcode(categoryName, pcode);
+		return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+	}
 }
