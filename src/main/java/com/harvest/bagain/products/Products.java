@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.category.Category;
@@ -49,8 +50,8 @@ public class Products {
     @Column(name = "products_flag")
     private Byte flag;
 
-    @Column(name = "products_likes_count")
-    private Integer likesCount;
+    @Column(name = "products_likes_count", nullable = false)
+    private Integer likesCount = 0;
     
     @Column(name = "products_photo")
     private String photo;
@@ -71,7 +72,9 @@ public class Products {
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<Liked> likedUsers;
+
 
     @OneToMany(mappedBy = "product")
     private List<Reviews> reviews;

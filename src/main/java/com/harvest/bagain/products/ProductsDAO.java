@@ -22,6 +22,8 @@ import com.harvest.bagain.productsphoto.ProductPhotoRepository;
 import com.harvest.bagain.users.Users;
 import com.harvest.bagain.users.UsersRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProductsDAO {
 
@@ -70,6 +72,7 @@ public class ProductsDAO {
 			product.setComment(req.getComment());
 			product.setPhoto(productImageFileName);
 			product.setCategory(categoryOpt.get());
+			product.setLikesCount(0);
 			prodRepo.save(product);
 
 			// 상세 내용 이미지 저장 및 ProductPhoto 엔티티 저장
@@ -120,26 +123,27 @@ public class ProductsDAO {
 
 	// 카테고리 이름으로 상품 목록 조회
 	public List<Products> getProductsByCategoryName(String categoryName) {
-		Optional<Category> category = cateRepo.findByName(categoryName);
-		if (category.isPresent()) {
-			List<Products> products = prodRepo.findByCategory(category.get());
-			for (Products product : products) {
-				List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
-				product.setProductPhotos(productPhotos);
-				String productImageUrl = product.getPhoto() != null
-						? "https://file.bargainus.kr/products/images/" + product.getPhoto()
-						: "";
-				product.setPhoto(productImageUrl);
-				for (ProductPhoto productPhoto : productPhotos) {
-					productPhoto.setPhotoUrl(
-							"https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
-				}
-			}
-			return products;
-		} else {
-			return new ArrayList<>();
-		}
+	    Optional<Category> category = cateRepo.findByName(categoryName);
+	    if (category.isPresent()) {
+	        List<Products> products = prodRepo.findByCategory(category.get());
+	        for (Products product : products) {
+	            List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+	            product.setProductPhotos(productPhotos);
+	            String productImageUrl = product.getPhoto() != null
+	                    ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+	                    : "";
+	            product.setPhoto(productImageUrl);
+	            for (ProductPhoto productPhoto : productPhotos) {
+	                productPhoto.setPhotoUrl(
+	                        "https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+	            }
+	        }
+	        return products;
+	    } else {
+	        return new ArrayList<>();
+	    }
 	}
+
 
 	// 카테고리 이름과 상품 코드로 단일 상품 조회
 	public Optional<Products> getProductByCategoryAndPcode(String categoryName, Integer pcode) {
@@ -158,49 +162,50 @@ public class ProductsDAO {
 					return prod;
 				});
 	}
+	// 상품 코드로 상품 조회
+    public Optional<Products> getProductByCode(Integer productCode) {
+        return prodRepo.findById(productCode);
+    }
 
-	// 상품 찜하기/취소
-    public Map<String, Object> toggleLikeProduct(Integer productCode, Integer userCode) {
+    // 사용자 코드로 사용자 조회
+    public Optional<Users> getUserByCode(Integer userCode) {
+        return userRepo.findById(userCode);
+    }
+
+ // 상품 찜하기/취소
+    @Transactional
+    public Map<String, Object> toggleLikeProduct(Products product, Users user) {
         Map<String, Object> response = new HashMap<>();
-        Optional<Products> optionalProduct = prodRepo.findById(productCode);
-        Optional<Users> optionalUser = userRepo.findById(userCode);
+        Optional<Liked> optionalLiked = likedRepo.findByUserAndProduct(user, product);
 
-        if (optionalProduct.isPresent() && optionalUser.isPresent()) {
-            Products product = optionalProduct.get();
-            Users user = optionalUser.get();
-
-            Optional<Liked> optionalLiked = likedRepo.findByUserAndProduct(user, product);
-
-            if (optionalLiked.isPresent()) {
-                Liked liked = optionalLiked.get();
-                if (liked.getLikedStatus()) {
-                    liked.setLikedStatus(false);
-                    product.setLikesCount(product.getLikesCount() - 1);
-                    response.put("message", "찜하기 취소");
-                } else {
-                    liked.setLikedStatus(true);
-                    product.setLikesCount(product.getLikesCount() + 1);
-                    response.put("message", "찜하기 성공");
-                }
-                likedRepo.save(liked);
+        if (optionalLiked.isPresent()) {
+            Liked liked = optionalLiked.get();
+            if (Boolean.TRUE.equals(liked.getLikedStatus())) {
+                liked.setLikedStatus(false);
+                int newLikesCount = Optional.ofNullable(product.getLikesCount()).orElse(0) - 1;
+                product.setLikesCount(Math.max(newLikesCount, 0)); // likesCount가 음수가 되지 않도록 설정
+                response.put("message", "찜하기 취소");
             } else {
-                // 새로운 찜하기 생성
-                Liked newLiked = new Liked();
-                newLiked.setProduct(product);
-                newLiked.setUser(user);
-                newLiked.setLikedStatus(true);
-                likedRepo.save(newLiked);
-                product.setLikesCount(product.getLikesCount() + 1);
+                liked.setLikedStatus(true);
+                product.setLikesCount(Optional.ofNullable(product.getLikesCount()).orElse(0) + 1);
                 response.put("message", "찜하기 성공");
             }
-
-            prodRepo.save(product);
-            response.put("status", true);
-            response.put("newLikesCount", product.getLikesCount());
+            likedRepo.save(liked);
         } else {
-            response.put("status", false);
-            response.put("message", "유효하지 않은 사용자 또는 상품");
+            // 새로운 찜하기 객체 생성
+            Liked newLiked = new Liked();
+            newLiked.setProduct(product);
+            newLiked.setUser(user);
+            newLiked.setLikedStatus(true);
+            likedRepo.save(newLiked);
+            product.setLikesCount(Optional.ofNullable(product.getLikesCount()).orElse(0) + 1);
+            response.put("message", "찜하기 성공");
         }
+
+        prodRepo.save(product);
+        response.put("status", true);
+        response.put("newLikesCount", product.getLikesCount());
         return response;
     }
+
 }

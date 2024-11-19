@@ -1,5 +1,6 @@
 package com.harvest.bagain.liked;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.harvest.bagain.products.Products;
 import com.harvest.bagain.users.Users;
 
@@ -29,7 +30,9 @@ public class Liked {
 
     @ManyToOne
     @JoinColumn(name = "products_code", referencedColumnName = "products_code")
+    @JsonBackReference
     private Products product;
+
 
     @ManyToOne
     @JoinColumn(name = "users_code", referencedColumnName = "users_code")
