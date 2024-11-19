@@ -80,7 +80,6 @@ const FruitsPage = () => {
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(fruit.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>

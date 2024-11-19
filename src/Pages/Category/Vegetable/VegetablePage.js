@@ -35,7 +35,7 @@ const VegetablePage = () => {
   const handleLike = async (vegetable) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/like',
+        'https://api.bargainus.kr/liked',
         { product_code: vegetable.pcode },
         { withCredentials: true }
       );
@@ -58,7 +58,7 @@ const VegetablePage = () => {
   return (
     <div className={style.fruitsPage}>
       <h1>채소</h1>
-      <div className={style.fruitsPage}>
+      <div className={style.fruitsList}>
         {vegetables.map((vegetable) => (
           <div key={vegetable.pcode} className={style.fruitCard}>
             <img
@@ -80,7 +80,6 @@ const VegetablePage = () => {
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(vegetable.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>

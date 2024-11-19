@@ -35,7 +35,7 @@ const GrainPage = () => { // GrainPage로 이름 변경
   const handleLike = async (grain) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/like',
+        'https://api.bargainus.kr/liked',
         { product_code: grain.pcode },
         { withCredentials: true }
       );
@@ -80,7 +80,6 @@ const GrainPage = () => { // GrainPage로 이름 변경
                 }}
               >
                 <VscHeart size="20" />
-                {likedItems.includes(grain.pcode) ? '찜 완료' : '찜하기'}
               </button>
             </div>
           </div>
