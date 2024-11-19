@@ -21,43 +21,60 @@ import com.harvest.bagain.productsphoto.ProductPhotoRepository;
 @Service
 public class ProductsDAO {
 
-    @Autowired
-    private CategoryRepository cateRepo;
+	@Autowired
+	private CategoryRepository cateRepo;
 
-    @Autowired
-    private ProductsRepository prodRepo;
-    
-    @Autowired
-    private ProductPhotoRepository productPhotoRepo;
+	@Autowired
+	private ProductsRepository prodRepo;
 
-    @Value("${products.images.directory}")
-    private String productsImagesDirectory;
+	@Autowired
+	private ProductPhotoRepository productPhotoRepo;
 
-    @Value("${productcomment.images.directory}")
-    private String productCommentImagesDirectory;
+	@Value("${products.images.directory}")
+	private String productsImagesDirectory;
 
-    // 카테고리 이름으로 상품 목록 조회
-    public List<Products> getProductsByCategoryName(String categoryName) {
-        Optional<Category> category = cateRepo.findByName(categoryName);
-        if (category.isPresent()) {
-            List<Products> products = prodRepo.findByCategory(category.get());
-            for (Products product : products) {
-                List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
-                product.setProductPhotos(productPhotos);
-                String productImageUrl = product.getPhoto() != null ? "https://file.bargainus.kr/products/images/" + product.getPhoto() : "";
-                product.setPhoto(productImageUrl);
-                for (ProductPhoto productPhoto : productPhotos) {
-                    productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
-                }
-            }
-            return products;
-        } else {
-            return new ArrayList<>();
-        }
-    }
+	@Value("${productcomment.images.directory}")
+	private String productCommentImagesDirectory;
 
-    // 상품 등록
-    public Map<String, Object> addProduct(ProductsAddReq req, MultipartFile photo, MultipartFile[] commentphoto) {
+	// 카테고리 이름으로 상품 목록 조회
+	public List<Products> getProductsByCategoryName(String categoryName) {
+		Optional<Category> category = cateRepo.findByName(categoryName);
+		if (category.isPresent()) {
+			List<Products> products = prodRepo.findByCategory(category.get());
+			for (Products product : products) {
+				List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+				product.setProductPhotos(productPhotos);
+				String productImageUrl = product.getPhoto() != null
+						? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+						: "";
+				product.setPhoto(productImageUrl);
+				for (ProductPhoto productPhoto : productPhotos) {
+					productPhoto.setPhotoUrl(
+							"https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+				}
+			}
+			return products;
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	// 카테고리 이름을 영어로 변환하는 메서드
+	private String convertCategoryNameToEnglish(String koreanCategoryName) {
+		switch (koreanCategoryName) {
+		case "과일":
+			return "fruits";
+		case "채소":
+			return "vegetables";
+		case "곡식":
+			return "grains";
+		default:
+			throw new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + koreanCategoryName);
+		}
+	}
+
+	// 상품 등록
+	public Map<String, Object> addProduct(ProductsAddReq req, MultipartFile photo, MultipartFile[] commentphoto) {
         String productImageFileName = null;
         Map<String, Object> response = new HashMap<>();
         try {
@@ -68,6 +85,10 @@ public class ProductsDAO {
                 req.setPhotoFilename(productImageFileName); // DTO에 파일명만 저장
             }
             
+            // 카테고리 이름 변환
+            String englishCategoryName = convertCategoryNameToEnglish(req.getCategoryName());
+            Optional<Category> categoryOpt = cateRepo.findByName(englishCategoryName);
+            
             // Products 객체 생성 및 저장
             Products product = new Products();
             product.setName(req.getName());
@@ -75,7 +96,6 @@ public class ProductsDAO {
             product.setInventory(req.getInventory());
             product.setComment(req.getComment());
             product.setPhoto(productImageFileName);
-            Optional<Category> categoryOpt = cateRepo.findByName(req.getCategoryName());
             product.setCategory(categoryOpt.get());
             prodRepo.save(product);
             
@@ -91,7 +111,7 @@ public class ProductsDAO {
                         // ProductPhoto 객체 저장
                         ProductPhoto productPhoto = new ProductPhoto();
                         productPhoto.setProduct(product);
-                        productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + commentImageFileName);
+                        productPhoto.setPhotoUrl(commentImageFileName);
                         productPhotoRepo.save(productPhoto);
                     }
                 }
