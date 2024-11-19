@@ -35,7 +35,7 @@ const VegetablePage = () => {
   const handleLike = async (vegetable) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/liked',
+        'https://api.bargainus.kr/like',
         { product_code: vegetable.pcode },
         { withCredentials: true }
       );

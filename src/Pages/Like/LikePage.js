@@ -17,7 +17,7 @@ export default function MyLike() {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/liked', {
+        const response = await axios.get('https://api.bargainus.kr/like', {
           withCredentials: true, // 인증 정보 포함
         });
         if (response.status === 200) {
@@ -41,7 +41,7 @@ export default function MyLike() {
     if (!window.confirm('찜 목록에서 삭제하시겠습니까?')) return;
 
     try {
-      const response = await axios.delete(`https://api.bargainus.kr/liked/${productCode}`, {
+      const response = await axios.delete(`https://api.bargainus.kr/like/${productCode}`, {
         withCredentials: true,
       });
       if (response.status === 200) {

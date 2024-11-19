@@ -35,7 +35,7 @@ const GrainPage = () => { // GrainPage로 이름 변경
   const handleLike = async (grain) => {
     try {
       const response = await axios.post(
-        'https://api.bargainus.kr/liked',
+        'https://api.bargainus.kr/like',
         { product_code: grain.pcode },
         { withCredentials: true }
       );
