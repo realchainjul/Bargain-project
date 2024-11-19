@@ -57,7 +57,7 @@ const FruitsPage = () => {
 
   return (
     <div className={style.fruitsPage}>
-      <h1>과일 목록</h1>
+      <h1>과일</h1>
       <div className={style.fruitsList}>
         {fruits.map((fruit) => (
           <div key={fruit.pcode} className={style.fruitCard}>
@@ -65,7 +65,7 @@ const FruitsPage = () => {
               src={fruit.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
               alt={fruit.name}
               className={style.fruitImage}
-              onClick={() => navigate(`/products/${fruit.pcode}`)} // 상품 클릭 시 상세 페이지로 이동
+              onClick={() => navigate(`/category/fruits/products/${fruit.pcode}`)} // 상세 페이지로 이동
             />
             <div className={style.fruitInfo}>
               <h2>{fruit.name}</h2>

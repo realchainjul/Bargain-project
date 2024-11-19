@@ -1,15 +1,23 @@
 .fruitsPage {
     padding: 20px;
-  
+    font-family: 'Pretendard-Regular';
     h1 {
       text-align: center;
       margin-bottom: 20px;
+      padding-bottom: 3rem;
+      padding-top: 3rem;
+      width: 100%;
     }
   
     .fruitsList {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
+      grid-gap: 20px;
+      flex-wrap: wrap;
+      grid-template-columns: repeat(auto-fill, 180px);
+      justify-content: center;
+      min-height: 50vh;
+      width: 100%;
     }
   
     .fruitCard {
