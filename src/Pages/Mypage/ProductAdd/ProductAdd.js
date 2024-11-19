@@ -19,7 +19,7 @@ const ProductAdd = () => {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await axios.get('https://api.bargainus.kr/categories'); // 카테고리 API 주소
+        const response = await axios.get('https://api.bargainus.kr/category'); // 카테고리 API 주소
         if (response.status === 200 && response.data) {
           setCategories(response.data); // 서버에서 가져온 카테고리 리스트 설정
           setProduct((prev) => ({
