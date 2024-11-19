@@ -60,7 +60,6 @@ function App() {
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
         <Route path="/mypage/like" element={<LikePage /> }/>
-        <Route path="/mypage/userpage/productadd" element={<LikePage /> }/>
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
           <Route index element={<Navigate to="/mypage/userpage/info" />} />
