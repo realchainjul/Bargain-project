@@ -71,6 +71,14 @@
           color: #404040;
           font-size: 16px;
         }
+        .likeButton{
+          svg {
+            color: #ff4757; /* 찜 버튼 색상 */
+            font-size: 24px;
+            transition: transform 0.2s;
+          }
+          
+        }
       }
 
       .total {
