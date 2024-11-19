@@ -23,9 +23,9 @@ function BannerSub() {
       spaceBetween={70} // 슬라이드간의 간격
       slidesPerView={4} // 한 번에 보여지는 슬라이드 개수
       style={{
-        "--swiper-navigation-color": "#43007c",
+        "--swiper-navigation-color": "#383810",
         "--swiper-navigation-size": "40px",
-        "--swiper-pagination-color": "#43007c"
+        "--swiper-pagination-color": "#383810"
       }}
       breakpoints= {{
         1800:{
@@ -63,7 +63,7 @@ function BannerSub() {
       </a>
       </SwiperSlide>
       <SwiperSlide className={style.slide}>
-      <a href="/products/">
+      <a href="/grain/products/6">
       <img src="https://simg.ssgcdn.com/trans.ssg?src=/cmpt/edit/202405/16/132024051613284001788369076936_579.jpg&w=830&t=734c7a1c0fd519916a1310e70db19b19397a767e" alt="" className={style.image}/>
       </a>
       </SwiperSlide>

@@ -17,8 +17,8 @@ import 'swiper/css/autoplay';
         spaceBetween={0} // 슬라이드간의 간격
         slidesPerView={1} // 한 번에 보여지는 슬라이드 개수
         style={{
-          '--swiper-navigation-color': '#43007c',
-          '--swiper-pagination-color': '#43007c',
+          '--swiper-navigation-color': '#383810',
+          '--swiper-pagination-color': '#383810',
         }}
       >
         <SwiperSlide className={style.slide}>

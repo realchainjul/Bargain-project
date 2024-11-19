@@ -4,9 +4,7 @@ import axios from 'axios';
 import Button from '../../components/common/Button';
 import style from './Login.module.scss';
 
-//일반인 로그인 구현
-
-function Login() {
+function Login({ setIsLoggedIn, setNickname }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,9 +14,16 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://bargainus.kr/api/login', { email, password });
-      if (response.data.success) {
-        navigate('/home');
+      const response = await axios.post('https://api.bargainus.kr/login', null, {
+        params: { email, password },
+        withCredentials: true,
+      });
+
+      if (response.data.status) {
+        alert('로그인 성공!');
+        setIsLoggedIn(true);
+        setNickname(response.data.nickname);
+        navigate('/');
       } else {
         setErrorMessage(response.data.message || '이메일 또는 비밀번호를 확인하세요.');
       }
@@ -26,19 +31,6 @@ function Login() {
       setErrorMessage(error.response?.data?.message || '서버 오류가 발생했습니다.');
     }
   };
-
-  const buttons = [
-    {
-      type: 'submit',
-      name: '로그인',
-      className: style.loginButton,
-      isBrown: true,
-    },
-    {
-      name: '회원가입',
-      onClick: () => navigate('/signup'),
-    },
-  ];
 
   return (
     <section className={style.login}>
@@ -63,9 +55,8 @@ function Login() {
           />
           {errorMessage && <p className={style.error}>{errorMessage}</p>}
           <section className={style.login_container_buttonSection}>
-            {buttons.map((buttonProps, index) => (
-              <Button key={index} {...buttonProps} />
-            ))}
+            <Button type="submit" name="로그인" isBrown={true} />
+            <Button name="회원가입" onClick={() => navigate('/signup')} />
           </section>
         </form>
       </section>

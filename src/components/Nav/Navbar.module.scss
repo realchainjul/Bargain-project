@@ -18,6 +18,15 @@
     height: 2.6rem;
     font-size: 13px;
     
+    .welcomeText {
+      font-family: 'Pretendard-Regular';
+    }
+
+    .separator {
+      color: rgb(217, 217, 217); /* 구분선 색상 */
+      font-weight: bold;
+    }
+
     a,
     p {
       &:first-child {
@@ -36,6 +45,23 @@
       text-decoration: none;
   }
 }
+
+.logoutButton {
+  font-family: 'Pretendard-Regular';
+  background-color: white;
+  color: #404040;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #a99773;
+  }
+}
+
+
 
   .search {
     width: 74vm;
