@@ -65,7 +65,7 @@ const FruitsPage = () => {
               src={fruit.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
               alt={fruit.name}
               className={style.fruitImage}
-              onClick={() => navigate(`/category/fruits/products/${fruit.pcode}`)} // 상세 페이지로 이동
+              onClick={() => navigate(`/fruits/products/${fruit.pcode}`)} // 상세 페이지로 이동
             />
             <div className={style.fruitInfo}>
               <h2>{fruit.name}</h2>
