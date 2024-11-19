@@ -10,9 +10,9 @@ const ProductAdd = () => {
     price: '',
     inventory: '',
     comment: '',
-    category_code: '', // 선택한 카테고리 코드 저장
-    photo: null,
-    commentPhotos: [],
+    category_name: '', // 카테고리 이름 저장
+    photo: null, // 대표 상품 이미지
+    commentphoto: [], // 상세 정보 이미지 리스트
   });
 
   // 서버에서 카테고리 리스트 가져오기
@@ -24,7 +24,7 @@ const ProductAdd = () => {
           setCategories(response.data); // 서버에서 가져온 카테고리 리스트 설정
           setProduct((prev) => ({
             ...prev,
-            category_code: response.data[0]?.category_code || '', // 첫 번째 카테고리를 기본값으로 설정
+            category_name: response.data[0]?.name || '', // 첫 번째 카테고리를 기본값으로 설정
           }));
         }
       } catch (error) {
@@ -50,12 +50,12 @@ const ProductAdd = () => {
     if (name === 'photo') {
       setProduct({
         ...product,
-        photo: e.target.files[0],
+        photo: e.target.files[0], // 대표 이미지 저장
       });
-    } else if (name === 'commentPhotos') {
+    } else if (name === 'commentphoto') {
       setProduct({
         ...product,
-        commentPhotos: [...e.target.files],
+        commentphoto: [...e.target.files], // 상세 정보 이미지 리스트 저장
       });
     }
   };
@@ -69,26 +69,26 @@ const ProductAdd = () => {
     formData.append('price', product.price);
     formData.append('inventory', product.inventory);
     formData.append('comment', product.comment);
-    formData.append('category_code', product.category_code); // 선택된 카테고리 코드 전송
+    formData.append('category_name', product.category_name); // 선택된 카테고리 이름 전송
     if (product.photo) {
       formData.append('photo', product.photo);
     }
-    if (product.commentPhotos.length > 0) {
-      product.commentPhotos.forEach((file) => formData.append('commentPhotos', file));
+    if (product.commentphoto.length > 0) {
+      product.commentphoto.forEach((file) => formData.append('commentphoto', file));
     }
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/product/add', formData, {
+      const response = await axios.post('https://api.bargainus.kr/mypage/userpage/productadd', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.status) {
         alert('상품이 성공적으로 등록되었습니다!');
       } else {
-        alert('상품 등록에 실패했습니다.');
+        alert(response.data.message || '상품 등록에 실패했습니다.');
       }
     } catch (error) {
       console.error('상품 등록 중 오류 발생:', error.response?.data || error);
@@ -159,7 +159,7 @@ const ProductAdd = () => {
           <label>상세 정보 이미지</label>
           <input
             type="file"
-            name="commentPhotos"
+            name="commentphoto"
             accept="image/*"
             onChange={handleFileChange}
             multiple
@@ -168,14 +168,14 @@ const ProductAdd = () => {
         <div>
           <label>분류 카테고리</label>
           <select
-            name="category_code"
-            value={product.category_code}
+            name="category_name"
+            value={product.category_name}
             onChange={handleChange}
             required
           >
             {categories.map((cat) => (
-              <option key={cat.category_code} value={cat.category_code}>
-                {cat.category_name} ({cat.category_code})
+              <option key={cat.code} value={cat.name}>
+                {cat.name}
               </option>
             ))}
           </select>
