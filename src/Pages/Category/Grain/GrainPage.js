@@ -65,7 +65,7 @@ const GrainPage = () => { // GrainPage로 이름 변경
               src={grain.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
               alt={grain.name}
               className={style.fruitImage} // 클래스 이름 변경
-              onClick={() => navigate(`/grains/products/${grain.pcode}`)} // 경로에 grains 사용
+              onClick={() => navigate(`/grain/products/${grain.pcode}`)} // 경로에 grains 사용
             />
             <div className={style.fruitInfo}> {/* 클래스 이름 변경 */}
               <h2>{grain.name}</h2>
