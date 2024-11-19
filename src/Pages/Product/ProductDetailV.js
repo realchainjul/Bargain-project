@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import style from './ProductDetail.module.scss';
+import { VscHeart } from 'react-icons/vsc';
 import Button from '../../components/common/Button';
 
 const ProductDetailG = () => {
@@ -49,6 +50,7 @@ const ProductDetailG = () => {
             alt={product.name}
             className={style.productImage}
           />
+          <p className={style.desc}>{product.comment}</p>
           {/* 상세 이미지 */}
           <div className={style.detailImages}>
             {product.productPhotos && product.productPhotos.length > 0 ? (
@@ -68,11 +70,18 @@ const ProductDetailG = () => {
 
         {/* 상품 정보 영역 */}
         <div className={style.menu}>
-          <div className={style.info}>
+        <div className={style.info}>
+          <div>
             <h2 className={style.title}>{product.name}</h2>
             <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
-            <p className={style.desc}>{product.comment}</p>
           </div>
+          <button
+            className={style.likeButton}
+            onClick={() => alert('찜 목록에 추가되었습니다!')}
+          >
+            <VscHeart />
+          </button>
+        </div>
 
           <div className={style.total}>
             <div className={style.countwrap}>
