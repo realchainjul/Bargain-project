@@ -14,12 +14,26 @@ const ProductAdd = () => {
     commentPhotos: [], // 상세 이미지 배열
   });
 
+  const formatPrice = (value) => {
+    // 숫자만 추출 후 천 단위 콤마 추가
+    return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct({
-      ...product,
-      [name]: value,
-    });
+
+    // 가격 입력 필드 포맷팅
+    if (name === 'price') {
+      setProduct({
+        ...product,
+        [name]: formatPrice(value), // 콤마 추가된 값 설정
+      });
+    } else {
+      setProduct({
+        ...product,
+        [name]: value,
+      });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -42,7 +56,7 @@ const ProductAdd = () => {
 
     const formData = new FormData();
     formData.append('name', product.name);
-    formData.append('price', product.price);
+    formData.append('price', product.price.replace(/,/g, '')); // 콤마 제거 후 전송
     formData.append('inventory', product.inventory);
     formData.append('comment', product.comment);
     formData.append('categoryName', product.categoryName); // 카테고리 이름
@@ -92,7 +106,7 @@ const ProductAdd = () => {
         <div>
           <label>가격</label>
           <input
-            type="number"
+            type="text" // 숫자 대신 텍스트로 처리하여 포맷팅 적용
             name="price"
             value={product.price}
             onChange={handleChange}
