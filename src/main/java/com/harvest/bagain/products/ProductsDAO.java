@@ -58,6 +58,24 @@ public class ProductsDAO {
 			return new ArrayList<>();
 		}
 	}
+	// 카테고리 이름과 상품 코드로 단일 상품 조회
+	public Optional<Products> getProductByCategoryAndPcode(String categoryName, Integer pcode) {
+	    return cateRepo.findByName(categoryName)
+	            .flatMap(category -> prodRepo.findProductByCategoryAndPcode(category, pcode))
+	            .map(prod -> {
+	                List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(prod);
+	                prod.setProductPhotos(productPhotos);
+	                String productImageUrl = prod.getPhoto() != null
+	                        ? "https://file.bargainus.kr/products/images/" + prod.getPhoto()
+	                        : "";
+	                prod.setPhoto(productImageUrl);
+	                for (ProductPhoto productPhoto : productPhotos) {
+	                    productPhoto.setPhotoUrl(
+	                            "https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+	                }
+	                return prod;
+	            });
+	}
 
 	// 카테고리 이름을 영어로 변환하는 메서드
 	private String convertCategoryNameToEnglish(String koreanCategoryName) {

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    Optional<Category> findByName(String name); // 필드 이름과 일치하도록 수정
+    Optional<Category> findByName(String name);
 }
