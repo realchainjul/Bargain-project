@@ -23,6 +23,7 @@
         margin-bottom: 40px;
         object-fit: cover;
         border-bottom: 2px solid rgb(51, 51, 51);
+        padding-bottom: 50px;
       }
 
       .detailImages {
@@ -50,6 +51,8 @@
       border-left: 1px solid #eeeeee;
 
       .info {
+        display: flex;
+          justify-content: space-between;
         .title {
           font-size: 24px;
           font-weight: 700;
