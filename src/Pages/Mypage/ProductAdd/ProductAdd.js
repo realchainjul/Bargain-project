@@ -1,41 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import style from './ProductAdd.module.scss';
 import Button from '../../../components/common/Button';
 import axios from 'axios';
 
 const ProductAdd = () => {
-  const [categories, setCategories] = useState([]); // 서버에서 가져온 카테고리 리스트
   const [product, setProduct] = useState({
     name: '',
     price: '',
     inventory: '',
     comment: '',
-    category_name: '', // 카테고리 이름 저장
-    photo: null, // 대표 상품 이미지
-    commentphoto: [], // 상세 정보 이미지 리스트
+    categoryName: '', // 카테고리 이름
+    photo: null, // 대표 이미지
+    commentPhotos: [], // 상세 이미지 배열
   });
 
-  // 서버에서 카테고리 리스트 가져오기
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await axios.get('https://api.bargainus.kr/category'); // 카테고리 API 주소
-        if (response.status === 200 && response.data) {
-          setCategories(response.data); // 서버에서 가져온 카테고리 리스트 설정
-          setProduct((prev) => ({
-            ...prev,
-            category_name: response.data[0]?.name || '', // 첫 번째 카테고리를 기본값으로 설정
-          }));
-        }
-      } catch (error) {
-        console.error('카테고리 리스트 불러오기 실패:', error);
-        alert('카테고리를 불러오는 데 실패했습니다. 다시 시도해주세요.');
-      }
-    }
-    fetchCategories();
-  }, []);
-
-  // 입력 변경 처리
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct({
@@ -44,23 +22,21 @@ const ProductAdd = () => {
     });
   };
 
-  // 파일 변경 처리
   const handleFileChange = (e) => {
-    const { name } = e.target;
+    const { name, files } = e.target;
     if (name === 'photo') {
       setProduct({
         ...product,
-        photo: e.target.files[0], // 대표 이미지 저장
+        photo: files[0], // 단일 파일
       });
-    } else if (name === 'commentphoto') {
+    } else if (name === 'commentPhotos') {
       setProduct({
         ...product,
-        commentphoto: [...e.target.files], // 상세 정보 이미지 리스트 저장
+        commentPhotos: [...files], // 파일 배열
       });
     }
   };
 
-  // 폼 제출 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -69,26 +45,26 @@ const ProductAdd = () => {
     formData.append('price', product.price);
     formData.append('inventory', product.inventory);
     formData.append('comment', product.comment);
-    formData.append('category_name', product.category_name); // 선택된 카테고리 이름 전송
+    formData.append('categoryName', product.categoryName); // 카테고리 이름
     if (product.photo) {
-      formData.append('photo', product.photo);
+      formData.append('photo', product.photo); // 대표 이미지
     }
-    if (product.commentphoto.length > 0) {
-      product.commentphoto.forEach((file) => formData.append('commentphoto', file));
+    if (product.commentPhotos.length > 0) {
+      product.commentPhotos.forEach((file) => formData.append('commentphoto', file)); // 상세 이미지
     }
 
     try {
-      const response = await axios.post('https://api.bargainus.kr/mypage/userpage/productadd', formData, {
+      const response = await axios.post('https://bargainus.kr/mypage/userpage/productadd', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
       });
 
-      if (response.status === 200 && response.data.status) {
+      if (response.status === 200) {
         alert('상품이 성공적으로 등록되었습니다!');
       } else {
-        alert(response.data.message || '상품 등록에 실패했습니다.');
+        alert(`등록 실패: ${response.data.message}`);
       }
     } catch (error) {
       console.error('상품 등록 중 오류 발생:', error.response?.data || error);
@@ -136,18 +112,28 @@ const ProductAdd = () => {
           />
         </div>
         <div>
-          <label>상세 정보</label>
+          <label>상세 설명</label>
           <textarea
             name="comment"
             value={product.comment}
             onChange={handleChange}
-            placeholder="상세 정보를 입력하세요"
+            placeholder="상세 설명을 입력하세요"
             rows="4"
             required
           />
         </div>
         <div>
-          <label>대표 상품 이미지</label>
+          <label>상세 설명 이미지</label>
+          <input
+            type="file"
+            name="commentPhotos"
+            accept="image/*"
+            onChange={handleFileChange}
+            multiple
+          />
+        </div>
+        <div>
+          <label>대표 이미지</label>
           <input
             type="file"
             name="photo"
@@ -156,28 +142,19 @@ const ProductAdd = () => {
           />
         </div>
         <div>
-          <label>상세 정보 이미지</label>
-          <input
-            type="file"
-            name="commentphoto"
-            accept="image/*"
-            onChange={handleFileChange}
-            multiple
-          />
-        </div>
-        <div>
           <label>분류 카테고리</label>
           <select
-            name="category_name"
-            value={product.category_name}
+            name="categoryName"
+            value={product.categoryName}
             onChange={handleChange}
             required
           >
-            {categories.map((cat) => (
-              <option key={cat.code} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
+            <option value="" disabled>
+              카테고리를 선택하세요
+            </option>
+            <option value="과일">과일</option>
+            <option value="채소">채소</option>
+            <option value="곡물">곡물</option>
           </select>
         </div>
         <section className={style.btn}>
