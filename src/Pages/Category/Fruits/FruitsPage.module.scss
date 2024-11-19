@@ -45,9 +45,6 @@
       }
   
       .fruitInfo {
-        display: flex; /* 플렉스 설정 */
-        align-items: center; /* 세로 가운데 정렬 */
-        justify-content: space-between; /* h2, p와 버튼 사이 공간 확보 */
         padding: 15px;
   
         h2 {
@@ -62,11 +59,9 @@
           font-size: 1.2rem;
           font-weight: bold;
           color: #333;
-          margin-left: 10px; /* 텍스트 간격 확보 */
         }
   
         button {
-          margin-left: auto; /* 버튼을 오른쪽으로 배치 */
           background-color: #f7f7f7;
           border: none;
           border-radius: 4px;
