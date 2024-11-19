@@ -14,6 +14,8 @@ import MyInfo from './Pages/Mypage/MyInfo/MyInfo';
 import { useState, useEffect } from 'react';
 import ProductAdd from './Pages/Mypage/ProductAdd/ProductAdd';
 import ProductDetail from './Pages/Product/ProductDetail';
+import ProductDetailG from './Pages/Product/ProductDetailG';
+import ProductDetailV from './Pages/Product/ProductDetailV';
 import axios from 'axios';
 
 function App() {
@@ -62,6 +64,8 @@ function App() {
         <Route path="/category/grain" element={<GrainPage />} />
         <Route path="/mypage/like" element={<LikePage /> }/>
         <Route path="/fruits/products/:id" element={<ProductDetail />} />
+        <Route path="/vegetable/products/:id" element={<ProductDetailV />} />
+        <Route path="/grain/products/:id" element={<ProductDetailG />} />
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
           <Route index element={<Navigate to="/mypage/userpage/info" />} />
