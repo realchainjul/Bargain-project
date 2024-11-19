@@ -70,8 +70,8 @@ const ProductDetailG = () => {
 
         {/* 상품 정보 영역 */}
         <div className={style.menu}>
-        <div className={style.info}>
-          <div className={style.zzim}>
+        <div className={style.zzim}>
+          <div>
             <h2 className={style.title}>{product.name}</h2>
             <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
           </div>
