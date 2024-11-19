@@ -68,7 +68,7 @@ const ProductAdd = () => {
     }
 
     try {
-      const response = await axios.post('https://bargainus.kr/productadd', formData, {
+      const response = await axios.post('https://api.bargainus.kr/mypage/userpage/productadd', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
