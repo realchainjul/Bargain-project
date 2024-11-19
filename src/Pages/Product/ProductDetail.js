@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './Product.module.scss';
+import style from './ProductDetail.module.scss';
 import Button from '../../components/common/Button';
 import Cart from '../../components/Product/Cart/Cart';
 import { useEffect, useState } from 'react';
