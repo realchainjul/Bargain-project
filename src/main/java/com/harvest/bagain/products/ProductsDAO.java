@@ -40,7 +40,17 @@ public class ProductsDAO {
     public List<Products> getProductsByCategoryName(String categoryName) {
         Optional<Category> category = cateRepo.findByName(categoryName);
         if (category.isPresent()) {
-            return prodRepo.findByCategory(category.get());
+            List<Products> products = prodRepo.findByCategory(category.get());
+            for (Products product : products) {
+                List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+                product.setProductPhotos(productPhotos);
+                String productImageUrl = product.getPhoto() != null ? "https://file.bargainus.kr/products/images/" + product.getPhoto() : "";
+                product.setPhoto(productImageUrl);
+                for (ProductPhoto productPhoto : productPhotos) {
+                    productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+                }
+            }
+            return products;
         } else {
             return new ArrayList<>();
         }
@@ -86,11 +96,12 @@ public class ProductsDAO {
                         // ProductPhoto 객체 저장
                         ProductPhoto productPhoto = new ProductPhoto();
                         productPhoto.setProduct(product);
-                        productPhoto.setPhotoUrl(commentImageFileName);
+                        productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + commentImageFileName);
                         productPhotoRepo.save(productPhoto);
                     }
                 }
                 req.setCommentPhotoFilenames(commentPhotoFilenames.toArray(new String[0])); // 파일명들 저장
+                product.setProductPhotos(productPhotoRepo.findByProduct(product)); // ProductPhoto 리스트 설정
             }
 
             response.put("status", true);

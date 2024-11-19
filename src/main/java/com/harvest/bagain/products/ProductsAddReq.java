@@ -1,5 +1,9 @@
 package com.harvest.bagain.products;
 
+import java.util.List;
+
+import com.harvest.bagain.productsphoto.ProductPhoto;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -25,4 +29,5 @@ public class ProductsAddReq {
     private Integer categoryCode;
     private String photoFilename;
     private String[] commentPhotoFilenames;
+    private List<ProductPhoto> productPhotos;
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.category.Category;
 import com.harvest.bagain.liked.Liked;
+import com.harvest.bagain.productsphoto.ProductPhoto;
 import com.harvest.bagain.reviews.Reviews;
 
 import jakarta.persistence.Column;
@@ -62,4 +63,7 @@ public class Products {
 
     @OneToMany(mappedBy = "product")
     private List<Reviews> reviews;
+    
+    @OneToMany(mappedBy = "product")
+    private List<ProductPhoto> productPhotos;
 }
