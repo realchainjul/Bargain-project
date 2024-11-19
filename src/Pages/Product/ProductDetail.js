@@ -13,7 +13,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/products/${id}`);
+        const response = await axios.get(`https://api.bargainus.kr/fruits/products/${id}`);
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
         } else {
