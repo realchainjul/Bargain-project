@@ -1,5 +1,6 @@
 package com.harvest.bagain.productsphoto;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.harvest.bagain.products.Products;
 
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ public class ProductPhoto {
 
     @ManyToOne
     @JoinColumn(name = "products_code")
+    @JsonBackReference
     private Products product;
 
     @Column(name = "photo_url")

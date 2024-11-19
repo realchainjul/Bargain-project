@@ -2,6 +2,7 @@ package com.harvest.bagain.products;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.category.Category;
 import com.harvest.bagain.liked.Liked;
@@ -65,5 +66,6 @@ public class Products {
     private List<Reviews> reviews;
     
     @OneToMany(mappedBy = "product")
+    @JsonManagedReference
     private List<ProductPhoto> productPhotos;
 }
