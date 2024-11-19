@@ -10,4 +10,4 @@ import com.harvest.bagain.category.Category;
 @Repository
 public interface ProductsRepository extends JpaRepository<Products, Integer> {
     List<Products> findByCategory(Category category); 
-}
+} 

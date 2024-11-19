@@ -1,22 +1,32 @@
 package com.harvest.bagain.products;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/mypage/userpage/")
 public class ProductsController {
+
     @Autowired
     private ProductsDAO productsDAO;
 
-    // 카테고리 이름으로 상품 목록 조회
-    @GetMapping("/{categoryName}")
-    public List<Products> getProductsByCategoryName(@PathVariable String categoryName) {
-        return productsDAO.getProductsByCategoryName(categoryName);
+    // 상품 등록
+    @PostMapping("/productadd")
+    public ResponseEntity<Map<String, Object>> addProduct(
+            @Validated @ModelAttribute ProductsAddReq req,
+            @RequestParam(required = false) MultipartFile photo,
+            @RequestParam(required = false) MultipartFile[] commentphoto) {
+
+        Map<String, Object> result = productsDAO.addProduct(req, photo, commentphoto);
+        return ResponseEntity.ok(result);
     }
 }

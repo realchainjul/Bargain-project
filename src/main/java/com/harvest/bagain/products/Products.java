@@ -9,6 +9,8 @@ import com.harvest.bagain.reviews.Reviews;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,8 +24,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity(name = "products")
 public class Products {
-    @Id
-    @Column(name = "products_code")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "products_code")
     private Integer pcode;
 
     @Column(name = "products_name")
@@ -43,6 +46,9 @@ public class Products {
 
     @Column(name = "products_likes_count")
     private Integer likesCount;
+    
+    @Column(name = "products_photo")
+    private String photo;
     
     @ManyToOne
     @JoinColumn(name = "category_code", referencedColumnName = "category_code")
