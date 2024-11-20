@@ -18,10 +18,10 @@ function BannerSub() {
       className={style.swiper}
       modules = {[Pagination, Autoplay]}
       pagination={{ clickable : true }}
-      loop={true} // 루프 슬라이드cd
-      autoplay={{ delay: 4000 }} // 자동 슬라이드
-      spaceBetween={70} // 슬라이드간의 간격
-      slidesPerView={4} // 한 번에 보여지는 슬라이드 개수
+      loop={true} 
+      autoplay={{ delay: 4000 }} 
+      spaceBetween={70} 
+      slidesPerView={4} 
       style={{
         "--swiper-navigation-color": "#383810",
         "--swiper-navigation-size": "40px",
@@ -53,7 +53,7 @@ function BannerSub() {
       </a>
       </SwiperSlide>
       <SwiperSlide className={style.slide}>
-      <a href="/products/">
+      <a href="/fruits/products/11">
       <img src="https://simg.ssgcdn.com/trans.ssg?src=/cmpt/edit/202303/29/102023032910151010083953051495_975.jpg&w=830&t=ee7048857c2106150c3abdbd8cf9ac683a5c17a7" alt="" className={style.image}/>
       </a>
       </SwiperSlide>

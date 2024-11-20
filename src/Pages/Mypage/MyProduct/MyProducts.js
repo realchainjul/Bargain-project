@@ -78,28 +78,31 @@ const MyProducts = () => {
             <p>등록된 상품이 없습니다.</p>
           </div>
         ) : (
-          products.slice(offset, offset + limit).map((product) => (
-            <li key={product.pcode}>
-              <Link to={`/products/${product.pcode}`}>
-                <div className={style.img}>
-                  <img
-                    src={product.photo || '/images/default.jpg'}
-                    alt={product.name || '상품 이미지'}
-                  />
+          products.slice(offset, offset + limit).map((product) => {
+            const categoryPath = product.category?.name.toLowerCase(); // category.name 사용
+            return (
+              <li key={product.pcode}>
+                <Link to={`/${categoryPath}/products/${product.pcode}`}>
+                  <div className={style.img}>
+                    <img
+                      src={product.photo || '/images/default.jpg'}
+                      alt={product.name || '상품 이미지'}
+                    />
+                  </div>
+                </Link>
+                <Link to={`/${categoryPath}/products/${product.pcode}`}>
+                  <div className={style.product}>
+                    <p>{product.name || '상품명 없음'}</p>
+                    <span>{product.price ? `${Number(product.price).toLocaleString()} 원` : '가격 정보 없음'}</span>
+                    <span>재고: {product.inventory || 0}</span>
+                  </div>
+                </Link>
+                <div className={style.button}>
+                  <Button name="삭제" onClick={() => handleDeleteProduct(product.pcode)} />
                 </div>
-              </Link>
-              <Link to={`/products/${product.pcode}`}>
-                <div className={style.product}>
-                  <p>{product.name || '상품명 없음'}</p>
-                  <span>{product.price ? `${Number(product.price).toLocaleString()} 원` : '가격 정보 없음'}</span>
-                  <span>재고: {product.inventory || 0}</span>
-                </div>
-              </Link>
-              <div className={style.button}>
-                <Button name="삭제" onClick={() => handleDeleteProduct(product.pcode)} />
-              </div>
-            </li>
-          ))
+              </li>
+            );
+          })
         )}
       </ul>
       <div className={style.page}>
