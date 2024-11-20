@@ -34,9 +34,8 @@ const GrainPage = () => { // GrainPage로 이름 변경
   // 찜 버튼 클릭 핸들러
   const handleLike = async (grain) => {
     try {
-      const response = await axios.post(
+      const response = await axios.get(
         `https://api.bargainus.kr/products/${grain.pcode}/liked`, // 변경된 주소
-        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {

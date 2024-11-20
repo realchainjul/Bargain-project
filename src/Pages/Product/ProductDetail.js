@@ -13,10 +13,12 @@ const ProductDetail = () => {
   const [liked, setLiked] = useState(false); // 찜 여부
 
   useEffect(() => {
-    // 상품 데이터 가져오기
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/fruits/products/${id}`);
+        const response = await axios.get(`https://api.bargainus.kr/fruits/products/${id}`,
+          {
+            withCredentials: true,
+          });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
         } else {
@@ -30,44 +32,28 @@ const ProductDetail = () => {
       }
     };
 
-    // 찜 여부 확인
-    const checkLikedStatus = async () => {
-      try {
-        const response = await axios.get(`https://api.bargainus.kr/products/${id}/liked`, {
-          withCredentials: true,
-        });
-        if (response.status === 200 && response.data.liked) {
-          setLiked(true); // 찜 상태 업데이트
-        }
-      } catch (error) {
-        console.error('찜 여부 확인 오류:', error);
-      }
-    };
-
     fetchProduct();
-    checkLikedStatus();
   }, [id]);
 
-  // 찜 버튼 클릭 핸들러
-  const handleLike = async () => {
-    try {
-      const response = await axios.get(
-        `https://api.bargainus.kr/products/${id}/liked`, // 변경된 API 주소
-        { withCredentials: true } // 인증 정보 포함
-      );
-      if (response.status === 200) {
-        if (response.data.status) {
-          alert(response.data.message); // 서버에서 제공한 메시지 사용
-          setLiked(!liked); // 찜 상태 토글
-        } else {
-          alert('찜 목록 변경에 실패했습니다.');
-        }
-      }
-    } catch (error) {
-      console.error('찜 추가/취소 오류:', error);
-      alert('서버와 연결할 수 없습니다.');
+ // 찜 버튼 클릭 핸들러
+ const handleLike = async () => {
+  try {
+    const response = await axios.get(
+      `https://api.bargainus.kr/products/${id}/liked`, // 변경된 API 주소
+      null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 `null`로 설정
+      { withCredentials: true } // 인증 정보 포함
+    );
+    if (response.status === 200) {
+      alert('찜 목록에 추가되었습니다!');
+      setLiked(true); // 찜 상태 업데이트
+    } else {
+      alert('찜 목록 추가에 실패했습니다.');
     }
-  };
+  } catch (error) {
+    console.error('찜 추가 오류:', error);
+    alert('서버와 연결할 수 없습니다.');
+  }
+};
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;

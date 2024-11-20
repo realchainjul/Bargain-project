@@ -5,7 +5,7 @@ import style from './ProductDetail.module.scss';
 import { VscHeart } from 'react-icons/vsc';
 import Button from '../../components/common/Button';
 
-const ProductDetailG = () => {
+const ProductDetailV = () => {
   const { id } = useParams(); // URL에서 상품 ID 가져오기
   const [product, setProduct] = useState(null); // 상품 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
@@ -149,4 +149,4 @@ const ProductDetailG = () => {
   );
 };
 
-export default ProductDetailG;
+export default ProductDetailV;
