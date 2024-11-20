@@ -69,7 +69,7 @@ const MyProducts = () => {
   return (
     <div className={style.myProducts}>
       <div className={style.header}>
-        <h1>내 상품 관리</h1>
+        <h1>내 상품</h1>
       </div>
       <span className={style.productNum}>({products.length})</span>
       <ul>

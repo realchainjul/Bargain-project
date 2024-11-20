@@ -53,7 +53,7 @@ function BannerSub() {
       </a>
       </SwiperSlide>
       <SwiperSlide className={style.slide}>
-      <a href="/fruits/products/11">
+      <a href="/fruits/products/12">
       <img src="https://simg.ssgcdn.com/trans.ssg?src=/cmpt/edit/202303/29/102023032910151010083953051495_975.jpg&w=830&t=ee7048857c2106150c3abdbd8cf9ac683a5c17a7" alt="" className={style.image}/>
       </a>
       </SwiperSlide>
