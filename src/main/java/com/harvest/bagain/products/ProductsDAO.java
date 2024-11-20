@@ -173,7 +173,19 @@ public class ProductsDAO {
     public Optional<Products> getProductByCode(Integer productCode) {
         return prodRepo.findById(productCode);
     }
-
+ // 내가 등록한 상품 목록 조회
+    public Map<String, Object> getProductsBySeller(Users seller) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Products> productsList = prodRepo.findBySeller(seller);
+            response.put("status", true);
+            response.put("products", productsList);
+        } catch (Exception e) {
+            response.put("status", false);
+            response.put("message", "상품 목록 조회 실패");
+        }
+        return response;
+    }
     // 사용자 코드로 사용자 조회
     public Optional<Users> getUserByCode(Integer userCode) {
         return userRepo.findById(userCode);
