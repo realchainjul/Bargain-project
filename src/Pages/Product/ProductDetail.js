@@ -36,16 +36,15 @@ const ProductDetail = () => {
   }, [id]);
 
  // 찜 버튼 클릭 핸들러
- const handleLike = async () => {
+ const handleLike = async (fruits) => {
   try {
     const response = await axios.get(
-      `https://api.bargainus.kr/products/${id}/liked`, // 변경된 API 주소
-      null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 `null`로 설정
+      `https://api.bargainus.kr/products/${fruits.pcode}/liked`, // 변경된 주소
       { withCredentials: true } // 인증 정보 포함
     );
     if (response.status === 200) {
-      alert('찜 목록에 추가되었습니다!');
-      setLiked(true); // 찜 상태 업데이트
+      alert(`${fruits.name}이(가) 찜 목록에 추가되었습니다!`);
+      setLikedItems((prev) => [...prev, fruits.pcode]); // 찜한 상품 ID 저장
     } else {
       alert('찜 목록 추가에 실패했습니다.');
     }
