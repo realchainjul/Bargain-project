@@ -15,7 +15,9 @@ const ProductDetailG = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/grain/products/${id}`);
+        const response = await axios.get(`https://api.bargainus.kr/grain/products/${id}`, {
+          withCredentials: true,
+        });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
         } else {
@@ -33,15 +35,15 @@ const ProductDetailG = () => {
   }, [id]);
 
   // 찜 버튼 클릭 핸들러
-  const handleLike = async (grain) => {
+  const handleLike = async () => {
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${grain.pcode}/liked`, // 변경된 주소
+        `https://api.bargainus.kr/products/${product.pcode}/liked`, // 변경된 주소
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
-        alert(`${grain.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLikedItems((prev) => [...prev, grain.pcode]); // 찜한 상품 ID 저장
+        alert(`${product.name}이(가) 찜 목록에 추가되었습니다!`);
+        setLiked(true); // 찜 상태 업데이트
       } else {
         alert('찜 목록 추가에 실패했습니다.');
       }
@@ -50,6 +52,7 @@ const ProductDetailG = () => {
       alert('서버와 연결할 수 없습니다.');
     }
   };
+
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
@@ -63,14 +66,12 @@ const ProductDetailG = () => {
       <div className={style.container}>
         {/* 이미지 영역 */}
         <div className={style.imgarea}>
-          {/* 대표 이미지 */}
           <img
             src={product.photo || '/images/default.jpg'} // 대표 이미지
             alt={product.name}
             className={style.productImage}
           />
           <p className={style.desc}>{product.comment}</p>
-          {/* 상세 이미지 */}
           <div className={style.detailImages}>
             {product.productPhotos && product.productPhotos.length > 0 ? (
               product.productPhotos.map((photo) => (
@@ -106,19 +107,10 @@ const ProductDetailG = () => {
           <div className={style.total}>
             <div className={style.countwrap}>
               <p>구매 수량</p>
-              {/* 수량 선택 */}
               <div className={style.count}>
-                <button
-                  onClick={() => setCount(count > 1 ? count - 1 : 1)}
-                >
-                  -
-                </button>
+                <button onClick={() => setCount(count > 1 ? count - 1 : 1)}>-</button>
                 <p>{count}</p>
-                <button
-                  onClick={() => setCount(count + 1)}
-                >
-                  +
-                </button>
+                <button onClick={() => setCount(count + 1)}>+</button>
               </div>
             </div>
             <div className={style.totalprice}>

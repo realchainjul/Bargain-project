@@ -1,3 +1,10 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import style from './ProductDetail.module.scss';
+import { VscHeart } from 'react-icons/vsc';
+import Button from '../../components/common/Button';
+
 const ProductDetailV = () => {
   const { id } = useParams(); // URL에서 상품 ID 가져오기
   const [product, setProduct] = useState(null); // 상품 데이터 저장
