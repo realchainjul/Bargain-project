@@ -20,9 +20,12 @@ export default function MyLike() {
         const response = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
           withCredentials: true, // 인증 정보 포함
         });
+
         if (response.status === 200 && Array.isArray(response.data)) {
+          console.log('찜 목록 데이터:', response.data); // 데이터 확인
           setLikes(response.data); // 데이터 저장
         } else {
+          console.error('API 응답 데이터 형식이 잘못되었습니다:', response.data);
           alert('찜 목록 데이터를 불러오는 데 실패했습니다.');
         }
       } catch (error) {
@@ -47,10 +50,12 @@ export default function MyLike() {
           withCredentials: true,
         }
       );
+      console.log('삭제 요청 응답:', response.data); // 삭제 응답 확인
       if (response.status === 200 && response.data?.status) {
-        setLikes((prevLikes) => prevLikes.filter((like) => like.product_code !== productCode));
+        setLikes((prevLikes) => prevLikes.filter((like) => like.productCode !== productCode));
         alert(response.data.message || '삭제되었습니다.');
       } else {
+        console.error('삭제 실패 응답 데이터:', response.data);
         alert(response.data?.message || '삭제에 실패했습니다.');
       }
     } catch (error) {
@@ -63,6 +68,8 @@ export default function MyLike() {
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
+
+  console.log('현재 찜 목록:', likes); // 렌더링 시 현재 찜 목록 확인
 
   // 찜 목록 UI
   return (
@@ -78,25 +85,35 @@ export default function MyLike() {
             <p>찜한 상품이 없습니다.</p>
           </div>
         ) : (
-          likes.slice(offset, offset + limit).map((item, idx) => (
-            <li key={idx}>
-              <Link to={`/products/${item.product_code}`}>
-                <div className={style.img}>
-                  <img src={item.photo_url || '/images/default.jpg'} alt={item.product_name || '상품 이미지'} />
+          likes.slice(offset, offset + limit).map((item, idx) => {
+            console.log('렌더링 중 상품 데이터:', item); // 개별 상품 데이터 확인
+            return (
+              <li key={idx}>
+                <Link to={`/products/${item.productCode}`}>
+                  <div className={style.img}>
+                    <img
+                      src={item.photoUrl || '/images/default.jpg'}
+                      alt={item.productName || '상품 이미지'}
+                    />
+                  </div>
+                </Link>
+                <Link to={`/products/${item.productCode}`}>
+                  <div className={style.product}>
+                    <p>{item.productName || '상품명 없음'}</p>
+                    <span>
+                      {item.price
+                        ? `${Number(item.price).toLocaleString()} 원`
+                        : '가격 정보 없음'}
+                    </span>
+                    <span>재고: {item.inventory || 0}</span>
+                  </div>
+                </Link>
+                <div className={style.button}>
+                  <Button name="삭제" onClick={() => handleDeleteLike(item.productCode)} />
                 </div>
-              </Link>
-              <Link to={`/products/${item.product_code}`}>
-                <div className={style.product}>
-                  <p>{item.product_name || '상품명 없음'}</p>
-                  <span>{item.product_price ? `${Number(item.product_price).toLocaleString()} 원` : '가격 정보 없음'}</span>
-                  <span>재고: {item.product_inventory || 0}</span>
-                </div>
-              </Link>
-              <div className={style.button}>
-                <Button name="삭제" onClick={() => handleDeleteLike(item.product_code)} />
-              </div>
-            </li>
-          ))
+              </li>
+            );
+          })
         )}
       </ul>
       <div className={style.page}>

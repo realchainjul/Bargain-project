@@ -14,9 +14,8 @@ const VegetablePage = () => {
   useEffect(() => {
     const fetchVegetables = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/category/vegetable', {
-          withCredentials: true,
-        });
+        const response = await axios.get('https://api.bargainus.kr/category/vegetable'); // vegetable URL
+        
         if (response.status === 200) {
           setVegetables(response.data); // 데이터 저장
         } else {
@@ -35,16 +34,10 @@ const VegetablePage = () => {
 
   // 찜 버튼 클릭 핸들러
   const handleLike = async (vegetable) => {
-    if (likedItems.includes(vegetable.pcode)) {
-      alert('이미 찜한 상품입니다.');
-      return;
-    }
-
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${vegetable.pcode}/liked`,
-        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
-        { withCredentials: true }
+        `https://api.bargainus.kr/products/${vegetable.pcode}/liked`, // 변경된 주소
+        { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
         alert(`${vegetable.name}이(가) 찜 목록에 추가되었습니다!`);
@@ -70,13 +63,13 @@ const VegetablePage = () => {
           <div key={vegetable.pcode} className={style.fruitCard}>
             <img
               src={vegetable.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
-              alt={vegetable.name || '상품 이미지'}
+              alt={vegetable.name}
               className={style.fruitImage}
               onClick={() => navigate(`/vegetable/products/${vegetable.pcode}`)} // 상세 페이지로 이동
             />
             <div className={style.fruitInfo}>
-              <h2>{vegetable.name || '상품명 없음'}</h2>
-              <p>{vegetable.price !== undefined ? Number(vegetable.price).toLocaleString() + ' 원' : '가격 정보 없음'}</p>
+              <h2>{vegetable.name}</h2>
+              <p>{Number(vegetable.price).toLocaleString()} 원</p>
               <button
                 className={`${style.likeButton} ${
                   likedItems.includes(vegetable.pcode) ? style.liked : ''
@@ -86,7 +79,7 @@ const VegetablePage = () => {
                   handleLike(vegetable);
                 }}
               >
-                <VscHeart size="20" style={{ color: likedItems.includes(vegetable.pcode) ? '#ff4757' : '#000' }} />
+                <VscHeart size="20" />
               </button>
             </div>
           </div>
