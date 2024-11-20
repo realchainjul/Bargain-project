@@ -124,5 +124,14 @@
     button {
       margin-bottom: 50px;
     }
+    .deleteAccountButton {
+      background: none;
+      color: red;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    
   }
 }
