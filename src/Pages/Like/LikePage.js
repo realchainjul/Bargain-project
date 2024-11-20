@@ -17,7 +17,7 @@ export default function MyLike() {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/mypage/userpage/like', {
+        const response = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
           withCredentials: true, // 인증 정보 포함
         });
         if (response.status === 200) {
