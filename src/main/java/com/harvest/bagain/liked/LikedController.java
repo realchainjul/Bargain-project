@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +38,6 @@ public class LikedController {
 		return ResponseEntity.ok(likedProducts);
 	}
 
-	// 찜하기 삭제 (Delete 요청으로 찜하기 삭제)
 	@GetMapping("/mypage/userpage/liked/{productCode}/delete")
 	@Transactional
 	public ResponseEntity<Map<String, Object>> deleteLikeProductGet(@PathVariable Integer productCode,

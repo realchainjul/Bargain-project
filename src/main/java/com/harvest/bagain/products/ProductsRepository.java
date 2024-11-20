@@ -11,7 +11,7 @@ import com.harvest.bagain.users.Users;
 
 @Repository
 public interface ProductsRepository extends JpaRepository<Products, Integer> {
-	Optional<Products> findProductByCategoryAndPcode(Category category, Integer pcode);
+    Optional<Products> findProductByCategoryAndPcode(Category category, Integer pcode);
     List<Products> findByCategory(Category category);
     List<Products> findBySeller(Users seller);
-} 
+}

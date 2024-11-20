@@ -13,4 +13,7 @@ import com.harvest.bagain.users.Users;
 public interface LikedRepository extends JpaRepository<Liked, Integer> {
     Optional<Liked> findByUserAndProduct(Users user, Products product);
     List<Liked> findAllByUserCodeAndLikedStatusTrue(Integer userCode);
+    Optional<Liked> findByUser_CodeAndProduct_Pcode(Integer userCode, Integer productCode);
+
+
 }

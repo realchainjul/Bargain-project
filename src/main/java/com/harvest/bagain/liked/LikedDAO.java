@@ -38,7 +38,7 @@ public class LikedDAO {
         }
     }
 
-    // 특정 사용자의 찜한 상품 목록 조회
+ // 특정 사용자의 찜한 상품 목록 조회
     public List<Map<String, Object>> getLikedProductsByUser(Integer userCode) {
         List<Liked> likedList = likedRepo.findAllByUserCodeAndLikedStatusTrue(userCode);
         List<Map<String, Object>> responseList = new ArrayList<>();
@@ -54,6 +54,7 @@ public class LikedDAO {
             productInfo.put("photoUrl", product.getPhoto() != null
                     ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
                     : "");
+            productInfo.put("categoryName", product.getCategory().getName());
             responseList.add(productInfo);
         }
 
