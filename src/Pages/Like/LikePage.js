@@ -20,8 +20,8 @@ export default function MyLike() {
         const response = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
           withCredentials: true, // 인증 정보 포함
         });
-        if (response.status === 200) {
-          setLikes(response.data);
+        if (response.status === 200 && Array.isArray(response.data)) {
+          setLikes(response.data); // 데이터 저장
         } else {
           alert('찜 목록 데이터를 불러오는 데 실패했습니다.');
         }
@@ -41,14 +41,17 @@ export default function MyLike() {
     if (!window.confirm('찜 목록에서 삭제하시겠습니까?')) return;
 
     try {
-      const response = await axios.get(`https://api.bargainus.kr/mypage/userpage/liked/${productCode}/delete`, {
-        withCredentials: true,
-      });
-      if (response.status === 200 && response.data.status) {
+      const response = await axios.get(
+        `https://api.bargainus.kr/mypage/userpage/liked/${productCode}/delete`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === 200 && response.data?.status) {
         setLikes((prevLikes) => prevLikes.filter((like) => like.product_code !== productCode));
         alert(response.data.message || '삭제되었습니다.');
       } else {
-        alert(response.data.message || '삭제에 실패했습니다.');
+        alert(response.data?.message || '삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('찜 삭제 오류:', error);
@@ -79,21 +82,18 @@ export default function MyLike() {
             <li key={idx}>
               <Link to={`/products/${item.product_code}`}>
                 <div className={style.img}>
-                  <img src={item.photo_url || '/images/default.jpg'} alt={item.product_name} />
+                  <img src={item.photo_url || '/images/default.jpg'} alt={item.product_name || '상품 이미지'} />
                 </div>
               </Link>
               <Link to={`/products/${item.product_code}`}>
                 <div className={style.product}>
-                  <p>{item.product_name}</p>
-                  <span>{item.product_price.toLocaleString()} 원</span>
-                  <span>재고: {item.product_inventory}</span>
+                  <p>{item.product_name || '상품명 없음'}</p>
+                  <span>{item.product_price ? `${Number(item.product_price).toLocaleString()} 원` : '가격 정보 없음'}</span>
+                  <span>재고: {item.product_inventory || 0}</span>
                 </div>
               </Link>
               <div className={style.button}>
-                <Button
-                  name={'삭제'}
-                  onClick={() => handleDeleteLike(item.product_code)}
-                />
+                <Button name="삭제" onClick={() => handleDeleteLike(item.product_code)} />
               </div>
             </li>
           ))
@@ -101,21 +101,22 @@ export default function MyLike() {
       </ul>
       <div className={style.page}>
         <nav className={style.nav}>
-          <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1}>
             <MdArrowBackIosNew />
           </button>
-          {Array(Math.ceil(likes.length / limit))
-            .fill()
-            .map((_, idx) => (
-              <button
-                key={idx + 1}
-                onClick={() => setPage(idx + 1)}
-                aria-current={page === idx + 1 ? 'page' : null}
-              >
-                {idx + 1}
-              </button>
-            ))}
-          <button onClick={() => setPage(page + 1)} disabled={page === Math.ceil(likes.length / limit)}>
+          {Array.from({ length: Math.ceil(likes.length / limit) }, (_, idx) => (
+            <button
+              key={idx + 1}
+              onClick={() => setPage(idx + 1)}
+              aria-current={page === idx + 1 ? 'page' : null}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setPage((prev) => Math.min(prev + 1, Math.ceil(likes.length / limit)))}
+            disabled={page === Math.ceil(likes.length / limit)}
+          >
             <MdArrowForwardIos />
           </button>
         </nav>
