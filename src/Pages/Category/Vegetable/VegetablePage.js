@@ -14,7 +14,10 @@ const VegetablePage = () => {
   useEffect(() => {
     const fetchVegetables = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/category/vegetable'); // vegetable URL
+        const response = await axios.get('https://api.bargainus.kr/category/vegetable', // vegetable URL
+        {
+          withCredentials: true,
+        });
         if (response.status === 200) {
           setVegetables(response.data); // 데이터 저장
         } else {
@@ -36,7 +39,6 @@ const VegetablePage = () => {
     try {
       const response = await axios.get(
         `https://api.bargainus.kr/products/${vegetable.pcode}/liked`, // 변경된 주소
-        null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 null로 설정
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
@@ -50,7 +52,6 @@ const VegetablePage = () => {
       alert('서버와 연결할 수 없습니다.');
     }
   };
-  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;

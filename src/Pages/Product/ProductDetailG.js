@@ -35,7 +35,7 @@ const ProductDetailG = () => {
   // 찜 버튼 클릭 핸들러
   const handleLike = async () => {
     try {
-      const response = await axios.post(
+      const response = await axios.get(
         `https://api.bargainus.kr/products/${id}/liked`, // 변경된 API 주소
         null, // POST 요청에 추가 데이터를 보낼 필요가 없으면 `null`로 설정
         { withCredentials: true } // 인증 정보 포함
