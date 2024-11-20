@@ -12,6 +12,7 @@ import com.harvest.bagain.category.Category;
 import com.harvest.bagain.liked.Liked;
 import com.harvest.bagain.productsphoto.ProductPhoto;
 import com.harvest.bagain.reviews.Reviews;
+import com.harvest.bagain.users.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,9 +31,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity(name = "products")
 public class Products {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "products_code")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "products_code")
     private Integer pcode;
 
     @Column(name = "products_name")
@@ -68,13 +69,17 @@ public class Products {
     @JoinColumn(name = "category_code", referencedColumnName = "category_code")
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "users_code", referencedColumnName = "users_code")
+    @JsonManagedReference
+    private Users seller;
+
     @OneToMany(mappedBy = "product")
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<Liked> likedUsers;
-
 
     @OneToMany(mappedBy = "product")
     private List<Reviews> reviews;

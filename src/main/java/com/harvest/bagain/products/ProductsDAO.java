@@ -49,63 +49,70 @@ public class ProductsDAO {
 	private String productCommentImagesDirectory;
 
 	// 상품 등록
-	public Map<String, Object> addProduct(ProductsAddReq req, MultipartFile photo, MultipartFile[] commentphoto) {
-		String productImageFileName = null;
-		Map<String, Object> response = new HashMap<>();
-		try {
-			// 상품 사진 저장
-			if (photo != null && !photo.isEmpty()) {
-				productImageFileName = BagainFileNameGenerator.generate(photo);
-				photo.transferTo(new File(productsImagesDirectory + "/" + productImageFileName));
-				req.setPhotoFilename(productImageFileName); // DTO에 파일명만 저장
-			}
+	public Map<String, Object> addProduct(ProductsAddReq req, MultipartFile photo, MultipartFile[] commentphoto, Users user) {
+        String productImageFileName = null;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 상품 사진 저장
+            if (photo != null && !photo.isEmpty()) {
+                productImageFileName = BagainFileNameGenerator.generate(photo);
+                photo.transferTo(new File(productsImagesDirectory + "/" + productImageFileName));
+                req.setPhotoFilename(productImageFileName); // DTO에 파일명만 저장
+            }
 
-			// 카테고리 이름 변환
-			String englishCategoryName = convertCategoryNameToEnglish(req.getCategoryName());
-			Optional<Category> categoryOpt = cateRepo.findByName(englishCategoryName);
+            // 카테고리 이름 변환
+            String englishCategoryName = convertCategoryNameToEnglish(req.getCategoryName());
+            Optional<Category> categoryOpt = cateRepo.findByName(englishCategoryName);
 
-			// Products 객체 생성 및 저장
-			Products product = new Products();
-			product.setName(req.getName());
-			product.setPrice(req.getPrice());
-			product.setInventory(req.getInventory());
-			product.setComment(req.getComment());
-			product.setPhoto(productImageFileName);
-			product.setCategory(categoryOpt.get());
-			product.setLikesCount(0);
-			prodRepo.save(product);
+            if (categoryOpt.isEmpty()) {
+                response.put("status", false);
+                response.put("message", "유효하지 않은 카테고리 이름");
+                return response;
+            }
 
-			// 상세 내용 이미지 저장 및 ProductPhoto 엔티티 저장
-			if (commentphoto != null && commentphoto.length > 0) {
-				List<String> commentPhotoFilenames = new ArrayList<>();
-				for (MultipartFile commentImage : commentphoto) {
-					if (commentImage != null && !commentImage.isEmpty()) {
-						String commentImageFileName = BagainFileNameGenerator.generate(commentImage);
-						commentImage.transferTo(new File(productCommentImagesDirectory + "/" + commentImageFileName));
-						commentPhotoFilenames.add(commentImageFileName);
+            // Products 객체 생성 및 저장
+            Products product = new Products();
+            product.setName(req.getName());
+            product.setPrice(req.getPrice());
+            product.setInventory(req.getInventory());
+            product.setComment(req.getComment());
+            product.setPhoto(productImageFileName);
+            product.setCategory(categoryOpt.get());
+            product.setLikesCount(0);
+            product.setSeller(user);
+            prodRepo.save(product);
 
-						// ProductPhoto 객체 저장
-						ProductPhoto productPhoto = new ProductPhoto();
-						productPhoto.setProduct(product);
-						productPhoto.setPhotoUrl(commentImageFileName);
-						productPhotoRepo.save(productPhoto);
-					}
-				}
-				req.setCommentPhotoFilenames(commentPhotoFilenames.toArray(new String[0])); // 파일명들 저장
-				product.setProductPhotos(productPhotoRepo.findByProduct(product)); // ProductPhoto 리스트 설정
-			}
+            // 상세 내용 이미지 저장 및 ProductPhoto 엔티티 저장
+            if (commentphoto != null && commentphoto.length > 0) {
+                List<String> commentPhotoFilenames = new ArrayList<>();
+                for (MultipartFile commentImage : commentphoto) {
+                    if (commentImage != null && !commentImage.isEmpty()) {
+                        String commentImageFileName = BagainFileNameGenerator.generate(commentImage);
+                        commentImage.transferTo(new File(productCommentImagesDirectory + "/" + commentImageFileName));
+                        commentPhotoFilenames.add(commentImageFileName);
 
-			response.put("status", true);
-			response.put("message", "상품 등록 성공");
-		} catch (Exception e) {
-			if (productImageFileName != null) {
-				new File(productsImagesDirectory + "/" + productImageFileName).delete();
-			}
-			response.put("status", false);
-			response.put("message", "상품 등록 실패");
-		}
-		return response;
-	}
+                        // ProductPhoto 객체 저장
+                        ProductPhoto productPhoto = new ProductPhoto();
+                        productPhoto.setProduct(product);
+                        productPhoto.setPhotoUrl(commentImageFileName);
+                        productPhotoRepo.save(productPhoto);
+                    }
+                }
+                req.setCommentPhotoFilenames(commentPhotoFilenames.toArray(new String[0])); // 파일명들 저장
+                product.setProductPhotos(productPhotoRepo.findByProduct(product)); // ProductPhoto 리스트 설정
+            }
+
+            response.put("status", true);
+            response.put("message", "상품 등록 성공");
+        } catch (Exception e) {
+            if (productImageFileName != null) {
+                new File(productsImagesDirectory + "/" + productImageFileName).delete();
+            }
+            response.put("status", false);
+            response.put("message", "상품 등록 실패");
+        }
+        return response;
+    }
 
 	// 카테고리 이름을 영어로 변환하는 메서드
 	private String convertCategoryNameToEnglish(String koreanCategoryName) {
@@ -170,6 +177,10 @@ public class ProductsDAO {
     // 사용자 코드로 사용자 조회
     public Optional<Users> getUserByCode(Integer userCode) {
         return userRepo.findById(userCode);
+    }
+    
+    public Optional<Users> getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
     }
 
  // 상품 찜하기/취소

@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.harvest.bagain.users.Users;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 public class ProductsController {
 
@@ -27,33 +29,38 @@ public class ProductsController {
 	
 	// 상품 등록
 	@PostMapping("/mypage/userpage/productadd")
-	public ResponseEntity<Map<String, Object>> addProduct(@Validated @ModelAttribute ProductsAddReq req,
-			@RequestParam(required = false) MultipartFile photo,
-			@RequestParam(required = false) MultipartFile[] commentphoto) {
+    public ResponseEntity<Map<String, Object>> addProduct(@Validated @ModelAttribute ProductsAddReq req,
+            @RequestParam(required = false) MultipartFile photo,
+            @RequestParam(required = false) MultipartFile[] commentphoto, HttpSession session) {
 
-		Map<String, Object> result = productsDAO.addProduct(req, photo, commentphoto);
-		return ResponseEntity.ok(result);
-	}
+        String userEmail = (String) session.getAttribute("userEmail");
+        Optional<Users> userOpt = productsDAO.getUserByEmail(userEmail);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 사용자 코드"));
+        }
+        Map<String, Object> result = productsDAO.addProduct(req, photo, commentphoto, userOpt.get());
+        return ResponseEntity.ok(result);
+    }
 
-	@GetMapping("/products/{productCode}/liked/{userCode}")
-	public ResponseEntity<Map<String, Object>> toggleLikeProduct(
-	        @PathVariable Integer productCode, 
-	        @PathVariable Integer userCode) {
-	    try {
-	        Optional<Products> productOpt = productsDAO.getProductByCode(productCode);
-	        Optional<Users> userOpt = productsDAO.getUserByCode(userCode);
+	@GetMapping("/products/{productCode}/liked")
+    public ResponseEntity<Map<String, Object>> toggleLikeProduct(
+            @PathVariable Integer productCode, HttpSession session) {
+        try {
+            Optional<Products> productOpt = productsDAO.getProductByCode(productCode);
+            String userEmail = (String) session.getAttribute("userEmail");
+            Optional<Users> userOpt = productsDAO.getUserByEmail(userEmail);
 
-	        if (productOpt.isEmpty()) {
-	            return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 상품 코드"));
-	        }
-	        if (userOpt.isEmpty()) {
-	            return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 사용자 코드"));
-	        }
+            if (productOpt.isEmpty()) {
+                return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 상품 코드"));
+            }
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 사용자 코드"));
+            }
 
-	        Map<String, Object> response = productsDAO.toggleLikeProduct(productOpt.get(), userOpt.get());
-	        return ResponseEntity.ok(response);
-	    } catch (Exception e) {
-	        return ResponseEntity.status(500).body(Map.of("status", false, "message", "서버 내부 오류: " + e.getMessage()));
-	    }
-	}
+            Map<String, Object> response = productsDAO.toggleLikeProduct(productOpt.get(), userOpt.get());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("status", false, "message", "서버 내부 오류: " + e.getMessage()));
+        }
+    }
 }

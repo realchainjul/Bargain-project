@@ -3,9 +3,12 @@ package com.harvest.bagain.users;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.harvest.bagain.bills.Bills;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.liked.Liked;
+import com.harvest.bagain.products.Products;
 import com.harvest.bagain.reviews.Reviews;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,14 +62,22 @@ public class Users {
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference // 무한 참조 방지
     private List<Bills> bills;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference // 무한 참조 방지
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference // 무한 참조 방지
     private List<Liked> likedProducts;
 
     @OneToMany(mappedBy = "user")
+    @JsonBackReference // 무한 참조 방지
     private List<Reviews> reviews;
+
+    @OneToMany(mappedBy = "seller")
+    @JsonManagedReference // 순환 참조 방지
+    private List<Products> products;
 }
