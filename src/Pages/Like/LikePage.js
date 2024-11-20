@@ -89,7 +89,7 @@ export default function MyLike() {
             console.log('렌더링 중 상품 데이터:', item); // 개별 상품 데이터 확인
             return (
               <li key={idx}>
-                <Link to={`/products/${item.productCode}`}>
+                <Link to={`/${item.categoryName}/products/${item.productCode}`}>
                   <div className={style.img}>
                     <img
                       src={item.photoUrl || '/images/default.jpg'}
@@ -97,7 +97,7 @@ export default function MyLike() {
                     />
                   </div>
                 </Link>
-                <Link to={`/products/${item.productCode}`}>
+                <Link to={`/${item.categoryName}/products/${item.productCode}`}>
                   <div className={style.product}>
                     <p>{item.productName || '상품명 없음'}</p>
                     <span>
