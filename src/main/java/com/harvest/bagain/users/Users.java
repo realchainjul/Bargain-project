@@ -62,19 +62,19 @@ public class Users {
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference // 무한 참조 방지
+    @JsonBackReference
     private List<Bills> bills;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference // 무한 참조 방지
+    @JsonBackReference
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference // 무한 참조 방지
+    @JsonBackReference 
     private List<Liked> likedProducts;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference // 무한 참조 방지
+    @JsonBackReference 
     private List<Reviews> reviews;
 
     @OneToMany(mappedBy = "seller")
