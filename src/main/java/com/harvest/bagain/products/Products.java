@@ -5,8 +5,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.category.Category;
 import com.harvest.bagain.liked.Liked;
@@ -53,10 +53,10 @@ public class Products {
 
     @Column(name = "products_likes_count", nullable = false)
     private Integer likesCount = 0;
-    
+
     @Column(name = "products_photo")
     private String photo;
-    
+
     @CreationTimestamp
     @Column(name = "products_createat")
     private java.sql.Timestamp createAt;
@@ -64,27 +64,29 @@ public class Products {
     @UpdateTimestamp
     @Column(name = "products_updateat")
     private java.sql.Timestamp updateAt;
-    
+
     @ManyToOne
     @JoinColumn(name = "category_code", referencedColumnName = "category_code")
     private Category category;
 
     @ManyToOne
     @JoinColumn(name = "users_code", referencedColumnName = "users_code")
-    @JsonManagedReference
+    @JsonManagedReference // 순환 참조 방지
     private Users seller;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore // 무한 참조 방지
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "product")
-    @JsonIgnore
+    @JsonIgnore // 무한 참조 방지
     private List<Liked> likedUsers;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore // 무한 참조 방지
     private List<Reviews> reviews;
-    
+
     @OneToMany(mappedBy = "product")
-    @JsonManagedReference
+    @JsonManagedReference // 순환 참조 방지
     private List<ProductPhoto> productPhotos;
 }

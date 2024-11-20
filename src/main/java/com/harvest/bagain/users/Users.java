@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.harvest.bagain.bills.Bills;
 import com.harvest.bagain.bucket.Bucket;
 import com.harvest.bagain.liked.Liked;
@@ -62,22 +62,22 @@ public class Users {
     private Timestamp updatedAt;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference
+    @JsonIgnore // 무한 참조 방지
     private List<Bills> bills;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference
+    @JsonIgnore // 무한 참조 방지
     private List<Bucket> buckets;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference 
+    @JsonIgnore // 무한 참조 방지
     private List<Liked> likedProducts;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference 
+    @JsonIgnore // 무한 참조 방지
     private List<Reviews> reviews;
 
     @OneToMany(mappedBy = "seller")
-    @JsonManagedReference // 순환 참조 방지
+    @JsonBackReference // 순환 참조 방지
     private List<Products> products;
 }
