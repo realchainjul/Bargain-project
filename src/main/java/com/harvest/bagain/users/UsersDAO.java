@@ -46,6 +46,28 @@ public class UsersDAO {
 		return userOptional.orElse(null);
 	}
 	
+	public Map<String, Object> delete(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        Users loginMember = (Users) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            response.put("status", false);
+            response.put("message", "로그인이 필요합니다.");
+            return response;
+        }
+
+        try {
+            usersRepo.delete(loginMember);
+            response.put("status", true);
+            response.put("message", "회원 탈퇴 성공");
+            return response;
+        } catch (Exception e) {
+            logger.error("회원 탈퇴 중 오류 발생", e);
+            response.put("status", false);
+            response.put("message", "회원 탈퇴 실패");
+            return response;
+        }
+    }
+	
 	public Map<String, Object> info(HttpSession session) {
 		String userEmail = (String) session.getAttribute("userEmail");
 		if (userEmail != null) {

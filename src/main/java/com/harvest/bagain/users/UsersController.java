@@ -34,7 +34,18 @@ public class UsersController {
 		String result = usersDAO.checkNicknameDuplicate(nickname);
 		return ResponseEntity.ok(result);
 	}
-
+	
+	// 회원 탈퇴
+	@GetMapping("/mypage/userpage/delete")
+    public ResponseEntity<Map<String, Object>> delete(HttpSession session) {
+        Map<String, Object> result = usersDAO.delete(session);
+        if ((boolean) result.get("status")) {
+            session.invalidate(); // 회원 탈퇴 후 세션 무효화
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(400).body(result);
+        }
+    }
 	// 사용자 등록 (회원가입)
 	@PostMapping("/join")
 	public ResponseEntity<String> join(@Validated @ModelAttribute UserJoinReq req,
