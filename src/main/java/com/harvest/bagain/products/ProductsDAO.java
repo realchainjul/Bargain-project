@@ -183,40 +183,24 @@ public class ProductsDAO {
         return userRepo.findByEmail(email);
     }
 
- // 상품 찜하기/취소
+    // 찜하기
     @Transactional
-    public Map<String, Object> toggleLikeProduct(Products product, Users user) {
-        Map<String, Object> response = new HashMap<>();
+    public Map<String, Object> toggleLikeProduct(Users user, Products product) {
         Optional<Liked> optionalLiked = likedRepo.findByUserAndProduct(user, product);
-
         if (optionalLiked.isPresent()) {
-            Liked liked = optionalLiked.get();
-            if (Boolean.TRUE.equals(liked.getLikedStatus())) {
-                liked.setLikedStatus(false);
-                int newLikesCount = Optional.ofNullable(product.getLikesCount()).orElse(0) - 1;
-                product.setLikesCount(Math.max(newLikesCount, 0)); // likesCount가 음수가 되지 않도록 설정
-                response.put("message", "찜하기 취소");
-            } else {
-                liked.setLikedStatus(true);
-                product.setLikesCount(Optional.ofNullable(product.getLikesCount()).orElse(0) + 1);
-                response.put("message", "찜하기 성공");
-            }
-            likedRepo.save(liked);
+            // 기존 찜하기가 있으면 삭제
+            likedRepo.delete(optionalLiked.get());
+            product.setLikesCount(Math.max(Optional.ofNullable(product.getLikesCount()).orElse(0) - 1, 0));
+            return Map.of("status", true, "message", "찜하기가 삭제되었습니다.");
         } else {
-            // 새로운 찜하기 객체 생성
-            Liked newLiked = new Liked();
-            newLiked.setProduct(product);
-            newLiked.setUser(user);
-            newLiked.setLikedStatus(true);
-            likedRepo.save(newLiked);
+            // 찜하기가 없으면 새로 추가
+            Liked liked = new Liked();
+            liked.setProduct(product);
+            liked.setUser(user);
+            liked.setLikedStatus(true);
+            likedRepo.save(liked);
             product.setLikesCount(Optional.ofNullable(product.getLikesCount()).orElse(0) + 1);
-            response.put("message", "찜하기 성공");
+            return Map.of("status", true, "message", "찜하기가 추가되었습니다.");
         }
-
-        prodRepo.save(product);
-        response.put("status", true);
-        response.put("newLikesCount", product.getLikesCount());
-        return response;
     }
-
 }
