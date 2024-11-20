@@ -127,7 +127,27 @@ public class ProductsDAO {
 			throw new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + koreanCategoryName);
 		}
 	}
+	
+	public Map<String, Object> deleteProductBySeller(Users seller, Integer pcode) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        Optional<Products> productOpt = prodRepo.findById(pcode);
+	        if (productOpt.isPresent() && productOpt.get().getSeller().getCode().equals(seller.getCode())) {
+	            prodRepo.delete(productOpt.get());
+	            response.put("status", true);
+	            response.put("message", "상품 삭제 성공");
+	        } else {
+	            response.put("status", false);
+	            response.put("message", "상품을 찾을 수 없거나 권한이 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        response.put("status", false);
+	        response.put("message", "상품 삭제 실패");
+	    }
+	    return response;
+	}
 
+	
 	// 카테고리 이름으로 상품 목록 조회
 	public List<Products> getProductsByCategoryName(String categoryName) {
 	    Optional<Category> category = cateRepo.findByName(categoryName);

@@ -58,6 +58,16 @@ public class ProductsController {
         return ResponseEntity.ok(response);
     }
 	
+	@GetMapping("/mypage/userpage/products/delete")
+	public ResponseEntity<Map<String, Object>> deleteMyProduct(@RequestParam Integer pcode, HttpSession session) {
+	    Users loginMember = (Users) session.getAttribute("loginMember");
+	    if (loginMember == null) {
+	        return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
+	    }
+	    Map<String, Object> response = productsDAO.deleteProductBySeller(loginMember, pcode);
+	    return ResponseEntity.ok(response);
+	}
+	
 	// 찜하기
 	@GetMapping("/products/{productCode}/liked")
     @Transactional
