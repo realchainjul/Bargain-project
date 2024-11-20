@@ -71,7 +71,7 @@ function App() {
           <Route index element={<Navigate to="/mypage/userpage/info" />} />
           <Route path="info" element={<MyInfo />} />
           <Route path="productadd" element={<ProductAdd />} />
-          <Route path="liked" element={<LikePage /> }/>
+          <Route path="like" element={<LikePage /> }/>
         </Route>
 
 
