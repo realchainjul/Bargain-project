@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom';
 import style from './ProductAdd.module.scss';
 import Button from '../../../components/common/Button';
 import axios from 'axios';
@@ -13,6 +14,8 @@ const ProductAdd = () => {
     photo: null, // 대표 이미지
     commentPhotos: [], // 상세 이미지 배열
   });
+
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
 
   const formatPrice = (value) => {
     // 숫자만 추출 후 천 단위 콤마 추가
@@ -77,6 +80,7 @@ const ProductAdd = () => {
 
       if (response.status === 200) {
         alert('상품이 성공적으로 등록되었습니다!');
+        navigate('/'); 
       } else {
         alert(`등록 실패: ${response.data.message}`);
       }

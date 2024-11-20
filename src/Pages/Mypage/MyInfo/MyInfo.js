@@ -57,7 +57,7 @@ const handleDeleteAccount = async () => {
     if (response.status === 200 && response.data.status) {
       alert(response.data.message || '회원 탈퇴가 완료되었습니다.');
       // 로그아웃 또는 메인 페이지로 이동
-      window.location.href = '/logout'; // 로그아웃 처리
+      window.location.href = '/'; // 로그아웃 처리
     } else {
       alert(response.data.message || '회원 탈퇴에 실패했습니다.');
     }

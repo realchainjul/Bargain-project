@@ -16,6 +16,7 @@ import ProductAdd from './Pages/Mypage/ProductAdd/ProductAdd';
 import ProductDetail from './Pages/Product/ProductDetail';
 import ProductDetailG from './Pages/Product/ProductDetailG';
 import ProductDetailV from './Pages/Product/ProductDetailV';
+import MyProducts from './Pages/Mypage/MyProduct/MyProducts';
 import axios from 'axios';
 
 function App() {
@@ -68,10 +69,11 @@ function App() {
         <Route path="/grain/products/:id" element={<ProductDetailG />} />
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
-          <Route index element={<Navigate to="/mypage/userpage/info" />} />
+          <Route index element={<Navigate to="/mypage/userpage/products" />} />
           <Route path="info" element={<MyInfo />} />
           <Route path="productadd" element={<ProductAdd />} />
           <Route path="liked" element={<LikePage /> }/>
+          <Route path="products" element={<MyProducts /> }/>
         </Route>
 
 
