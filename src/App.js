@@ -62,7 +62,7 @@ function App() {
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
-        <Route path="/mypage/like" element={<LikePage /> }/>
+        <Route path="/mypage/liked" element={<LikePage /> }/>
         <Route path="/fruits/products/:id" element={<ProductDetail />} />
         <Route path="/vegetable/products/:id" element={<ProductDetailV />} />
         <Route path="/grain/products/:id" element={<ProductDetailG />} />
