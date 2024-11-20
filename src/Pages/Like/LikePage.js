@@ -17,7 +17,7 @@ export default function MyLike() {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/liked', {
+        const response = await axios.get('https://api.bargainus.kr/mypage/userpage/like', {
           withCredentials: true, // 인증 정보 포함
         });
         if (response.status === 200) {
@@ -41,14 +41,14 @@ export default function MyLike() {
     if (!window.confirm('찜 목록에서 삭제하시겠습니까?')) return;
 
     try {
-      const response = await axios.delete(`https://api.bargainus.kr/products/${productCode}/liked`, {
+      const response = await axios.get(`https://api.bargainus.kr/mypage/userpage/liked/${productCode}/delete`, {
         withCredentials: true,
       });
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.status) {
         setLikes((prevLikes) => prevLikes.filter((like) => like.product_code !== productCode));
-        alert('삭제되었습니다.');
+        alert(response.data.message || '삭제되었습니다.');
       } else {
-        alert('삭제에 실패했습니다.');
+        alert(response.data.message || '삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('찜 삭제 오류:', error);
