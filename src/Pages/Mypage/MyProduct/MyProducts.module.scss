@@ -37,17 +37,16 @@
         gap: 20px;
         padding: 20px 0;
         border-bottom: 1px solid #f4f4f4;
-  
+        a {
+            text-decoration: none;
+            color: inherit;
+          }
         .img {
           width: 100px;
           height: 100px;
           img {
             width: 100%;
           }
-        }
-        .a{
-            text-decoration: none;
-            color: inherit;
         }
         .product {
           display: flex;
