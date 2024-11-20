@@ -140,30 +140,30 @@ export default function Signup() {
     event.preventDefault();
 
     // 입력 필드 유효성 검사
-    if (!inputs.email || !isConfirmEmail) {
-      alert('이메일 중복 확인을 완료해주세요.');
-      return;
-    }
+  if (!inputs.email || !isConfirmEmail) {
+    alert('이메일 중복 확인을 완료해주세요.');
+    return;
+  }
 
-    if (!inputs.nickname || !isConfirmNickname) {
-      alert('닉네임 중복 확인을 완료해주세요.');
-      return;
-    }
+  if (!inputs.nickname || !isConfirmNickname) {
+    alert('닉네임 중복 확인을 완료해주세요.');
+    return;
+  }
 
-    if (!inputs.pw || !isConfirmPassword) {
-      alert('비밀번호는 8자 이상이어야 합니다.');
-      return;
-    }
+  if (!inputs.pw || !isConfirmPassword) {
+    alert('비밀번호는 8자 이상이어야 합니다.');
+    return;
+  }
 
-    if (!inputs.checkPassword || !isConfirmCheckPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
+  if (!inputs.checkPassword || !isConfirmCheckPassword) {
+    alert('비밀번호가 일치하지 않습니다.');
+    return;
+  }
 
-    if (!inputs.name || !inputs.phoneNumber || !inputs.postalCode || !inputs.address) {
-      alert('모든 필수 입력 사항을 입력해주세요.');
-      return;
-    }
+  if (!inputs.name || !inputs.phoneNumber || !inputs.postalCode || !inputs.address) {
+    alert('모든 필수 입력 사항을 입력해주세요.');
+    return;
+  }
 
     try {
       const formData = new FormData();
@@ -184,7 +184,7 @@ export default function Signup() {
 
       if (response.data === '회원가입 성공') {
         alert('회원가입이 완료되었습니다.');
-        navigate('/'); // 홈으로 이동
+        navigate('/login');
       } else {
         alert(response.data);
       }
@@ -199,8 +199,144 @@ export default function Signup() {
         <h1>회원가입</h1>
       </div>
       <form id="signup" onSubmit={handleSubmitSignup}>
-        {/* InfoList 컴포넌트 작성 코드 유지 */}
-        <Button name="가입하기" form="signup" type="submit" isBrown={true} />
+        <InfoList
+          label={'이메일'}
+          input={{
+            name: 'email',
+            value: inputs.email,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '이메일을 입력해 주세요',
+          }}
+          button={{
+            name: '중복 확인',
+            onClick: handleCheckEmail,
+          }}
+        />
+        {emailError && <p className={style.error}>{emailError}</p>}
+
+        <InfoList
+          label={'닉네임'}
+          input={{
+            name: 'nickname',
+            value: inputs.nickname,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '닉네임을 입력해 주세요',
+          }}
+          button={{
+            name: '중복 확인',
+            onClick: handleCheckNickname,
+          }}
+        />
+        {nicknameError && <p className={style.error}>{nicknameError}</p>}
+
+        <InfoList
+          label={'비밀번호'}
+          input={{
+            name: 'pw',
+            value: inputs.pw,
+            type: 'password',
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '비밀번호를 입력해 주세요',
+            checkInput: {
+              isConfirm: isConfirmPassword,
+              errorMessage: '비밀번호는 8자 이상이어야 합니다.',
+            },
+          }}
+        />
+
+        <InfoList
+          label={'비밀번호 확인'}
+          input={{
+            name: 'checkPassword',
+            value: inputs.checkPassword,
+            type: 'password',
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '비밀번호를 다시 입력해 주세요',
+            checkInput: {
+              isConfirm: isConfirmCheckPassword,
+              errorMessage: '비밀번호가 일치하지 않습니다.',
+            },
+          }}
+        />
+        <InfoList
+          label={'이름'}
+          input={{
+            name: 'name',
+            value: inputs.name,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '이름을 입력해 주세요',
+          }}
+        />
+
+        <InfoList
+          label={'전화번호'}
+          input={{
+            name: 'phoneNumber',
+            value: inputs.phoneNumber,
+            required: true,
+            onChange: handleChangeInfoInputs,
+            placeholder: '전화번호를 입력해 주세요',
+          }}
+        />
+
+        <InfoList
+          label={'우편번호'}
+          input={{
+            name: 'postalCode',
+            value: inputs.postalCode,
+            required: true,
+            readOnly: true,
+            placeholder: '우편번호를 입력해 주세요',
+          }}
+          button={{
+            name: '주소 검색',
+            onClick: (e) => {
+              e.preventDefault();
+              handleAddressSearch();
+            },
+          }}
+        />
+
+        <InfoList
+          label={'주소'}
+          input={{
+            name: 'address',
+            value: inputs.address,
+            required: true,
+            readOnly: true,
+            placeholder: '기본 주소를 입력해 주세요',
+          }}
+        />
+
+        <InfoList
+          label={'상세주소'}
+          input={{
+            name: 'detailAddress',
+            value: inputs.detailAddress,
+            onChange: handleChangeInfoInputs,
+            placeholder: '상세 주소를 입력해 주세요',
+          }}
+        />
+
+        <section className={style.profile}>
+          <label>프로필</label>
+          <article className={style.profile_inputContainer}>
+            <input
+              type="file"
+              accept=".jpg, .jpeg, .webp, .png, .gif, .svg"
+              onChange={handleChangeProfileImg}
+            />
+            <figure className={style.profile_inputContainer_img}>
+              {profileImg && <img alt="프로필" width={150} height={150} src={URL.createObjectURL(profileImg)} />}
+            </figure>
+          </article>
+        </section>
+        <Button name="가입하기" form="signup" type="submit" isBrown={true}/>
       </form>
     </div>
   );
