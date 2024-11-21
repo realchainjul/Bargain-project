@@ -57,18 +57,30 @@ const FruitsPage = () => {
     }
 
     try {
-      const response = await axios.get(
-        `https://api.bargainus.kr/products/${fruit.pcode}/liked`, // 변경된 주소
+      // 찜 추가/삭제 요청
+      const response = await axios.post(
+        `https://api.bargainus.kr/products/${fruit.pcode}/liked`,
+        {},
         { withCredentials: true } // 인증 정보 포함
       );
+  
       if (response.status === 200) {
-        alert(`${fruit.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLikedItems((prev) => [...prev, fruit.pcode]); // 찜한 상품 ID 저장
+        const { likedStatus, message } = response.data;
+  
+        if (likedStatus) {
+          // 찜 추가
+          alert(`${fruit.name}이(가) 찜 목록에 추가되었습니다.`);
+          setLikedItems((prev) => [...prev, fruit.pcode]); // 찜한 상품 ID 추가
+        } else {
+          // 찜 삭제
+          alert(`${fruit.name}이(가) 찜 목록에서 삭제되었습니다.`);
+          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode)); // 찜한 상품 ID 삭제
+        }
       } else {
-        alert('찜 목록 추가에 실패했습니다.');
+        alert('찜 목록 갱신에 실패했습니다.');
       }
     } catch (error) {
-      console.error('찜 추가 오류:', error);
+      console.error('찜 추가/삭제 오류:', error);
       alert('서버와 연결할 수 없습니다.');
     }
   };
