@@ -82,7 +82,11 @@ export default function MainDisplay({ endpoint, name }) {
                 {/* 상품 카드 클릭 시 상세 페이지로 이동 */}
                 <div
                   className={style.productContent}
-                  onClick={() => navigate(`/${endpoint}/products/${product.id}`)}
+                  onClick={() => {
+                    console.log('Navigating to:', `/${endpoint}/products/${product.pcode}`); // 콘솔에 경로 확인
+                    console.log('Product PCode:', product.pcode); // pcode 값 확인
+                    navigate(`/${endpoint}/products/${product.pcode}`);
+                  }}
                   style={{ cursor: 'pointer' }}
                 >
                   <img
