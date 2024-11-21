@@ -54,7 +54,6 @@ export default function MainDisplay({ endpoint, name }) {
             autoplay={{ delay: 3000 }} // 자동 슬라이드
             spaceBetween={20} // 슬라이드 간격
             slidesPerView={5} // 한 번에 보여지는 슬라이드 개수
-            navigation // 네비게이션 버튼 활성화
             pagination={{ clickable: true }} // 페이지네이션 활성화
             breakpoints={{
               1800: {
