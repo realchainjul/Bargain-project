@@ -55,33 +55,39 @@ const FruitsPage = () => {
       navigate('/login'); // 로그인 페이지로 이동
       return;
     }
-
+  
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${fruit.pcode}/liked`, // POST 요청 사용
-        {},
+        `https://api.bargainus.kr/products/${fruit.pcode}/liked`, // GET 요청 URL
         { withCredentials: true } // 인증 정보 포함
       );
   
       if (response.status === 200) {
-        const { likedStatus, message } = response.data;
+        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 message 추출
   
-        // likedStatus에 따라 알림 출력 및 상태 업데이트
+        alert(message); // 서버에서 전달된 메시지 표시
+  
         if (likedStatus) {
-          alert(`${fruit.name}이(가) 찜 목록에 추가되었습니다.`);
-          setLikedItems((prev) => [...prev, fruit.pcode]); // 찜한 상품 ID 추가
+          // 찜 추가 상태 처리
+          setLikedItems((prev) => [...prev, fruit.pcode]);
         } else {
-          alert(`${fruit.name}이(가) 찜 목록에서 삭제되었습니다.`);
-          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode)); // 찜한 상품 ID 삭제
+          // 찜 삭제 상태 처리
+          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode));
         }
       } else {
-        alert('찜 목록 갱신에 실패했습니다.');
+        alert('요청을 처리하지 못했습니다.');
       }
     } catch (error) {
-      console.error('찜 추가/삭제 오류:', error);
-      alert('서버와 연결할 수 없습니다.');
+      console.error('찜 요청 오류:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        navigate('/login');
+      } else {
+        alert('서버와 연결할 수 없습니다.');
+      }
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
