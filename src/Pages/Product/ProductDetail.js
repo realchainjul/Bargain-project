@@ -99,11 +99,11 @@ const ProductDetail = () => {
       alert('유효한 상품이 아닙니다.');
       return;
     }
-
+  
     try {
       const response = await axios.post(
-        `https://bargainus.kr/products/${product.productCode}/bucket/add`, // productCode를 포함한 URL
-        { count }, // 구매 수량을 count로 설정하여 전송
+        `https://bargainus.kr/products/${product.productCode}/bucket/add`, // productCode 포함
+        { count }, // 구매 수량을 count로 전송
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
@@ -112,13 +112,17 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
-      if (error.response?.status === 403) {
-        alert('장바구니에 추가할 수 없습니다. 다시 시도해주세요.');
+      if (error.response?.status === 404) {
+        alert('유효하지 않은 상품 코드입니다.');
+      } else if (error.response?.status === 401) {
+        alert('로그인이 필요합니다.');
+        navigate('/login'); // 로그인 페이지로 이동
       } else {
         alert('장바구니 추가 중 문제가 발생했습니다.');
       }
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
