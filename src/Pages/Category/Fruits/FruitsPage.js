@@ -10,27 +10,29 @@ const FruitsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
-  // API 호출 및 로그인 상태 확인
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // 과일 목록 불러오기
   useEffect(() => {
     const fetchFruits = async () => {
       try {
-        const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
-
-        let user = null;
-        if (loginResponse.status === 200 && loginResponse.data.nickname) {
-          setIsLoggedIn(true);
-          user = loginResponse.data; // 로그인한 사용자 정보 저장
-        }
-
-        // 과일 목록 가져오기
         const response = await axios.get('https://api.bargainus.kr/category/fruits', { withCredentials: true });
         if (response.status === 200) {
-          // 각 상품의 likedStatus를 이용해 상태 설정
-          const updatedFruits = response.data.map((fruit) => ({
-            ...fruit,
-            likedStatus: user ? fruit.likedStatus : false, // 로그인한 경우 서버에서 전달받은 likedStatus 사용
-          }));
-          setFruits(updatedFruits);
+          setFruits(response.data);
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
