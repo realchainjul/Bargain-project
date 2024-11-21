@@ -10,7 +10,6 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null); // 상품 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [count, setCount] = useState(1); // 구매 수량
-  const [liked, setLiked] = useState(false); // 찜 여부
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 확인
   const navigate = useNavigate(); // 페이지 이동 함수
 
@@ -39,7 +38,6 @@ const ProductDetail = () => {
         });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
-          setLiked(response.data.likedStatus); // 초기 찜 상태 설정
         } else {
           alert('상품 정보를 불러오는 데 실패했습니다.');
         }
@@ -70,7 +68,10 @@ const ProductDetail = () => {
       if (response.status === 200) {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 서버 메시지 출력
-        setLiked(likedStatus); // 찜 상태 업데이트
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          likedStatus, // 찜 상태 업데이트
+        }));
       } else {
         alert('요청을 처리하지 못했습니다.');
       }
@@ -146,7 +147,7 @@ const ProductDetail = () => {
               <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
             </div>
             <button className={style.likeButton} onClick={handleLike}>
-              {liked ? (
+              {product.likedStatus ? (
                 <VscHeartFilled style={{ color: '#ff4757', fontSize: '24px' }} />
               ) : (
                 <VscHeart style={{ color: '#ff4757', fontSize: '24px' }} />
