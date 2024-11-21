@@ -15,16 +15,18 @@ const FruitsPage = () => {
   useEffect(() => {
     const fetchLikedItems = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
-          withCredentials: true,
-        });
-        if (response.status === 200) {
-          setLikedItems(response.data.map((item) => item.pcode)); // 찜한 상품 ID 목록 저장
+        const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (loginResponse.status === 200 && loginResponse.data.nickname) {
           setIsLoggedIn(true);
+          // 로그인 성공 시 찜 목록 불러오기
+          const likedResponse = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
+            withCredentials: true,
+          });
+          setLikedItems(likedResponse.data.map((item) => item.pcode)); // 찜한 상품 ID 저장
         }
       } catch (error) {
+        console.error('로그인 또는 찜 목록 불러오기 실패:', error);
         setIsLoggedIn(false);
-        console.error('찜 목록 불러오기 실패:', error);
       }
     };
 
@@ -113,7 +115,6 @@ const FruitsPage = () => {
                   handleLike(fruit);
                 }}
               >
-                {/* 찜 상태에 따라 하트 아이콘 변경 */}
                 {likedItems.includes(fruit.pcode) ? (
                   <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
                 ) : (
