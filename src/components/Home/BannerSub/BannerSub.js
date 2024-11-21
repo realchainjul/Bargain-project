@@ -11,7 +11,7 @@ function BannerSub() {
   return (
     <div className={style.banner_m}>
     <div className={style.title}>     
-      <h1>인기상품</h1>
+      <h1>이번주 베스트 상품 🏆</h1>
     </div>
     <Swiper
       className={style.swiper}
