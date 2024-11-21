@@ -32,6 +32,12 @@ const ProductDetail = () => {
   // 상품 데이터 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!id) {
+        console.error('Invalid product ID');
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await axios.get(`https://api.bargainus.kr/fruits/products/${id}`, {
           withCredentials: true,
@@ -88,11 +94,17 @@ const ProductDetail = () => {
 
   // 장바구니 추가 핸들러
   const handleAddToCart = async () => {
+    if (!product?.productCode) {
+      console.error('Invalid product code for adding to cart');
+      alert('유효한 상품이 아닙니다.');
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `https://bargainus.kr/products/${product.productCode}/bucket/add`,
-        { count },
-        { withCredentials: true }
+        `https://bargainus.kr/products/${product.productCode}/bucket/add`, // productCode를 포함한 URL
+        { count }, // 구매 수량을 count로 설정하여 전송
+        { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
         alert(response.data.message || '장바구니에 추가되었습니다.');
@@ -100,7 +112,11 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
-      alert('장바구니 추가 중 문제가 발생했습니다.');
+      if (error.response?.status === 403) {
+        alert('장바구니에 추가할 수 없습니다. 다시 시도해주세요.');
+      } else {
+        alert('장바구니 추가 중 문제가 발생했습니다.');
+      }
     }
   };
 
@@ -125,9 +141,9 @@ const ProductDetail = () => {
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
             {product.productPhotos && product.productPhotos.length > 0 ? (
-              product.productPhotos.map((photo) => (
+              product.productPhotos.map((photo, index) => (
                 <img
-                  key={photo}
+                  key={index}
                   src={photo}
                   alt={`${product.name} 상세 이미지`}
                   className={style.detailImage}
@@ -176,7 +192,11 @@ const ProductDetail = () => {
             ) : (
               <>
                 <Button name="장바구니" onClick={handleAddToCart} />
-                <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
+                <Button
+                  name="구매하기"
+                  isBrown={true}
+                  onClick={() => alert('구매 페이지로 이동합니다.')}
+                />
               </>
             )}
           </div>

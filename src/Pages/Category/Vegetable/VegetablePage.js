@@ -26,13 +26,13 @@ const VegetablePage = () => {
     checkLoginStatus();
   }, []);
 
-  // API 호출
+  // 채소 데이터 불러오기
   useEffect(() => {
     const fetchVegetables = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/category/vegetable', { withCredentials: true });
         if (response.status === 200) {
-          setVegetables(response.data); // 데이터 저장
+          setVegetables(response.data);
         } else {
           alert('채소 데이터를 불러오는 데 실패했습니다.');
         }
