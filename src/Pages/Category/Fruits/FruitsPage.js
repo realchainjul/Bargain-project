@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './FruitsPage.module.scss';
-import { VscHeart } from 'react-icons/vsc';
-import { VscHeartFilled } from 'react-icons/vsc';
+import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 
 const FruitsPage = () => {
   const [fruits, setFruits] = useState([]); // 과일 데이터 저장
@@ -28,13 +27,19 @@ const FruitsPage = () => {
     checkLoginStatus();
   }, []);
 
-  // API 호출
+  // API 호출 및 찜 상태 초기화
   useEffect(() => {
     const fetchFruits = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/category/fruits');
         if (response.status === 200) {
-          setFruits(response.data); // 데이터 저장
+          setFruits(response.data); // 과일 데이터 저장
+
+          // 찜 상태 초기화: likedStatus가 true인 상품의 pcode만 저장
+          const liked = response.data
+            .filter((fruit) => fruit.likedStatus) // likedStatus가 true인 상품 필터링
+            .map((fruit) => fruit.pcode); // 찜된 상품의 pcode만 추출
+          setLikedItems(liked);
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
@@ -56,21 +61,23 @@ const FruitsPage = () => {
       navigate('/login'); // 로그인 페이지로 이동
       return;
     }
-  
+
     try {
       const response = await axios.get(
         `https://api.bargainus.kr/products/${fruit.pcode}/liked`,
         { withCredentials: true }
       );
-  
+
       if (response.status === 200) {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 메시지 출력
-  
+
         if (likedStatus) {
-          setLikedItems((prev) => [...prev, fruit.pcode]); // 찜 추가
+          // 찜 추가
+          setLikedItems((prev) => [...prev, fruit.pcode]);
         } else {
-          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode)); // 찜 삭제
+          // 찜 삭제
+          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode));
         }
       }
     } catch (error) {
@@ -83,8 +90,6 @@ const FruitsPage = () => {
       }
     }
   };
-  
-  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -106,12 +111,13 @@ const FruitsPage = () => {
               <h2>{fruit.name}</h2>
               <p>{Number(fruit.price).toLocaleString()} 원</p>
               <button
-                className={`${style.likeButton}`}
+                className={style.likeButton}
                 onClick={(e) => {
                   e.stopPropagation(); // 부모 클릭 이벤트 전파 방지
                   handleLike(fruit);
                 }}
               >
+                {/* 찜 상태에 따라 하트 아이콘 변경 */}
                 {likedItems.includes(fruit.pcode) ? (
                   <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
                 ) : (
