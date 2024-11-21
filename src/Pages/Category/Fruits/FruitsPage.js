@@ -11,10 +11,11 @@ const FruitsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
-  // 로그인 상태 확인 및 찜 목록 불러오기
+  // 데이터 로드 (로그인 상태 확인 및 찜 목록, 과일 데이터)
   useEffect(() => {
-    const fetchLikedItems = async () => {
+    const fetchData = async () => {
       try {
+        // 로그인 상태 확인
         const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
         if (loginResponse.status === 200 && loginResponse.data.nickname) {
           setIsLoggedIn(true);
@@ -25,34 +26,23 @@ const FruitsPage = () => {
           });
           setLikedItems(likedResponse.data.map((item) => item.pcode)); // 찜한 상품 ID 저장
         }
-      } catch (error) {
-        console.error('로그인 또는 찜 목록 불러오기 실패:', error);
-        setIsLoggedIn(false);
-      }
-    };
 
-    fetchLikedItems();
-  }, []);
-
-  // API 호출
-  useEffect(() => {
-    const fetchFruits = async () => {
-      try {
-        const response = await axios.get('https://api.bargainus.kr/category/fruits');
-        if (response.status === 200) {
-          setFruits(response.data); // 데이터 저장
+        // 과일 데이터 불러오기
+        const fruitsResponse = await axios.get('https://api.bargainus.kr/category/fruits');
+        if (fruitsResponse.status === 200) {
+          setFruits(fruitsResponse.data); // 과일 데이터 저장
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
       } catch (error) {
-        console.error('과일 데이터 불러오기 오류:', error);
+        console.error('데이터 불러오기 오류:', error);
         alert('서버와 연결할 수 없습니다.');
       } finally {
         setLoading(false); // 로딩 종료
       }
     };
 
-    fetchFruits();
+    fetchData();
   }, []);
 
   // 찜 버튼 클릭 핸들러
@@ -64,20 +54,18 @@ const FruitsPage = () => {
     }
 
     try {
-      const response = await axios.get(
-        `https://api.bargainus.kr/products/${fruit.pcode}/liked`,
-        { withCredentials: true }
-      );
+      // 현재 좋아요 상태에 따라 API 호출 구분
+      const url = `https://api.bargainus.kr/products/${fruit.pcode}/liked`;
+      const response = await axios.post(url, {}, { withCredentials: true });
 
       if (response.status === 200) {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 메시지 출력
 
-        if (likedStatus) {
-          setLikedItems((prev) => [...prev, fruit.pcode]); // 찜 추가
-        } else {
-          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode)); // 찜 삭제
-        }
+        // 좋아요 상태에 따라 찜 목록 업데이트
+        setLikedItems((prev) =>
+          likedStatus ? [...prev, fruit.pcode] : prev.filter((id) => id !== fruit.pcode)
+        );
       }
     } catch (error) {
       console.error('찜 요청 오류:', error);
