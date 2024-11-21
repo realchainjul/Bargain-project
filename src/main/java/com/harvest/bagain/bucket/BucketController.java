@@ -1,12 +1,16 @@
 package com.harvest.bagain.bucket;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,9 +46,28 @@ public class BucketController {
 	}
 
 	// 장바구니에서 상품 삭제
-	@PostMapping("/bucket/{bucketNo}/remove")
+	@DeleteMapping("/bucket/{bucketNo}/remove")
 	public ResponseEntity<Map<String, Object>> removeProductFromBucket(@PathVariable Integer bucketNo) {
 		Map<String, Object> response = bucketDAO.removeProductFromBucket(bucketNo);
 		return ResponseEntity.ok(response);
 	}
+	
+	 // 특정 사용자의 장바구니 목록 조회
+    @GetMapping("/bucket/list")
+    public ResponseEntity<List<Map<String, Object>>> getBucketListByUser(HttpSession session) {
+        Users user = (Users) session.getAttribute("loginMember");
+        if (user == null) {
+            return ResponseEntity.status(401).body(null);
+        }
+        List<Map<String, Object>> response = bucketDAO.getBucketListByUser(user);
+        return ResponseEntity.ok(response);
+    }
+    
+    // 장바구니 수량 업데이트
+    @PutMapping("/bucket/{bucketNo}/update")
+    public ResponseEntity<Map<String, Object>> updateBucketCount(@PathVariable Integer bucketNo,
+                                                                 @RequestParam Integer newCount) {
+        Map<String, Object> response = bucketDAO.updateBucketCount(bucketNo, newCount);
+        return ResponseEntity.ok(response);
+    }
 }

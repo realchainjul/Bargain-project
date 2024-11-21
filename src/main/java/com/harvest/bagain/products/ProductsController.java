@@ -59,15 +59,15 @@ public class ProductsController {
         return ResponseEntity.ok(response);
     }
 	
-	// 찜하기
+	//찜하기
 	@GetMapping("/products/{productCode}/liked")
-    public ResponseEntity<Map<String, Object>> toggleLikeProduct(@PathVariable Integer productCode, HttpSession session) {
-        Users user = (Users) session.getAttribute("loginMember");
-        if (user == null) {
-            return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
-        }
-        Map<String, Object> response = pDAO.toggleLikeProduct(user, productCode);
-        response.put("likedStatus", response.get("message").equals("찜 목록에 추가되었습니다."));
-        return ResponseEntity.ok(response);
-    }
+	public ResponseEntity<Map<String, Object>> toggleLikeProduct(@PathVariable Integer productCode, HttpSession session) {
+	    Users user = (Users) session.getAttribute("loginMember");
+	    if (user == null) {
+	        return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
+	    }
+	    Map<String, Object> response = pDAO.toggleLikeProduct(user, productCode);
+	    return ResponseEntity.ok(response);
+	}
+
 }
