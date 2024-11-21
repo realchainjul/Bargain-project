@@ -8,14 +8,30 @@ const VegetablePage = () => {
   const [vegetables, setVegetables] = useState([]); // 채소 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [likedItems, setLikedItems] = useState([]); // 찜한 상품 목록
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 확인
   const navigate = useNavigate(); // 페이지 이동 함수
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   // API 호출
   useEffect(() => {
     const fetchVegetables = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/category/vegetable'); // vegetable URL
-        
         if (response.status === 200) {
           setVegetables(response.data); // 데이터 저장
         } else {
@@ -34,6 +50,12 @@ const VegetablePage = () => {
 
   // 찜 버튼 클릭 핸들러
   const handleLike = async (vegetable) => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     try {
       const response = await axios.get(
         `https://api.bargainus.kr/products/${vegetable.pcode}/liked`, // 변경된 주소

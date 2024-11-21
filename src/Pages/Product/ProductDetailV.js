@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './ProductDetail.module.scss';
 import { VscHeart } from 'react-icons/vsc';
@@ -11,7 +11,26 @@ const ProductDetailV = () => {
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [count, setCount] = useState(1); // 구매 수량
   const [liked, setLiked] = useState(false); // 찜 여부
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
+  const navigate = useNavigate(); // 페이지 이동 함수
 
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  // 상품 데이터 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -34,10 +53,17 @@ const ProductDetailV = () => {
     fetchProduct();
   }, [id]);
 
+  // 찜 버튼 클릭 핸들러
   const handleLike = async () => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${product.pcode}/liked`, // API 호출 URL 수정
+        `https://api.bargainus.kr/products/${product.pcode}/liked`,
         { withCredentials: true }
       );
       if (response.status === 200) {

@@ -4,17 +4,34 @@ import axios from 'axios';
 import style from '../Fruits/FruitsPage.module.scss';
 import { VscHeart } from 'react-icons/vsc';
 
-const GrainPage = () => { // GrainPage로 이름 변경
+const GrainPage = () => {
   const [grains, setGrains] = useState([]); // 곡물 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [likedItems, setLikedItems] = useState([]); // 찜한 상품 목록
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 확인
   const navigate = useNavigate(); // 페이지 이동 함수
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   // API 호출
   useEffect(() => {
-    const fetchGrains = async () => { // 함수 이름 변경
+    const fetchGrains = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/category/grain'); // URL에서 grain 사용
+        const response = await axios.get('https://api.bargainus.kr/category/grain');
         if (response.status === 200) {
           setGrains(response.data); // 데이터 저장
         } else {
@@ -33,6 +50,12 @@ const GrainPage = () => { // GrainPage로 이름 변경
 
   // 찜 버튼 클릭 핸들러
   const handleLike = async (grain) => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     try {
       const response = await axios.get(
         `https://api.bargainus.kr/products/${grain.pcode}/liked`, // 변경된 주소
@@ -49,25 +72,24 @@ const GrainPage = () => { // GrainPage로 이름 변경
       alert('서버와 연결할 수 없습니다.');
     }
   };
-  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
 
   return (
-    <div className={style.fruitsPage}> {/* 클래스 이름 변경 */}
+    <div className={style.fruitsPage}>
       <h1>곡물</h1>
-      <div className={style.fruitsList}> {/* 클래스 이름 변경 */}
-        {grains.map((grain) => ( // grains로 변수 이름 변경
-          <div key={grain.pcode} className={style.fruitCard}> {/* 클래스 이름 변경 */}
+      <div className={style.fruitsList}>
+        {grains.map((grain) => (
+          <div key={grain.pcode} className={style.fruitCard}>
             <img
-              src={grain.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
+              src={grain.photo || '/images/default.jpg'}
               alt={grain.name}
-              className={style.fruitImage} // 클래스 이름 변경
-              onClick={() => navigate(`/grain/products/${grain.pcode}`)} // 경로에 grains 사용
+              className={style.fruitImage}
+              onClick={() => navigate(`/grain/products/${grain.pcode}`)} // 상세 페이지로 이동
             />
-            <div className={style.fruitInfo}> {/* 클래스 이름 변경 */}
+            <div className={style.fruitInfo}>
               <h2>{grain.name}</h2>
               <p>{Number(grain.price).toLocaleString()} 원</p>
               <button
