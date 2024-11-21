@@ -10,6 +10,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null); // 상품 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [count, setCount] = useState(1); // 구매 수량
+  const [liked, setLiked] = useState(false); // 찜 여부
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 확인
   const navigate = useNavigate(); // 페이지 이동 함수
 
@@ -32,18 +33,13 @@ const ProductDetail = () => {
   // 상품 데이터 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!id) {
-        console.error('Invalid product ID');
-        setLoading(false);
-        return;
-      }
-
       try {
         const response = await axios.get(`https://api.bargainus.kr/fruits/products/${id}`, {
           withCredentials: true,
         });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
+          setLiked(response.data.likedStatus); // 초기 찜 상태 설정
         } else {
           alert('상품 정보를 불러오는 데 실패했습니다.');
         }
@@ -74,10 +70,7 @@ const ProductDetail = () => {
       if (response.status === 200) {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 서버 메시지 출력
-        setProduct((prevProduct) => ({
-          ...prevProduct,
-          likedStatus, // 찜 상태 업데이트
-        }));
+        setLiked(likedStatus); // 찜 상태 업데이트
       } else {
         alert('요청을 처리하지 못했습니다.');
       }
@@ -94,29 +87,29 @@ const ProductDetail = () => {
 
   // 장바구니 추가 핸들러
   const handleAddToCart = async () => {
-    if (!product?.productCode) {
-      console.error('Invalid product code for adding to cart');
+    console.log("Product Object: ", product);
+    console.log("Product Code: ", product.productCode);
+
+    if (!product || !product.productCode) {
+      console.error('유효하지 않은 상품 코드입니다.');
       alert('유효한 상품이 아닙니다.');
       return;
     }
   
     try {
       const response = await axios.post(
-        `https://bargainus.kr/products/${product.productCode}/bucket/add`, // productCode 포함
+        `https://bargainus.kr/products/${product.productCode}/bucket/add`, // productCode를 경로에 포함
         { count }, // 구매 수량을 count로 전송
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
         alert(response.data.message || '장바구니에 추가되었습니다.');
-        navigate('/cart'); // 장바구니 페이지로 이동
+        navigate('/mypage/cart'); // 장바구니 페이지로 이동
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
-      if (error.response?.status === 404) {
-        alert('유효하지 않은 상품 코드입니다.');
-      } else if (error.response?.status === 401) {
-        alert('로그인이 필요합니다.');
-        navigate('/login'); // 로그인 페이지로 이동
+      if (error.response?.status === 403) {
+        alert('장바구니에 추가할 수 없습니다. 다시 시도해주세요.');
       } else {
         alert('장바구니 추가 중 문제가 발생했습니다.');
       }
@@ -145,9 +138,9 @@ const ProductDetail = () => {
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
             {product.productPhotos && product.productPhotos.length > 0 ? (
-              product.productPhotos.map((photo, index) => (
+              product.productPhotos.map((photo) => (
                 <img
-                  key={index}
+                  key={photo}
                   src={photo}
                   alt={`${product.name} 상세 이미지`}
                   className={style.detailImage}
@@ -167,7 +160,7 @@ const ProductDetail = () => {
               <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
             </div>
             <button className={style.likeButton} onClick={handleLike}>
-              {product.likedStatus ? (
+              {liked ? (
                 <VscHeartFilled style={{ color: '#ff4757', fontSize: '24px' }} />
               ) : (
                 <VscHeart style={{ color: '#ff4757', fontSize: '24px' }} />
@@ -196,11 +189,7 @@ const ProductDetail = () => {
             ) : (
               <>
                 <Button name="장바구니" onClick={handleAddToCart} />
-                <Button
-                  name="구매하기"
-                  isBrown={true}
-                  onClick={() => alert('구매 페이지로 이동합니다.')}
-                />
+                <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
               </>
             )}
           </div>
