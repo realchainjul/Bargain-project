@@ -3,6 +3,10 @@ import style from './MainDisplay.module.scss';
 import ProductHeader from '../../Product/ProductHeader';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
 import axios from 'axios';
 
 export default function MainDisplay({ endpoint, name }) {
@@ -48,14 +52,10 @@ export default function MainDisplay({ endpoint, name }) {
             modules={[Pagination, Navigation, Autoplay]}
             loop={true} // 루프 슬라이드
             autoplay={{ delay: 3000 }} // 자동 슬라이드
-            spaceBetween={-200} // 슬라이드 간격
+            spaceBetween={20} // 슬라이드 간격
             slidesPerView={5} // 한 번에 보여지는 슬라이드 개수
-            loopAdditionalSlides={1} // 추가 슬라이드 개수
-            style={{
-              '--swiper-navigation-color': '#404040',
-              '--swiper-navigation-size': '40px',
-              '--swiper-pagination-color': '#404040',
-            }}
+            navigation // 네비게이션 버튼 활성화
+            pagination={{ clickable: true }} // 페이지네이션 활성화
             breakpoints={{
               1800: {
                 slidesPerView: 5,
