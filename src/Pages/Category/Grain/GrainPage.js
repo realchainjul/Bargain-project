@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import style from './FruitsPage.module.scss';
+import style from '../Fruits/FruitsPage.module.scss';
 import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 
 const GrainPage = () => {
