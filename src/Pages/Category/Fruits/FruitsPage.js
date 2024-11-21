@@ -7,71 +7,75 @@ import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 const FruitsPage = () => {
   const [fruits, setFruits] = useState([]); // 과일 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
-  const [likedItems, setLikedItems] = useState([]); // 찜한 상품 목록
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
-  // 로컬 스토리지에서 찜한 목록 불러오기
+  // 로그인 상태 확인
   useEffect(() => {
-    const storedLikedItems = localStorage.getItem('likedItems');
-    if (storedLikedItems) {
-      setLikedItems(JSON.parse(storedLikedItems));
-    }
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error('로그인 상태 확인 실패:', error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
   }, []);
 
-  // 데이터 로드 (로그인 상태 확인 및 찜 목록, 과일 데이터)
+  // API 호출
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFruits = async () => {
       try {
-        // 로그인 상태 확인
-        const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
-        if (loginResponse.status === 200 && loginResponse.data.nickname) {
-          setIsLoggedIn(true);
-
-          // 로그인 성공 시 찜 목록 불러오기
-          const likedResponse = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
-            withCredentials: true,
-          });
-          const likedProducts = likedResponse.data.map((item) => item.pcode);
-          setLikedItems(likedProducts); // 찜한 상품 ID 저장
-          localStorage.setItem('likedItems', JSON.stringify(likedProducts)); // 로컬 스토리지에 저장
-        }
-
-        // 과일 데이터 불러오기
-        const fruitsResponse = await axios.get('https://api.bargainus.kr/category/fruits');
-        if (fruitsResponse.status === 200) {
-          setFruits(fruitsResponse.data);
+        const response = await axios.get('https://api.bargainus.kr/category/fruits');
+        if (response.status === 200) {
+          setFruits(response.data); // 과일 데이터 저장
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
       } catch (error) {
-        console.error('데이터 불러오기 오류:', error);
+        console.error('과일 데이터 불러오기 오류:', error);
         alert('서버와 연결할 수 없습니다.');
       } finally {
-        setLoading(false);
+        setLoading(false); // 로딩 종료
       }
     };
 
-    fetchData();
+    fetchFruits();
   }, []);
 
   // 찜 버튼 클릭 핸들러
   const handleLike = async (fruit) => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     try {
-      // 현재 좋아요 상태에 따라 API 호출 구분
-      const url = `https://api.bargainus.kr/products/${fruit.pcode}/liked`;
-      const response = await axios.post(url, {}, { withCredentials: true });
+      const response = await axios.get(
+        `https://api.bargainus.kr/products/${fruit.productCode}/liked`,
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 메시지 출력
 
-        // 좋아요 상태에 따라 찜 목록 업데이트
-        setLikedItems((prev) => {
-          const updatedLikedItems = likedStatus ? [...prev, fruit.pcode] : prev.filter((id) => id !== fruit.pcode);
-          localStorage.setItem('likedItems', JSON.stringify(updatedLikedItems)); // 로컬 스토리지에 저장
-          return updatedLikedItems;
-        });
+        // 상태 변경: likedStatus가 변경된 값을 반영
+        setFruits((prevFruits) =>
+          prevFruits.map((item) =>
+            item.productCode === fruit.productCode
+              ? { ...item, likedStatus } // likedStatus 업데이트
+              : item
+          )
+        );
       }
     } catch (error) {
       console.error('찜 요청 오류:', error);
@@ -93,15 +97,15 @@ const FruitsPage = () => {
       <h1>과일</h1>
       <div className={style.fruitsList}>
         {fruits.map((fruit) => (
-          <div key={fruit.pcode} className={style.fruitCard}>
+          <div key={fruit.productCode} className={style.fruitCard}>
             <img
-              src={fruit.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
-              alt={fruit.name}
+              src={fruit.photoUrl || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
+              alt={fruit.productName}
               className={style.fruitImage}
-              onClick={() => navigate(`/fruits/products/${fruit.pcode}`)} // 상세 페이지로 이동
+              onClick={() => navigate(`/fruits/products/${fruit.productCode}`)} // 상세 페이지로 이동
             />
             <div className={style.fruitInfo}>
-              <h2>{fruit.name}</h2>
+              <h2>{fruit.productName}</h2>
               <p>{Number(fruit.price).toLocaleString()} 원</p>
               <button
                 className={style.likeButton}
@@ -110,7 +114,8 @@ const FruitsPage = () => {
                   handleLike(fruit);
                 }}
               >
-                {likedItems.includes(fruit.pcode) ? (
+                {/* likedStatus를 기준으로 하트 상태 표시 */}
+                {fruit.likedStatus ? (
                   <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
                 ) : (
                   <VscHeart size="20" />
