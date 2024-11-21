@@ -11,35 +11,33 @@ const FruitsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
-  // 로그인 상태 확인
+  // 로그인 상태 확인 및 찜 목록 불러오기
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const fetchLikedItems = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
-        if (response.status === 200 && response.data.nickname) {
+        const response = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
+          withCredentials: true,
+        });
+        if (response.status === 200) {
+          setLikedItems(response.data.map((item) => item.pcode)); // 찜한 상품 ID 목록 저장
           setIsLoggedIn(true);
         }
       } catch (error) {
         setIsLoggedIn(false);
+        console.error('찜 목록 불러오기 실패:', error);
       }
     };
 
-    checkLoginStatus();
+    fetchLikedItems();
   }, []);
 
-  // API 호출 및 찜 상태 초기화
+  // API 호출
   useEffect(() => {
     const fetchFruits = async () => {
       try {
         const response = await axios.get('https://api.bargainus.kr/category/fruits');
         if (response.status === 200) {
-          setFruits(response.data); // 과일 데이터 저장
-
-          // 찜 상태 초기화: likedStatus가 true인 상품의 pcode만 저장
-          const liked = response.data
-            .filter((fruit) => fruit.likedStatus) // likedStatus가 true인 상품 필터링
-            .map((fruit) => fruit.pcode); // 찜된 상품의 pcode만 추출
-          setLikedItems(liked);
+          setFruits(response.data); // 데이터 저장
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
@@ -73,11 +71,9 @@ const FruitsPage = () => {
         alert(message); // 메시지 출력
 
         if (likedStatus) {
-          // 찜 추가
-          setLikedItems((prev) => [...prev, fruit.pcode]);
+          setLikedItems((prev) => [...prev, fruit.pcode]); // 찜 추가
         } else {
-          // 찜 삭제
-          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode));
+          setLikedItems((prev) => prev.filter((id) => id !== fruit.pcode)); // 찜 삭제
         }
       }
     } catch (error) {
