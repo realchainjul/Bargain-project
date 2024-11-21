@@ -58,7 +58,7 @@ const FruitsPage = () => {
 
     try {
       // 찜 추가/삭제 요청
-      const response = await axios.post(
+      const response = await axios.get(
         `https://api.bargainus.kr/products/${fruit.pcode}/liked`,
         {},
         { withCredentials: true } // 인증 정보 포함
