@@ -10,32 +10,27 @@ const FruitsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
-  // 로그인 상태 확인
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await axios.get('https://api.bargainus.kr/info', {
-          withCredentials: true,
-        });
-        if (response.status === 200 && response.data.nickname) {
-          setIsLoggedIn(true);
-        }
-      } catch (error) {
-        console.error('로그인 상태 확인 실패:', error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkLoginStatus();
-  }, []);
-
-  // API 호출
+  // API 호출 및 로그인 상태 확인
   useEffect(() => {
     const fetchFruits = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/category/fruits');
+        const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+
+        let user = null;
+        if (loginResponse.status === 200 && loginResponse.data.nickname) {
+          setIsLoggedIn(true);
+          user = loginResponse.data; // 로그인한 사용자 정보 저장
+        }
+
+        // 과일 목록 가져오기
+        const response = await axios.get('https://api.bargainus.kr/category/fruits', { withCredentials: true });
         if (response.status === 200) {
-          setFruits(response.data); // 과일 데이터 저장
+          // 각 상품의 likedStatus를 이용해 상태 설정
+          const updatedFruits = response.data.map((fruit) => ({
+            ...fruit,
+            likedStatus: user ? fruit.likedStatus : false, // 로그인한 경우 서버에서 전달받은 likedStatus 사용
+          }));
+          setFruits(updatedFruits);
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
@@ -60,7 +55,7 @@ const FruitsPage = () => {
 
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${fruit.productCode}/liked`,
+        `https://api.bargainus.kr/products/${fruit.pcode}/liked`,
         { withCredentials: true }
       );
 
@@ -68,12 +63,10 @@ const FruitsPage = () => {
         const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
         alert(message); // 메시지 출력
 
-        // 상태 변경: likedStatus가 변경된 값을 반영
+        // fruits 상태를 업데이트
         setFruits((prevFruits) =>
           prevFruits.map((item) =>
-            item.productCode === fruit.productCode
-              ? { ...item, likedStatus } // likedStatus 업데이트
-              : item
+            item.pcode === fruit.pcode ? { ...item, likedStatus } : item
           )
         );
       }
@@ -97,15 +90,15 @@ const FruitsPage = () => {
       <h1>과일</h1>
       <div className={style.fruitsList}>
         {fruits.map((fruit) => (
-          <div key={fruit.productCode} className={style.fruitCard}>
+          <div key={fruit.pcode} className={style.fruitCard}>
             <img
-              src={fruit.photoUrl || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
-              alt={fruit.productName}
+              src={fruit.photo || '/images/default.jpg'} // 이미지가 없을 경우 기본 이미지 사용
+              alt={fruit.name}
               className={style.fruitImage}
-              onClick={() => navigate(`/fruits/products/${fruit.productCode}`)} // 상세 페이지로 이동
+              onClick={() => navigate(`/fruits/products/${fruit.pcode}`)} // 상세 페이지로 이동
             />
             <div className={style.fruitInfo}>
-              <h2>{fruit.productName}</h2>
+              <h2>{fruit.name}</h2>
               <p>{Number(fruit.price).toLocaleString()} 원</p>
               <button
                 className={style.likeButton}
@@ -114,7 +107,6 @@ const FruitsPage = () => {
                   handleLike(fruit);
                 }}
               >
-                {/* likedStatus를 기준으로 하트 상태 표시 */}
                 {fruit.likedStatus ? (
                   <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
                 ) : (
