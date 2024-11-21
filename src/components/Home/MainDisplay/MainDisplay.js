@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import style from './MainDisplay.module.scss';
 import ProductHeader from '../../Product/ProductHeader';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -12,6 +13,7 @@ import axios from 'axios';
 export default function MainDisplay({ endpoint, name }) {
   const [data, setData] = useState([]); // 상품 데이터 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
+  const navigate = useNavigate(); // 페이지 이동 함수
 
   // API를 통해 상품 데이터 가져오기
   useEffect(() => {
@@ -55,6 +57,11 @@ export default function MainDisplay({ endpoint, name }) {
             spaceBetween={20} // 슬라이드 간격
             slidesPerView={5} // 한 번에 보여지는 슬라이드 개수
             pagination={{ clickable: true }} // 페이지네이션 활성화
+            style={{
+              "--swiper-navigation-color": "#383810",
+              "--swiper-navigation-size": "40px",
+              "--swiper-pagination-color": "#383810"
+            }}
             breakpoints={{
               1800: {
                 slidesPerView: 5,
@@ -72,8 +79,12 @@ export default function MainDisplay({ endpoint, name }) {
           >
             {data.map((product) => (
               <SwiperSlide key={product.id} className={style.productCard}>
-                {/* 상품 정보 렌더링 */}
-                <div className={style.productContent}>
+                {/* 상품 카드 클릭 시 상세 페이지로 이동 */}
+                <div
+                  className={style.productContent}
+                  onClick={() => navigate(`/${endpoint}/products/${product.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <img
                     src={product.photo || '/images/default.jpg'}
                     alt={product.name}
