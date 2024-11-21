@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './Cart.module.scss';
 import { BsCart2 } from 'react-icons/bs';
-import Button from '../../components/common/Button';
+import Button from '../../../components/common/Button';
 
 // Cart Component
 const Cart = () => {

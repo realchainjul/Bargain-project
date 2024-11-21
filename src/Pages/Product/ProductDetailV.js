@@ -85,6 +85,26 @@ const ProductDetailV = () => {
     }
   };
 
+  // 장바구니 버튼 클릭 핸들러
+  const handleAddToCart = async () => {
+    try {
+      const response = await axios.post(
+        `https://bargainus.kr/products/${product.pcode}/bucket/add`,
+        { count },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        alert('장바구니에 추가되었습니다!');
+        navigate('/cart'); // 장바구니 페이지로 이동
+      } else {
+        alert('장바구니에 추가하지 못했습니다.');
+      }
+    } catch (error) {
+      console.error('장바구니 추가 오류:', error);
+      alert('장바구니 추가 중 문제가 발생했습니다.');
+    }
+  };
+
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
@@ -156,7 +176,7 @@ const ProductDetailV = () => {
               <Button name="품절" className={style.soldout} disabled={true} />
             ) : (
               <>
-                <Button name="장바구니" onClick={() => alert('장바구니에 추가되었습니다!')} />
+                <Button name="장바구니" onClick={handleAddToCart} />
                 <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
               </>
             )}
