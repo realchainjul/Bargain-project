@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // useNavigate import
 import style from './ProductAdd.module.scss';
 import Button from '../../../components/common/Button';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const ProductAdd = () => {
+  const navigate = useNavigate(); // useNavigate 호출
   const [product, setProduct] = useState({
     name: '',
     price: '',
@@ -78,7 +79,7 @@ const ProductAdd = () => {
 
       if (response.status === 200) {
         alert('상품이 성공적으로 등록되었습니다!');
-        navigate('/mypage/userpage/products');
+        navigate('/mypage/userpage/products'); // 등록 성공 후 페이지 이동
       } else {
         alert(`등록 실패: ${response.data.message}`);
       }
