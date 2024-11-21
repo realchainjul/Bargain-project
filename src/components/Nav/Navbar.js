@@ -23,6 +23,7 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
   const handleRestrictedClick = (event) => {
     event.preventDefault();
     alert('로그인 후 이용 가능합니다.');
+    window.location.href = '/login';
   };
 
   return (
