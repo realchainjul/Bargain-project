@@ -85,38 +85,40 @@ const ProductDetail = () => {
   // 장바구니 추가 핸들러
   const handleAddToCart = async () => {
     if (!product?.pcode) {
-      console.error("Invalid product code");
-      alert("유효하지 않은 상품입니다.");
+      console.error('Invalid product code');
+      alert('유효하지 않은 상품입니다.');
       return;
     }
   
-    console.log("Adding to cart:", { productCode: product.pcode, count });
-  
     try {
-      const response = await axios.post(
-        `https://bargainus.kr/products/${product.pcode}/bucket/add?count=${count}`,
-        null, // POST 요청의 body는 비워둠
-        { withCredentials: true } // 인증 정보 포함
-      );
-      console.log("Response:", response);
+      // FormData 생성 및 데이터 추가
+      const formData = new FormData();
+      formData.append('productCode', product.pcode);
+      formData.append('count', count); // 구매 수량
+  
+      console.log('Adding to cart:', Object.fromEntries(formData)); // 디버깅 로그
+  
+      const response = await axios.post(`https://bargainus.kr/products/${product.pcode}/bucket/add`, formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
       if (response.status === 200) {
-        alert(response.data.message || "장바구니에 추가되었습니다.");
-        navigate("/cart");
+        alert(response.data.message || '장바구니에 추가되었습니다.');
+        navigate('/cart'); // 장바구니 페이지로 이동
       }
     } catch (error) {
-      console.error("장바구니 추가 오류:", error);
+      console.error('장바구니 추가 오류:', error);
       if (error.response) {
-        console.error("Response Data:", error.response.data);
-        console.error("Response Status:", error.response.status);
-        console.error("Response Headers:", error.response.headers);
+        console.error('Response Data:', error.response.data);
+        console.error('Response Status:', error.response.status);
       }
-      if (error.response?.status === 403) {
-        alert("권한이 부족합니다. 로그인을 확인해주세요.");
-      } else {
-        alert("장바구니 추가 중 문제가 발생했습니다.");
-      }
+      alert('장바구니 추가 중 문제가 발생했습니다.');
     }
   };
+  
   
   
   
