@@ -18,6 +18,7 @@ const FruitsPage = () => {
         const loginResponse = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
         if (loginResponse.status === 200 && loginResponse.data.nickname) {
           setIsLoggedIn(true);
+
           // 로그인 성공 시 찜 목록 불러오기
           const likedResponse = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
             withCredentials: true,
