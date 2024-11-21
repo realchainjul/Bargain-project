@@ -8,7 +8,24 @@ const FruitsPage = () => {
   const [fruits, setFruits] = useState([]); // 과일 데이터 저장
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [likedItems, setLikedItems] = useState([]); // 찜한 상품 목록
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', { withCredentials: true });
+        if (response.status === 200 && response.data.nickname) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   // API 호출
   useEffect(() => {
@@ -32,15 +49,21 @@ const FruitsPage = () => {
   }, []);
 
   // 찜 버튼 클릭 핸들러
-  const handleLike = async (fruits) => {
+  const handleLike = async (fruit) => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${fruits.pcode}/liked`, // 변경된 주소
+        `https://api.bargainus.kr/products/${fruit.pcode}/liked`, // 변경된 주소
         { withCredentials: true } // 인증 정보 포함
       );
       if (response.status === 200) {
-        alert(`${fruits.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLikedItems((prev) => [...prev, fruits.pcode]); // 찜한 상품 ID 저장
+        alert(`${fruit.name}이(가) 찜 목록에 추가되었습니다!`);
+        setLikedItems((prev) => [...prev, fruit.pcode]); // 찜한 상품 ID 저장
       } else {
         alert('찜 목록 추가에 실패했습니다.');
       }
@@ -49,7 +72,6 @@ const FruitsPage = () => {
       alert('서버와 연결할 수 없습니다.');
     }
   };
-  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
