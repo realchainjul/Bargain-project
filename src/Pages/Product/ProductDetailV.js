@@ -30,7 +30,7 @@ const ProductDetailV = () => {
     checkLoginStatus();
   }, []);
 
-  // 상품 데이터 불러오기
+  // 상품 데이터 불러오기 및 초기 찜 상태 설정
   useEffect(() => {
     const fetchProduct = async () => {
       try {

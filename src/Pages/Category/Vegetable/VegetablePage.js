@@ -55,26 +55,22 @@ const VegetablePage = () => {
       navigate('/login'); // 로그인 페이지로 이동
       return;
     }
-
+  
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${vegetable.pcode}/liked`, // API 요청
+        `https://api.bargainus.kr/products/${vegetable.pcode}/liked`,
         { withCredentials: true }
       );
-
+  
       if (response.status === 200) {
-        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 message 추출
-        alert(message); // 서버 메시지 출력
-
+        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
+        alert(message); // 메시지 출력
+  
         if (likedStatus) {
-          // 찜 추가 상태 처리
-          setLikedItems((prev) => [...prev, vegetable.pcode]);
+          setLikedItems((prev) => [...prev, vegetable.pcode]); // 찜 추가
         } else {
-          // 찜 삭제 상태 처리
-          setLikedItems((prev) => prev.filter((id) => id !== vegetable.pcode));
+          setLikedItems((prev) => prev.filter((id) => id !== vegetable.pcode)); // 찜 삭제
         }
-      } else {
-        alert('요청을 처리하지 못했습니다.');
       }
     } catch (error) {
       console.error('찜 요청 오류:', error);
@@ -86,6 +82,7 @@ const VegetablePage = () => {
       }
     }
   };
+  
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
