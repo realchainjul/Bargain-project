@@ -93,18 +93,23 @@ const ProductDetail = () => {
     console.log("Adding to cart:", { productCode: product.pcode, count });
   
     try {
-      // 쿼리 파라미터로 count를 전달
       const response = await axios.post(
-        `https://bargainus.kr/products/${product.pcode}/bucket/add?count=${count}`, // URL에 count 추가
+        `https://bargainus.kr/products/${product.pcode}/bucket/add?count=${count}`,
         null, // POST 요청의 body는 비워둠
         { withCredentials: true } // 인증 정보 포함
       );
+      console.log("Response:", response);
       if (response.status === 200) {
         alert(response.data.message || "장바구니에 추가되었습니다.");
-        navigate("/cart"); // 장바구니 페이지로 이동
+        navigate("/cart");
       }
     } catch (error) {
       console.error("장바구니 추가 오류:", error);
+      if (error.response) {
+        console.error("Response Data:", error.response.data);
+        console.error("Response Status:", error.response.status);
+        console.error("Response Headers:", error.response.headers);
+      }
       if (error.response?.status === 403) {
         alert("권한이 부족합니다. 로그인을 확인해주세요.");
       } else {
@@ -112,6 +117,7 @@ const ProductDetail = () => {
       }
     }
   };
+  
   
   
 
