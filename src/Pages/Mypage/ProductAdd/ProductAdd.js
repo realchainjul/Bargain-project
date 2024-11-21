@@ -77,6 +77,7 @@ const ProductAdd = () => {
 
       if (response.status === 200) {
         alert('상품이 성공적으로 등록되었습니다!');
+        navigate('/mypage/userpage/products');
       } else {
         alert(`등록 실패: ${response.data.message}`);
       }
