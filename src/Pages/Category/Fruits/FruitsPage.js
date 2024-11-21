@@ -57,7 +57,7 @@ const FruitsPage = () => {
     }
 
     try {
-      const response = await axios.post(
+      const response = await axios.get(
         `https://api.bargainus.kr/products/${fruit.pcode}/liked`, // POST 요청 사용
         {},
         { withCredentials: true } // 인증 정보 포함
