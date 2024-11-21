@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './FruitsPage.module.scss';
 import { VscHeart } from 'react-icons/vsc';
+import { VscHeartFilled } from 'react-icons/vsc';
 
 const FruitsPage = () => {
   const [fruits, setFruits] = useState([]); // 과일 데이터 저장
@@ -109,15 +110,17 @@ const FruitsPage = () => {
               <h2>{fruit.name}</h2>
               <p>{Number(fruit.price).toLocaleString()} 원</p>
               <button
-                className={`${style.likeButton} ${
-                  likedItems.includes(fruit.pcode) ? style.liked : ''
-                }`}
+                className={`${style.likeButton}`}
                 onClick={(e) => {
                   e.stopPropagation(); // 부모 클릭 이벤트 전파 방지
                   handleLike(fruit);
                 }}
               >
-                <VscHeart size="20" />
+                {likedItems.includes(fruit.pcode) ? (
+                  <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
+                ) : (
+                  <VscHeart size="20" />
+                )}
               </button>
             </div>
           </div>

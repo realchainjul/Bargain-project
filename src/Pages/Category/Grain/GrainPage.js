@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from '../Fruits/FruitsPage.module.scss';
 import { VscHeart } from 'react-icons/vsc';
+import { VscHeartFilled } from 'react-icons/vsc';
 
 const GrainPage = () => {
   const [grains, setGrains] = useState([]); // 곡물 데이터 저장
@@ -58,18 +59,33 @@ const GrainPage = () => {
 
     try {
       const response = await axios.get(
-        `https://api.bargainus.kr/products/${grain.pcode}/liked`, // 변경된 주소
+        `https://api.bargainus.kr/products/${grain.pcode}/liked`, // API 요청 URL
         { withCredentials: true } // 인증 정보 포함
       );
+
       if (response.status === 200) {
-        alert(`${grain.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLikedItems((prev) => [...prev, grain.pcode]); // 찜한 상품 ID 저장
+        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 message 추출
+
+        alert(message); // 서버 메시지 출력
+
+        if (likedStatus) {
+          // 찜 추가 상태 처리
+          setLikedItems((prev) => [...prev, grain.pcode]);
+        } else {
+          // 찜 삭제 상태 처리
+          setLikedItems((prev) => prev.filter((id) => id !== grain.pcode));
+        }
       } else {
-        alert('찜 목록 추가에 실패했습니다.');
+        alert('요청을 처리하지 못했습니다.');
       }
     } catch (error) {
-      console.error('찜 추가 오류:', error);
-      alert('서버와 연결할 수 없습니다.');
+      console.error('찜 요청 오류:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        navigate('/login');
+      } else {
+        alert('서버와 연결할 수 없습니다.');
+      }
     }
   };
 
@@ -93,15 +109,17 @@ const GrainPage = () => {
               <h2>{grain.name}</h2>
               <p>{Number(grain.price).toLocaleString()} 원</p>
               <button
-                className={`${style.likeButton} ${
-                  likedItems.includes(grain.pcode) ? style.liked : ''
-                }`}
+                className={`${style.likeButton}`}
                 onClick={(e) => {
                   e.stopPropagation(); // 부모 클릭 이벤트 전파 방지
                   handleLike(grain);
                 }}
               >
-                <VscHeart size="20" />
+                {likedItems.includes(grain.pcode) ? (
+                  <VscHeartFilled size="20" style={{ color: '#ff4757' }} />
+                ) : (
+                  <VscHeart size="20" />
+                )}
               </button>
             </div>
           </div>

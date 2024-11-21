@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './ProductDetail.module.scss';
-import { VscHeart } from 'react-icons/vsc';
+import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 import Button from '../../components/common/Button';
 
 const ProductDetail = () => {
@@ -39,6 +39,7 @@ const ProductDetail = () => {
         });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
+          setLiked(response.data.likedStatus); // 초기 찜 상태 설정
         } else {
           alert('상품 정보를 불러오는 데 실패했습니다.');
         }
@@ -67,14 +68,20 @@ const ProductDetail = () => {
         { withCredentials: true }
       );
       if (response.status === 200) {
-        alert(`${product.name}이(가) 찜 목록에 추가되었습니다!`);
-        setLiked(true); // 찜 상태 업데이트
+        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
+        alert(message); // 서버 메시지 출력
+        setLiked(likedStatus); // 찜 상태 업데이트
       } else {
-        alert('찜 목록 추가에 실패했습니다.');
+        alert('요청을 처리하지 못했습니다.');
       }
     } catch (error) {
-      console.error('찜 추가 오류:', error);
-      alert('서버와 연결할 수 없습니다.');
+      console.error('찜 요청 오류:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        navigate('/login');
+      } else {
+        alert('서버와 연결할 수 없습니다.');
+      }
     }
   };
 
@@ -123,12 +130,12 @@ const ProductDetail = () => {
             <button
               className={style.likeButton}
               onClick={handleLike}
-              disabled={liked}
-              style={{
-                cursor: liked ? 'not-allowed' : 'pointer',
-              }}
             >
-              <VscHeart style={{ color: liked ? '#ff4757' : '#000', fontSize: '24px' }} />
+              {liked ? (
+                <VscHeartFilled style={{ color: '#ff4757', fontSize: '24px' }} />
+              ) : (
+                <VscHeart style={{ color: '#ff4757', fontSize: '24px' }} />
+              )}
             </button>
           </div>
 
