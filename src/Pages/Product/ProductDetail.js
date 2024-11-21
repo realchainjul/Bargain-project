@@ -51,9 +51,6 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-    fetchProduct();
-  }, [id]);
-
   // 찜 버튼 클릭 핸들러
   const handleLike = async () => {
     if (!isLoggedIn) {
