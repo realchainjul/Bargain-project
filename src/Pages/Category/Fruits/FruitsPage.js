@@ -11,6 +11,14 @@ const FruitsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate(); // 페이지 이동 함수
 
+  // 로컬 스토리지에서 찜한 목록 불러오기
+  useEffect(() => {
+    const storedLikedItems = localStorage.getItem('likedItems');
+    if (storedLikedItems) {
+      setLikedItems(JSON.parse(storedLikedItems));
+    }
+  }, []);
+
   // 데이터 로드 (로그인 상태 확인 및 찜 목록, 과일 데이터)
   useEffect(() => {
     const fetchData = async () => {
@@ -24,13 +32,15 @@ const FruitsPage = () => {
           const likedResponse = await axios.get('https://api.bargainus.kr/mypage/userpage/liked', {
             withCredentials: true,
           });
-          setLikedItems(likedResponse.data.map((item) => item.pcode)); // 찜한 상품 ID 저장
+          const likedProducts = likedResponse.data.map((item) => item.pcode);
+          setLikedItems(likedProducts); // 찜한 상품 ID 저장
+          localStorage.setItem('likedItems', JSON.stringify(likedProducts)); // 로컬 스토리지에 저장
         }
 
         // 과일 데이터 불러오기
         const fruitsResponse = await axios.get('https://api.bargainus.kr/category/fruits');
         if (fruitsResponse.status === 200) {
-          setFruits(fruitsResponse.data); // 과일 데이터 저장
+          setFruits(fruitsResponse.data);
         } else {
           alert('과일 데이터를 불러오는 데 실패했습니다.');
         }
@@ -38,7 +48,7 @@ const FruitsPage = () => {
         console.error('데이터 불러오기 오류:', error);
         alert('서버와 연결할 수 없습니다.');
       } finally {
-        setLoading(false); // 로딩 종료
+        setLoading(false);
       }
     };
 
@@ -47,12 +57,6 @@ const FruitsPage = () => {
 
   // 찜 버튼 클릭 핸들러
   const handleLike = async (fruit) => {
-    if (!isLoggedIn) {
-      alert('로그인 후 이용 가능합니다.');
-      navigate('/login'); // 로그인 페이지로 이동
-      return;
-    }
-
     try {
       // 현재 좋아요 상태에 따라 API 호출 구분
       const url = `https://api.bargainus.kr/products/${fruit.pcode}/liked`;
@@ -63,9 +67,11 @@ const FruitsPage = () => {
         alert(message); // 메시지 출력
 
         // 좋아요 상태에 따라 찜 목록 업데이트
-        setLikedItems((prev) =>
-          likedStatus ? [...prev, fruit.pcode] : prev.filter((id) => id !== fruit.pcode)
-        );
+        setLikedItems((prev) => {
+          const updatedLikedItems = likedStatus ? [...prev, fruit.pcode] : prev.filter((id) => id !== fruit.pcode);
+          localStorage.setItem('likedItems', JSON.stringify(updatedLikedItems)); // 로컬 스토리지에 저장
+          return updatedLikedItems;
+        });
       }
     } catch (error) {
       console.error('찜 요청 오류:', error);
