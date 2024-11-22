@@ -14,10 +14,14 @@ const Search = () => {
       try {
         const response = await axios.post(
           `https://api.bargainus.kr/bills/add`,
-          { query }, // 본문에 검색어 전달
-          { withCredentials: true }
+          { query }, // 검색어를 본문으로 전달
+          {
+            // withCredentials를 제거해 비로그인 상태에서도 요청 가능
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
         );
-        // API 응답 데이터를 검증 후 상태에 저장
         if (response.data && response.data.bills) {
           setResults(response.data.bills);
         } else {
