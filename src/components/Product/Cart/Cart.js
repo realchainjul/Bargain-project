@@ -199,7 +199,7 @@ const Cart = () => {
         </>
       ) : (
         <div className={style.empty}>
-          <BsCart2 size="30" title="장바구니" color="rgb(95, 0, 128)" />
+          <BsCart2 size="30" title="장바구니" color="#a99773" />
           <p>장바구니가 비었습니다.</p>
           <Button
             name={"쇼핑하러 가기"}
