@@ -18,21 +18,16 @@ const Cart = () => {
         const response = await axios.get("https://api.bargainus.kr/bucket/list", {
           withCredentials: true,
         });
-        if (response.status === 200) {
-          console.log("Fetched cart items:", response.data); // 서버에서 받아온 데이터 확인
-          setCartItems(response.data);
-          setCheckedItems(response.data.map((item) => item.bucketNo));
-        }
+        console.log("Fetched cart items:", response.data); // 데이터를 확인
+        setCartItems(response.data);
       } catch (error) {
-        console.error("장바구니 데이터 불러오기 실패:", error);
-        alert("장바구니 데이터를 불러오는 데 실패했습니다.");
-      } finally {
-        setLoading(false);
+        console.error("Error fetching cart items:", error);
       }
     };
   
     fetchCartItems();
   }, []);
+  
   
   // 전체 선택 및 해제 핸들러
   const handleAllCheck = (isChecked) => {
@@ -72,25 +67,25 @@ const Cart = () => {
   };
 
   // 수량 업데이트 핸들러
-  const handleQuantityUpdate = async (bucketNo, newCount) => {
-    console.log("Updating quantity for:", { bucketNo, newCount }); // 전달된 bucketNo와 newCount 확인
+  const handleQuantityUpdate = async (productCode, newCount) => {
+    console.log("Updating quantity for:", { productCode, newCount });
   
-    if (!bucketNo) {
-      console.error("Error: bucketNo is undefined!");
-      alert("장바구니 번호가 유효하지 않습니다.");
+    if (!productCode) {
+      console.error("Error: productCode is undefined!");
+      alert("상품 코드가 유효하지 않습니다.");
       return;
     }
   
     try {
       const response = await axios.put(
-        `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
-        {},
+        `https://api.bargainus.kr/bucket/${productCode}/update?newCount=${newCount}`,
+        {}, // PUT 요청의 body는 비워둡니다
         { withCredentials: true }
       );
       if (response.status === 200) {
         setCartItems((prev) =>
           prev.map((item) =>
-            item.bucketNo === bucketNo ? { ...item, bucketCount: newCount } : item
+            item.productCode === productCode ? { ...item, bucketCount: newCount } : item
           )
         );
         alert(response.data.message || "수량이 업데이트되었습니다.");
@@ -100,6 +95,7 @@ const Cart = () => {
       alert("수량 업데이트 중 문제가 발생했습니다.");
     }
   };
+  
   
 
   // 총 가격 계산
@@ -115,14 +111,11 @@ const Cart = () => {
 
   return (
     <div className={style.cart}>
-      <div className={style.header}>
-        <h1>장바구니</h1>
-      </div>
       {cartItems.length > 0 ? (
         <>
           <div className={style.cartlist}>
             {cartItems.map((item) => (
-              <div key={item.bucketNo} className={style.cartItem}>
+               <div key={item.productCode} className={style.cartItem}>
                 <input
                   type="checkbox"
                   checked={checkedItems.includes(item.bucketNo)}
