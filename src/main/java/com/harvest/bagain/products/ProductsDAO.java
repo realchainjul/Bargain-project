@@ -148,27 +148,38 @@ public class ProductsDAO {
 		return response;
 	}
 
-	// 카테고리 이름으로 상품 목록 조회
-	public List<Products> getProductsByCategoryName(String categoryName) {
-		Optional<Category> category = cateRepo.findByName(categoryName);
-		if (category.isPresent()) {
-			List<Products> products = prodRepo.findByCategory(category.get());
-			for (Products product : products) {
-				List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
-				product.setProductPhotos(productPhotos);
-				String productImageUrl = product.getPhoto() != null
-						? "https://file.bargainus.kr/products/images/" + product.getPhoto()
-						: "";
-				product.setPhoto(productImageUrl);
-				for (ProductPhoto productPhoto : productPhotos) {
-					productPhoto.setPhotoUrl(
-							"https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
-				}
-			}
-			return products;
-		} else {
-			return new ArrayList<>();
-		}
+	public List<Products> getProductsByCategoryName(String categoryName, Users user) {
+	    Optional<Category> category = cateRepo.findByName(categoryName);
+	    if (category.isPresent()) {
+	        List<Products> products = prodRepo.findByCategory(category.get());
+
+	        for (Products product : products) {
+	            // 사진 처리
+	            List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+	            product.setProductPhotos(productPhotos);
+	            String productImageUrl = product.getPhoto() != null
+	                    ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+	                    : "";
+	            product.setPhoto(productImageUrl);
+
+	            for (ProductPhoto productPhoto : productPhotos) {
+	                productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+	            }
+
+	            // likedStatus 처리
+	            if (user != null) {
+	                Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(user, product);
+	                boolean likedStatus = likedOptional.isPresent() && Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
+	                product.setLikedStatus(likedStatus);
+	            } else {
+	                product.setLikedStatus(false);
+	            }
+	        }
+
+	        return products;
+	    } else {
+	        return new ArrayList<>();
+	    }
 	}
 
 	// 카테고리 이름과 상품 코드로 단일 상품 조회

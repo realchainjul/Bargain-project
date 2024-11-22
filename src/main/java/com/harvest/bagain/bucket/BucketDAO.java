@@ -59,26 +59,25 @@ public class BucketDAO {
 		return response;
 	}
 	// 특정 사용자의 장바구니 목록 조회
-		public List<Map<String, Object>> getBucketListByUser(Users user) {
-			List<Bucket> bucketList = bucketRepo.findAllByUser(user);
-			List<Map<String, Object>> responseList = new ArrayList<>();
+    public List<Map<String, Object>> getBucketListByUser(Users user) {
+        List<Bucket> bucketList = bucketRepo.findAllByUser(user);
+        List<Map<String, Object>> responseList = new ArrayList<>();
 
-			for (Bucket bucket : bucketList) {
-				Products product = bucket.getProduct();
+        for (Bucket bucket : bucketList) {
+            Products product = bucket.getProduct();
 
-				Map<String, Object> productInfo = new HashMap<>();
-				productInfo.put("productCode", product.getPcode());
-				productInfo.put("productName", product.getName());
-				productInfo.put("price", product.getPrice());
-				productInfo.put("bucketCount", bucket.getBucketCount());
-				productInfo.put("photoUrl",
-						product.getPhoto() != null ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
-								: "");
-				responseList.add(productInfo);
-			}
+            Map<String, Object> productInfo = new HashMap<>();
+            productInfo.put("bucketNo", bucket.getBucketNo());
+            productInfo.put("productCode", product.getPcode());
+            productInfo.put("productName", product.getName());
+            productInfo.put("price", product.getPrice());
+            productInfo.put("bucketCount", bucket.getBucketCount());
+            productInfo.put("photoUrl", product.getPhoto() != null ? "https://file.bargainus.kr/products/images/" + product.getPhoto() : "");
+            responseList.add(productInfo);
+        }
 
-			return responseList;
-		}
+        return responseList;
+    }
 
 	// 장바구니에서 상품 삭제
 	public Map<String, Object> removeProductFromBucket(Integer bucketNo) {

@@ -29,11 +29,11 @@ public class Bills {
     private Integer code;
     
     @ManyToOne
-    @JoinColumn(name = "bills_users_code")
+    @JoinColumn(name = "users_code")
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name = "bills_products_code")
+    @JoinColumn(name = "products_code")
     private Products product;
 
     @Column(name = "bills_address")
@@ -47,6 +47,9 @@ public class Bills {
 
     @Column(name = "bills_price")
     private Integer price;
+    
+    @Column(name = "bills_total_price")
+    private Integer totalPrice;
     
     @CreationTimestamp
     @Column(name = "bills_buydate")
