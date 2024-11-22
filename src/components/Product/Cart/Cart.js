@@ -125,13 +125,13 @@ const Cart = () => {
         <>
           <div className={style.cartlist}>
           <label className={style.selectAll}>
-    <input
-      type="checkbox"
-      checked={checkedItems.length === cartItems.length}
-      onChange={(e) => handleAllCheck(e.target.checked)}
-    />
-    전체 선택
-  </label>
+            <input
+            type="checkbox"
+            checked={checkedItems.length === cartItems.length}
+            onChange={(e) => handleAllCheck(e.target.checked)}
+            />
+          전체 선택
+          </label>
             {cartItems.map((item) => (
               <div key={item.bucketNo} className={style.cartItem}>
                 <input
@@ -145,17 +145,16 @@ const Cart = () => {
                 <div className={style.info}>
                   <h2>{item.productName}</h2>
                   <p>{Number(item.price).toLocaleString()} 원</p>
-                  <p>수량:</p>
                   <div className={style.quantity}>
-  <button
-    onClick={() => {
-      console.log("Decreasing quantity for:", item);
-      handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1));
-    }}
-  >
-    -
-  </button>
-  <span>{item.bucketCount}</span>
+                <button
+                  onClick={() => {
+                  console.log("Decreasing quantity for:", item);
+                  handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1));
+                  }}
+                  >
+                  -
+                </button>
+                <span>{item.bucketCount}</span>
   <button
     onClick={() => {
       console.log("Increasing quantity for:", item);
@@ -165,7 +164,6 @@ const Cart = () => {
     +
   </button>
 </div>
-
                 </div>
                 <button
                   className={style.deleteButton}
