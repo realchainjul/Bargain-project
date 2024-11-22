@@ -20,7 +20,13 @@ const Cart = () => {
         });
         console.log("Fetched cart items:", response.data); // 데이터 확인용 로그
         setCartItems(response.data);
-        setCheckedItems(response.data.map((item) => item.bucketNo)); // 초기 체크 상태 설정
+  
+        // 각 항목의 bucketNo 확인
+        response.data.forEach((item, index) => {
+          if (!item.bucketNo) {
+            console.error(`Item at index ${index} is missing bucketNo:`, item);
+          }
+        });
       } catch (error) {
         console.error("Error fetching cart items:", error);
         alert("장바구니 데이터를 불러오는 데 실패했습니다.");
@@ -28,7 +34,7 @@ const Cart = () => {
         setLoading(false);
       }
     };
-
+  
     fetchCartItems();
   }, []);
 
@@ -72,17 +78,17 @@ const Cart = () => {
   // 수량 업데이트 핸들러
   const handleQuantityUpdate = async (bucketNo, newCount) => {
     console.log("Updating quantity for:", { bucketNo, newCount });
-
+  
     if (!bucketNo) {
       console.error("Error: bucketNo is undefined!");
       alert("장바구니 번호가 유효하지 않습니다.");
       return;
     }
-
+  
     try {
       const response = await axios.put(
         `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
-        {}, // PUT 요청의 body는 비워둡니다
+        {},
         { withCredentials: true }
       );
       if (response.status === 200) {
@@ -98,7 +104,7 @@ const Cart = () => {
       alert("수량 업데이트 중 문제가 발생했습니다.");
     }
   };
-
+  
   // 총 가격 계산
   const calculateTotalPrice = () => {
     return cartItems
@@ -135,20 +141,25 @@ const Cart = () => {
                   <p>{Number(item.price).toLocaleString()} 원</p>
                   <p>수량:</p>
                   <div className={style.quantity}>
-                    <button
-                      onClick={() =>
-                        handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1))
-                      }
-                    >
-                      -
-                    </button>
-                    <span>{item.bucketCount}</span>
-                    <button
-                      onClick={() => handleQuantityUpdate(item.bucketNo, item.bucketCount + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
+  <button
+    onClick={() => {
+      console.log("Decreasing quantity for:", item);
+      handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1));
+    }}
+  >
+    -
+  </button>
+  <span>{item.bucketCount}</span>
+  <button
+    onClick={() => {
+      console.log("Increasing quantity for:", item);
+      handleQuantityUpdate(item.bucketNo, item.bucketCount + 1);
+    }}
+  >
+    +
+  </button>
+</div>
+
                 </div>
                 <button
                   className={style.deleteButton}
