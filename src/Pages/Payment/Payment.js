@@ -6,17 +6,30 @@ import style from './Payment.module.scss';
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { bills, userAddress } = location.state || {};
+  const { bills } = location.state || {}; // 장바구니에서 넘겨준 bills 데이터
+  const [userAddress, setUserAddress] = useState(null); // 사용자 배송 정보
   const [paymentMethod, setPaymentMethod] = useState('카드'); // 기본 결제 방법
   const [loading, setLoading] = useState(false);
 
-  // 유효성 검사
+  // 로그인된 사용자 정보 가져오기
   useEffect(() => {
-    if (!bills || !userAddress) {
-      alert("결제 정보가 없습니다.");
-      navigate('/cart');
-    }
-  }, [bills, userAddress, navigate]);
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get('https://api.bargainus.kr/info', {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data) {
+          setUserAddress(response.data); // 사용자 주소 정보 저장
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        alert('사용자 정보를 불러오는 데 실패했습니다. 다시 로그인해주세요.');
+        navigate('/login');
+      }
+    };
+
+    fetchUserInfo();
+  }, [navigate]);
 
   // 결제 요청
   const handlePayment = async () => {
@@ -43,19 +56,22 @@ const Payment = () => {
       );
 
       if (response.status === 200 && response.data.status) {
-        alert(response.data.message || "결제가 성공적으로 완료되었습니다.");
-        navigate('/order-success'); // 결제 성공 페이지로 이동
+        navigate('/order-success', { state: { message: response.data.message } });
       }
     } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제 중 문제가 발생했습니다. 다시 시도해주세요.");
+      console.error('결제 실패:', error);
+      alert('결제 중 문제가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!bills || !userAddress) {
+  if (!bills) {
     return <div className={style.loading}>결제 정보를 불러오는 중...</div>;
+  }
+
+  if (!userAddress) {
+    return <div className={style.loading}>사용자 정보를 불러오는 중...</div>;
   }
 
   return (
@@ -104,7 +120,7 @@ const Payment = () => {
           onClick={handlePayment}
           disabled={loading}
         >
-          {loading ? "결제 진행 중..." : "결제하기"}
+          {loading ? '결제 진행 중...' : '결제하기'}
         </button>
       </div>
     </div>

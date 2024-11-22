@@ -160,13 +160,6 @@ const ProductDetailV = () => {
               <h2 className={style.title}>{product.name}</h2>
               <p className={style.price}>{Number(product.price).toLocaleString()} 원</p>
             </div>
-            <button className={style.likeButton} onClick={handleLike}>
-              {liked ? (
-                <VscHeartFilled style={{ color: '#ff4757', fontSize: '24px' }} />
-              ) : (
-                <VscHeart style={{ color: '#ff4757', fontSize: '24px' }} />
-              )}
-            </button>
           </div>
 
           <div className={style.total}>
