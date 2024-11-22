@@ -109,7 +109,7 @@ const Payment = () => {
         <h2>총 결제 금액</h2>
         <h3 className={style.totalPrice}>
           {calculateTotalPrice().toLocaleString()} 원
-        </p>
+        </h3>
       </section>
 
       {/* 결제 방법 선택 */}
