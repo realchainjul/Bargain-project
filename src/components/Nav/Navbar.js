@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BsCart2, BsFillPersonFill } from 'react-icons/bs';
 import { VscHeart } from 'react-icons/vsc';
 import { BiSearch } from 'react-icons/bi';
@@ -7,6 +7,7 @@ import style from '../Nav/Navbar.module.scss';
 
 function Nav({ isLoggedIn, nickname, onLogout }) {
   const [searchValue, setSearchValue] = React.useState('');
+  const navigate = useNavigate(); // useNavigate로 경로 변경
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -15,15 +16,17 @@ function Nav({ isLoggedIn, nickname, onLogout }) {
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     if (searchValue.trim()) {
-      window.location.href = `/search/${searchValue}`;
+      navigate(`/search/${searchValue.trim()}`); // 페이지 리로드 없이 경로 변경
       setSearchValue('');
+    } else {
+      alert('검색어를 입력해 주세요.');
     }
   };
 
   const handleRestrictedClick = (event) => {
     event.preventDefault();
     alert('로그인 후 이용 가능합니다.');
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   return (

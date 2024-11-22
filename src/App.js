@@ -17,6 +17,7 @@ import ProductDetail from './Pages/Product/ProductDetail';
 import ProductDetailG from './Pages/Product/ProductDetailG';
 import ProductDetailV from './Pages/Product/ProductDetailV';
 import MyProducts from './Pages/Mypage/MyProduct/MyProducts';
+import Search from './components/Search/Search';
 import axios from 'axios';
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
         <Route path="/fruits/products/:id" element={<ProductDetail />} />
         <Route path="/vegetable/products/:id" element={<ProductDetailV />} />
         <Route path="/grain/products/:id" element={<ProductDetailG />} />
+        <Route path="/search/:query" element={<Search />} />
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
           <Route index element={<Navigate to="/mypage/userpage/products" />} />
