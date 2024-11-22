@@ -122,7 +122,7 @@ const Cart = () => {
         <h1>장바구니</h1>
       </div>
       {cartItems.length > 0 ? (
-        <>
+        <div style="width: 80%">
           <div className={style.cartlist}>
           <label className={style.selectAll}>
             <input
@@ -200,10 +200,10 @@ const Cart = () => {
               onClick={() => navigate("/payment", { state: checkedItems })}
             />
           </div>
-        </>
+        </div>
       ) : (
         <div className={style.empty}>
-          <BsCart2 size="30" title="장바구니" color="#a99773" />
+          <BsCart2 size="30" title="장바구니" color="#a99773" margin="0 39%"/>
           <p>장바구니가 비었습니다.</p>
           <Button
             name={"쇼핑하러 가기"}
