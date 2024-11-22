@@ -63,8 +63,9 @@ const ProductDetailV = () => {
     }
 
     try {
-      const response = await axios.get(
-        `https://api.bargainus.kr/products/${product.pcode}/liked`,
+      const response = await axios.post(
+        `https://api.bargainus.kr/products/${product?.pcode}/liked`, // pcode로 수정
+        null,
         { withCredentials: true }
       );
       if (response.status === 200) {
@@ -87,17 +88,28 @@ const ProductDetailV = () => {
 
   // 장바구니 버튼 클릭 핸들러
   const handleAddToCart = async () => {
+    if (!product?.pcode) {
+      alert('유효하지 않은 상품입니다.');
+      return;
+    }
+
     try {
+      const formData = new FormData();
+      formData.append('productCode', product.pcode); // 상품 코드
+      formData.append('count', count); // 구매 수량
+
       const response = await axios.post(
-        `https://bargainus.kr/products/${product.pcode}/bucket/add`,
-        { count },
-        { withCredentials: true }
+        `https://api.bargainus.kr/products/${product.pcode}/bucket/add`,
+        formData,
+        {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
       );
+
       if (response.status === 200) {
         alert('장바구니에 추가되었습니다!');
         navigate('/cart'); // 장바구니 페이지로 이동
-      } else {
-        alert('장바구니에 추가하지 못했습니다.');
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
@@ -126,10 +138,10 @@ const ProductDetailV = () => {
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
             {product.productPhotos && product.productPhotos.length > 0 ? (
-              product.productPhotos.map((photo) => (
+              product.productPhotos.map((photo, index) => (
                 <img
-                  key={photo.photoId}
-                  src={photo.photoUrl}
+                  key={index}
+                  src={photo}
                   alt={`${product.name} 상세 이미지`}
                   className={style.detailImage}
                 />
