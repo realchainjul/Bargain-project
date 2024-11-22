@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './ProductDetail.module.scss';
-import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 import Button from '../../components/common/Button';
 
 const ProductDetailG = () => {
@@ -88,6 +87,12 @@ const ProductDetailG = () => {
 
   // 장바구니 추가 핸들러
   const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다.');
+      navigate('/login'); // 로그인 페이지로 이동
+      return;
+    }
+
     if (!product?.pcode) {
       console.error('Invalid product code');
       alert('유효하지 않은 상품입니다.');
@@ -98,8 +103,6 @@ const ProductDetailG = () => {
       const formData = new FormData();
       formData.append('productCode', product.pcode); // 상품 코드
       formData.append('count', count); // 구매 수량
-
-      console.log('Adding to cart:', Object.fromEntries(formData));
 
       const response = await axios.post(
         `https://api.bargainus.kr/products/${product.pcode}/bucket/add`,
@@ -122,6 +125,11 @@ const ProductDetailG = () => {
     }
   };
 
+  // 구매하기 버튼 핸들러
+  const handleBuyNow = () => {
+    navigate('/mypage/cart'); // 구매하기 클릭 시 장바구니 페이지로 이동
+  };
+
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
@@ -142,20 +150,19 @@ const ProductDetailG = () => {
           />
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
-  {product.productPhotos && product.productPhotos.length > 0 ? (
-    product.productPhotos.map((photo, index) => (
-      <img
-        key={index} // 고유한 key 설정
-        src={typeof photo === "string" ? photo : photo.photoUrl} // 문자열이면 photo 사용, 객체라면 photoUrl 사용
-        alt={`${product.name} 상세 이미지`}
-        className={style.detailImage}
-      />
-    ))
-  ) : (
-    <p>상세 이미지가 없습니다.</p>
-  )}
-</div>
-
+            {product.productPhotos && product.productPhotos.length > 0 ? (
+              product.productPhotos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={typeof photo === 'string' ? photo : photo.photoUrl}
+                  alt={`${product.name} 상세 이미지`}
+                  className={style.detailImage}
+                />
+              ))
+            ) : (
+              <p>상세 이미지가 없습니다.</p>
+            )}
+          </div>
         </div>
 
         {/* 상품 정보 영역 */}
@@ -189,7 +196,7 @@ const ProductDetailG = () => {
             ) : (
               <>
                 <Button name="장바구니" onClick={handleAddToCart} />
-                <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
+                <Button name="구매하기" isBrown={true} onClick={handleBuyNow} />
               </>
             )}
           </div>

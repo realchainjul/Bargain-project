@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './ProductDetail.module.scss';
-import { VscHeart, VscHeartFilled } from 'react-icons/vsc';
 import Button from '../../components/common/Button';
 
 const ProductDetailV = () => {
@@ -11,7 +10,7 @@ const ProductDetailV = () => {
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [count, setCount] = useState(1); // 구매 수량
   const [liked, setLiked] = useState(false); // 찜 여부
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 확인
   const navigate = useNavigate(); // 페이지 이동 함수
 
   // 로그인 상태 확인
@@ -30,7 +29,7 @@ const ProductDetailV = () => {
     checkLoginStatus();
   }, []);
 
-  // 상품 데이터 불러오기 및 초기 찜 상태 설정
+  // 상품 데이터 불러오기
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -54,40 +53,14 @@ const ProductDetailV = () => {
     fetchProduct();
   }, [id]);
 
-  // 찜 버튼 클릭 핸들러
-  const handleLike = async () => {
+  // 장바구니 추가 핸들러
+  const handleAddToCart = async () => {
     if (!isLoggedIn) {
       alert('로그인 후 이용 가능합니다.');
-      navigate('/mypage/login'); // 로그인 페이지로 이동
+      navigate('/login'); // 로그인 페이지로 이동
       return;
     }
 
-    try {
-      const response = await axios.post(
-        `https://api.bargainus.kr/products/${product?.pcode}/liked`, // pcode로 수정
-        null,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
-        alert(message); // 서버 메시지 출력
-        setLiked(likedStatus); // 찜 상태 업데이트
-      } else {
-        alert('요청을 처리하지 못했습니다.');
-      }
-    } catch (error) {
-      console.error('찜 요청 오류:', error);
-      if (error.response?.status === 401) {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-      } else {
-        alert('서버와 연결할 수 없습니다.');
-      }
-    }
-  };
-
-  // 장바구니 버튼 클릭 핸들러
-  const handleAddToCart = async () => {
     if (!product?.pcode) {
       alert('유효하지 않은 상품입니다.');
       return;
@@ -117,6 +90,11 @@ const ProductDetailV = () => {
     }
   };
 
+  // 구매하기 버튼 핸들러
+  const handleBuyNow = () => {
+    navigate('/mypage/cart'); // 구매하기 클릭 시 장바구니 페이지로 바로 이동
+  };
+
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
@@ -137,20 +115,19 @@ const ProductDetailV = () => {
           />
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
-  {product.productPhotos && product.productPhotos.length > 0 ? (
-    product.productPhotos.map((photo, index) => (
-      <img
-        key={index} // 고유한 key 설정
-        src={typeof photo === "string" ? photo : photo.photoUrl} // 문자열이면 photo 사용, 객체라면 photoUrl 사용
-        alt={`${product.name} 상세 이미지`}
-        className={style.detailImage}
-      />
-    ))
-  ) : (
-    <p>상세 이미지가 없습니다.</p>
-  )}
-</div>
-
+            {product.productPhotos && product.productPhotos.length > 0 ? (
+              product.productPhotos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={typeof photo === 'string' ? photo : photo.photoUrl}
+                  alt={`${product.name} 상세 이미지`}
+                  className={style.detailImage}
+                />
+              ))
+            ) : (
+              <p>상세 이미지가 없습니다.</p>
+            )}
+          </div>
         </div>
 
         {/* 상품 정보 영역 */}
@@ -183,7 +160,7 @@ const ProductDetailV = () => {
             ) : (
               <>
                 <Button name="장바구니" onClick={handleAddToCart} />
-                <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
+                <Button name="구매하기" isBrown={true} onClick={handleBuyNow} />
               </>
             )}
           </div>
