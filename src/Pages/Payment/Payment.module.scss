@@ -16,7 +16,6 @@
   
     .addressSection,
     .billSection,
-    .totalPriceSection
     .paymentMethod {
       margin-bottom: 1.5rem;
       width: 80%;
@@ -34,6 +33,9 @@
     }
   .paymentMethod {
     border-top: 1px solid #dddddd;
+  }
+  .totalPriceSection{
+    width: 80%;
   }
     .billItem {
       padding: 0.5rem;
