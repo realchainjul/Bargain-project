@@ -15,24 +15,25 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('https://api.bargainus.kr/bucket/list', {
+        const response = await axios.get("https://api.bargainus.kr/bucket/list", {
           withCredentials: true,
         });
         if (response.status === 200) {
-          setCartItems(response.data); // 장바구니 데이터 저장
-          setCheckedItems(response.data.map((item) => item.bucketNo)); // bucketNo로 초기화
+          console.log("Fetched cart items:", response.data); // 서버에서 받아온 데이터 확인
+          setCartItems(response.data);
+          setCheckedItems(response.data.map((item) => item.bucketNo));
         }
       } catch (error) {
-        console.error('장바구니 데이터 불러오기 실패:', error);
-        alert('장바구니 데이터를 불러오는 데 실패했습니다.');
+        console.error("장바구니 데이터 불러오기 실패:", error);
+        alert("장바구니 데이터를 불러오는 데 실패했습니다.");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchCartItems();
   }, []);
-
+  
   // 전체 선택 및 해제 핸들러
   const handleAllCheck = (isChecked) => {
     if (isChecked) {
@@ -72,6 +73,14 @@ const Cart = () => {
 
   // 수량 업데이트 핸들러
   const handleQuantityUpdate = async (bucketNo, newCount) => {
+    console.log("Updating quantity for:", { bucketNo, newCount }); // 전달된 bucketNo와 newCount 확인
+  
+    if (!bucketNo) {
+      console.error("Error: bucketNo is undefined!");
+      alert("장바구니 번호가 유효하지 않습니다.");
+      return;
+    }
+  
     try {
       const response = await axios.put(
         `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
@@ -84,13 +93,14 @@ const Cart = () => {
             item.bucketNo === bucketNo ? { ...item, bucketCount: newCount } : item
           )
         );
-        alert(response.data.message || '수량이 업데이트되었습니다.');
+        alert(response.data.message || "수량이 업데이트되었습니다.");
       }
     } catch (error) {
-      console.error('수량 업데이트 실패:', error);
-      alert('수량 업데이트 중 문제가 발생했습니다.');
+      console.error("수량 업데이트 실패:", error);
+      alert("수량 업데이트 중 문제가 발생했습니다.");
     }
   };
+  
 
   // 총 가격 계산
   const calculateTotalPrice = () => {
