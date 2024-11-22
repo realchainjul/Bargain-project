@@ -4,8 +4,9 @@ import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.harvest.bagain.users.Users;
+import com.harvest.bagain.payments.Payments;
 import com.harvest.bagain.products.Products;
+import com.harvest.bagain.users.Users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,6 +36,10 @@ public class Bills {
     @ManyToOne
     @JoinColumn(name = "products_code")
     private Products product;
+    
+    @ManyToOne
+    @JoinColumn(name = "payment_id", nullable = true)
+    private Payments payments;
 
     @Column(name = "bills_address")
     private String address;
@@ -55,5 +60,6 @@ public class Bills {
     @Column(name = "bills_buydate")
     private Timestamp buyDate;
     
-    
+    @Column(name = "bills_status")
+    private String status;   
 }
