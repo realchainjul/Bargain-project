@@ -137,19 +137,20 @@ const ProductDetailV = () => {
           />
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
-            {product.productPhotos && product.productPhotos.length > 0 ? (
-              product.productPhotos.map((photo, index) => (
-                <img
-                  key={index}
-                  src={photo}
-                  alt={`${product.name} 상세 이미지`}
-                  className={style.detailImage}
-                />
-              ))
-            ) : (
-              <p>상세 이미지가 없습니다.</p>
-            )}
-          </div>
+  {product.productPhotos && product.productPhotos.length > 0 ? (
+    product.productPhotos.map((photo, index) => (
+      <img
+        key={index} // 고유한 key 설정
+        src={typeof photo === "string" ? photo : photo.photoUrl} // 문자열이면 photo 사용, 객체라면 photoUrl 사용
+        alt={`${product.name} 상세 이미지`}
+        className={style.detailImage}
+      />
+    ))
+  ) : (
+    <p>상세 이미지가 없습니다.</p>
+  )}
+</div>
+
         </div>
 
         {/* 상품 정보 영역 */}
