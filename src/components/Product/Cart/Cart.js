@@ -89,7 +89,6 @@ const Cart = () => {
       });
 
       if (response.status === 200) {
-        alert("결제가 완료되었습니다!");
         navigate("/payment", { state: { bills, userAddress: payload.userAddress } }); // 결제 데이터 전달
       }
     } catch (error) {
@@ -151,7 +150,9 @@ const Cart = () => {
         </>
       ) : (
         <div className={style.empty}>
+          <div className={style.bs}>
           <BsCart2 size="30" title="장바구니" color="#a99773" />
+          </div>
           <p>장바구니가 비었습니다.</p>
           <Button
             name="쇼핑하러 가기"
