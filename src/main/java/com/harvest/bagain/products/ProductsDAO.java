@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -242,47 +245,77 @@ public class ProductsDAO {
 		return userRepo.findByEmail(email);
 	}
 
-	public Map<String, Object> searchProducts(String keyword, Users user) {
+	public synchronized Map<String, Object> searchProducts(String keyword, Users userOptional) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Products> productsList = prodRepo.findByNameContainingIgnoreCaseOrCommentContainingIgnoreCase(keyword, keyword);
-            
-            if (productsList.isEmpty()) {
-                response.put("status", true);
-                response.put("message", "검색 결과 없음");
+            // 키워드 초기 상태 확인
+            if (keyword == null) {
+                response.put("status", false);
+                response.put("message", "검색어는 두 글자 이상 입력해야 합니다.");
                 return response;
             }
-            
-            for (Products product : productsList) {
-                String productImageUrl = product.getPhoto() != null
-                        ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
-                        : "";
-                product.setPhoto(productImageUrl);
-                List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
-                for (ProductPhoto productPhoto : productPhotos) {
-                    productPhoto.setPhotoUrl(
-                            "https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
-                }
-                product.setProductPhotos(productPhotos);
 
-                // likedStatus 처리
-                if (user != null) {
-                    Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(user, product);
-                    boolean likedStatus = likedOptional.isPresent() && Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
-                    product.setLikedStatus(likedStatus);
-                } else {
-                    product.setLikedStatus(false);
+            keyword = keyword.trim();
+
+            if (keyword.isEmpty() || keyword.length() < 2) {
+                response.put("status", false);
+                response.put("message", "검색어는 두 글자 이상 입력해야 합니다.");
+                return response;
+            }
+
+            // 데이터베이스 쿼리 전 상태 확인
+            List<Products> productsList = prodRepo.findByNameContainingIgnoreCaseOrCommentContainingIgnoreCase(keyword, keyword);
+
+            // 검색 결과가 없을 경우
+            if (productsList.isEmpty()) {
+                response.put("status", false);
+                response.put("message", "상품 결과 없음");
+                return response;
+            }
+
+            for (Products product : productsList) {
+                try {
+                    String productImageUrl = product.getPhoto() != null
+                            ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+                            : "";
+                    product.setPhoto(productImageUrl);
+
+                    // 상품 사진 처리
+                    List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+                    for (ProductPhoto productPhoto : productPhotos) {
+                        try {
+                            productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+                        } catch (Exception e) {
+                        }
+                    }
+                    product.setProductPhotos(productPhotos);
+
+                    // likedStatus 처리
+                    if (userOptional != null) {
+                        try {
+                            Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(userOptional, product);
+                            boolean likedStatus = likedOptional.isPresent() && Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
+                            product.setLikedStatus(likedStatus);
+                        } catch (Exception e) {
+                            product.setLikedStatus(false); // 기본값 설정
+                        }
+                    } else {
+                        product.setLikedStatus(false);
+                    }
+                } catch (Exception e) {
                 }
             }
             response.put("status", true);
             response.put("products", productsList);
+        } catch (IllegalArgumentException e) {
+            response.put("status", false);
+            response.put("message", "잘못된 요청입니다. 입력값을 확인하세요.");
         } catch (Exception e) {
             response.put("status", false);
             response.put("message", "상품 검색 실패");
         }
         return response;
     }
-
 
 	// 찜하기
 	@Transactional

@@ -71,17 +71,20 @@ public class ProductsController {
 		response.put("likedStatus", response.get("message").equals("찜 목록에 추가되었습니다."));
 		return ResponseEntity.ok(response);
 	}
-
+	
+	
 	// 상품 검색
-	@GetMapping("/products/search")
+	@GetMapping("/search")
 	public ResponseEntity<Map<String, Object>> searchProducts(@RequestParam String keyword, HttpSession session) {
-		if (keyword.length() < 1) {
-			return ResponseEntity.badRequest().body(Map.of("status", false, "message", "검색어는 두 글자 이상 입력해야 합니다."));
-		}
-		{
-			Users loginMember = (Users) session.getAttribute("loginMember");
-			Map<String, Object> response = pDAO.searchProducts(keyword, loginMember);
-			return ResponseEntity.ok(response);
-		}
+	    if (keyword == null || keyword.trim().length() < 2) {
+	        return ResponseEntity.badRequest().body(Map.of("status", false, "message", "검색어는 두 글자 이상 입력해야 합니다."));
+	    }
+	    Users loginMember = null;
+	    if (session != null && session.getAttribute("loginMember") != null) {
+	        loginMember = (Users) session.getAttribute("loginMember");
+	    }
+	    Map<String, Object> response = pDAO.searchProducts(keyword, loginMember);
+	    return ResponseEntity.ok(response);
 	}
+
 }
