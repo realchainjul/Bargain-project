@@ -22,42 +22,42 @@ import 'swiper/css/autoplay';
         }}
       >
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+          <a href="/category/grain">
             <img src="/images/main-banner-02.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+          <a href="/category/fruits">
             <img src="/images/main-banner-01.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+        <a href="/category/grain">
             <img src="/images/main-banner-02.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="products/#">
+        <a href="/category/fruits">
             <img src="/images/main-banner-01.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+        <a href="/category/grain">
             <img src="/images/main-banner-02.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+        <a href="/category/fruits">
             <img src="/images/main-banner-01.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+        <a href="/category/grain">
             <img src="/images/main-banner-02.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
         <SwiperSlide className={style.slide}>
-          <a href="/products/#">
+        <a href="/category/fruits">
             <img src="/images/main-banner-01.png" alt="" className={style.image} />
           </a>
         </SwiperSlide>
