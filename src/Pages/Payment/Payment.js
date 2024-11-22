@@ -31,6 +31,11 @@ const Payment = () => {
     fetchUserInfo();
   }, [navigate]);
 
+  // 총 금액 계산
+  const calculateTotalPrice = () => {
+    return bills.reduce((total, bill) => total + bill.totalPrice, 0);
+  };
+
   // 결제 요청
   const handlePayment = async () => {
     setLoading(true);
@@ -97,6 +102,14 @@ const Payment = () => {
             <p>총 금액: {bill.totalPrice.toLocaleString()} 원</p>
           </div>
         ))}
+      </section>
+
+      {/* 총 금액 */}
+      <section className={style.totalPriceSection}>
+        <h2>총 결제 금액</h2>
+        <p className={style.totalPrice}>
+          {calculateTotalPrice().toLocaleString()} 원
+        </p>
       </section>
 
       {/* 결제 방법 선택 */}
