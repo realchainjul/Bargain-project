@@ -58,7 +58,7 @@ const ProductDetailV = () => {
   const handleLike = async () => {
     if (!isLoggedIn) {
       alert('로그인 후 이용 가능합니다.');
-      navigate('/login'); // 로그인 페이지로 이동
+      navigate('/mypage/login'); // 로그인 페이지로 이동
       return;
     }
 
