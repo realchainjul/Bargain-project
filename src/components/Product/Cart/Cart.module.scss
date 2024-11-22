@@ -1,4 +1,5 @@
 .cart {
+  font-family: 'Pretendard-Regular';
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -90,9 +91,6 @@
 
       .info {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5em;
 
         h2 {
           font-size: 1.2em;
@@ -114,8 +112,8 @@
             width: 30px;
             height: 30px;
             font-size: 1.2em;
-            background-color:  #eeeeee;
-            border: 1px solid #dadce0;
+            background-color:  #ffffff;
+            border: 1px solid #ffffff;
             border-radius: 4px;
             cursor: pointer;
 
@@ -133,8 +131,7 @@
       }
 
       .deleteButton {
-        background-color: #eeeeee;
-        color: #fff;
+        background-color: #f3f3f3;
         padding: 0.5em 1em;
         font-size: 1em;
         border: none;
@@ -142,7 +139,8 @@
         cursor: pointer;
 
         &:hover {
-          background-color: #5a5a5a;
+          background-color: #a99773;
+          color:#ffffff
         }
       }
     }
@@ -225,6 +223,7 @@
     Button {
       width: 100%;
       margin-top: 1em;
+      background-color: #a99773;
     }
   }
 }
