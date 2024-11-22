@@ -12,7 +12,7 @@ const Search = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/products/search`, {
+        const response = await axios.get(`https://api.bargainus.kr/search`, {
           params: {
             keyword: query, // 검색 키워드를 파라미터로 전달
           },
@@ -21,8 +21,8 @@ const Search = () => {
           },
         });
 
-        if (response.data && response.data.length > 0) {
-          setResults(response.data); // 검색 결과 저장
+        if (response.data && response.data.products) {
+          setResults(response.data.products); // 검색 결과 저장
         } else {
           setResults([]); // 결과가 없을 때 빈 배열로 설정
         }
@@ -46,13 +46,14 @@ const Search = () => {
       {results.length > 0 ? (
         <div className={style.results}>
           {results.map((item) => (
-            <div key={item.productCode} className={style.resultItem}>
-              <img src={item.photo || '/images/default.jpg'} alt={item.productName} />
+            <div key={item.pcode} className={style.resultItem}>
+              <img src={item.photo || '/images/default.jpg'} alt={item.name} />
               <div className={style.info}>
-                <h2>{item.productName}</h2>
+                <h2>{item.name}</h2>
                 <p>가격: {Number(item.price).toLocaleString()} 원</p>
-                <p>설명: {item.description}</p>
-                <Link to={`/products/${item.productCode}`} className={style.detailLink}>
+                <p>설명: {item.comment}</p>
+                <p>재고: {item.inventory} 개</p>
+                <Link to={`/products/${item.pcode}`} className={style.detailLink}>
                   상품 상세 보기
                 </Link>
               </div>
