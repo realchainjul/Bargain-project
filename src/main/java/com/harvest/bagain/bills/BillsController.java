@@ -32,7 +32,7 @@ public class BillsController {
         Map<String, Object> response = billsDAO.addBill(user);
         return ResponseEntity.ok(response);
     }
-    @PutMapping("/bill/update")
+    @PutMapping("/bills/update")
     public ResponseEntity<Map<String, Object>> updateBills(@RequestBody List<PaymentDetails> paymentDetailsList,
                                                            @RequestParam String postalCode,
                                                            @RequestParam String address,
