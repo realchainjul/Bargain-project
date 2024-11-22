@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,12 +17,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harvest.bagain.bills.Bills;
 import com.harvest.bagain.bills.BillsRepository;
 
 @Service
 public class PaymentsDAO {
-
+	 private static final Logger logger = LoggerFactory.getLogger(PaymentsDAO.class);
+	
     @Autowired
     private PaymentsRepository paymentsRepository;
 
@@ -87,16 +91,20 @@ public class PaymentsDAO {
             payment.setAmount(request.get("amount") != null ? Integer.parseInt(request.get("amount").toString()) : 0);
             payment.setPaymentMethod((String) request.get("paymentMethod"));
             payment.setPaymentStatus("PENDING");
-            payment.setImpUid((String) request.get("impUid"));
+            payment.setImpUid((String) request.get("impUid")); // 요청으로부터 impUid 사용
             payment.setMerchantUid("merchant_" + System.currentTimeMillis());
 
             Payments savedPayment = paymentsRepository.save(payment);
 
-            // billCodes 자동 설정 로직 추가
-            List<Bills> billsList = billsRepository.findAll();
-            for (Bills bill : billsList) {
-                bill.setPayments(savedPayment);  // `Payments` 객체를 설정
-                billsRepository.save(bill);
+            // billCodes로 해당 청구서들을 결제와 연결
+            List<Integer> billCodes = (List<Integer>) request.get("billCodes");
+            for (Integer billCode : billCodes) {
+                Optional<Bills> billOptional = billsRepository.findById(billCode);
+                if (billOptional.isPresent()) {
+                    Bills bill = billOptional.get();
+                    bill.setPayments(savedPayment);  // `Payments` 객체를 설정
+                    billsRepository.save(bill);
+                }
             }
 
             // I'mport 결제 준비 요청
@@ -120,7 +128,7 @@ public class PaymentsDAO {
         Optional<Payments> paymentOptional = paymentsRepository.findById(paymentId);
         if (paymentOptional.isEmpty()) {
             response.put("status", false);
-            response.put("message", "Payment not found");
+            response.put("message", "결제를 찾을 수 없습니다.");
             return response;
         }
 
@@ -132,7 +140,12 @@ public class PaymentsDAO {
         paymentsRepository.save(payment);
 
         response.put("status", true);
-        response.put("message", "Payment status updated successfully");
+        response.put("message", "결제상태가 업데이트 되었습니다.");
         return response;
+    }
+
+    public Integer findPaymentIdByImpUid(String impUid) {
+        Optional<Payments> paymentOptional = paymentsRepository.findByImpUid(impUid);
+        return paymentOptional.map(Payments::getPaymentId).orElse(null);
     }
 }
