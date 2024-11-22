@@ -112,70 +112,71 @@ const Cart = () => {
       {cartItems.length > 0 ? (
         <>
           <div className={style.cartlist}>
-            {cartItems.map((item) => (
-              <div key={item.productCode} className={style.cartItem}>
-                <input
-                  type="checkbox"
-                  checked={checkedItems.includes(item.productCode)}
-                  onChange={(e) => handleCheck(item.productCode, e.target.checked)}
-                />
-                <div className={style.img}>
-                  <img src={item.photoUrl || '/images/default.jpg'} alt={item.productName} />
-                </div>
-                <div className={style.info}>
-                  <h2>{item.productName}</h2>
-                  <p>{Number(item.price).toLocaleString()} 원</p>
-                  <p>수량:</p>
-                  <div className={style.quantity}>
-                    <button
-                      onClick={() =>
-                        handleQuantityUpdate(item.productCode, Math.max(item.bucketCount - 1, 1))
-                      }
-                    >
-                      -
-                    </button>
-                    <span>{item.bucketCount}</span>
-                    <button
-                      onClick={() => handleQuantityUpdate(item.productCode, item.bucketCount + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-                <button
-                  className={style.deleteButton}
-                  onClick={() => handleDeleteSelected(item.productCode)}
-                >
-                  삭제
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className={style.cartprice}>
-            <div className={style.calcwrap}>
-              <div className={style.orderprice}>
-                <p className={style.title}>총 주문 금액</p>
-                <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-              </div>
-              <div className={style.discount}>
-                <p className={style.title}>할인 금액</p>
-                <p className={style.price}>0 원</p>
-              </div>
-              <div className={style.shipping}>
-                <p className={style.title}>배송비</p>
-                <p className={style.price}>0 원</p>
-              </div>
-            </div>
-            <div className={style.total}>
-              <p className={style.title}>총 결제 금액</p>
-              <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-            </div>
-            <Button
-              name={'결제하기'}
-              isPurple={true}
-              onClick={() => navigate('/payment', { state: checkedItems })}
-            />
-          </div>
+  {cartItems.map((item) => (
+    <div key={item.pcode} className={style.cartItem}>
+      <input
+        type="checkbox"
+        checked={checkedItems.includes(item.pcode)}
+        onChange={(e) => handleCheck(item.pcode, e.target.checked)}
+      />
+      <div className={style.img}>
+        <img src={item.photoUrl || '/images/default.jpg'} alt={item.productName} />
+      </div>
+      <div className={style.info}>
+        <h2>{item.productName}</h2>
+        <p>{Number(item.price).toLocaleString()} 원</p>
+        <p>수량:</p>
+        <div className={style.quantity}>
+          <button
+            onClick={() =>
+              handleQuantityUpdate(item.pcode, Math.max(item.bucketCount - 1, 1))
+            }
+          >
+            -
+          </button>
+          <span>{item.bucketCount}</span>
+          <button
+            onClick={() => handleQuantityUpdate(item.pcode, item.bucketCount + 1)}
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <button
+        className={style.deleteButton}
+        onClick={() => handleDeleteSelected(item.pcode)}
+      >
+        삭제
+      </button>
+    </div>
+  ))}
+</div>
+<div className={style.cartprice}>
+  <div className={style.calcwrap}>
+    <div className={style.orderprice}>
+      <p className={style.title}>총 주문 금액</p>
+      <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
+    </div>
+    <div className={style.discount}>
+      <p className={style.title}>할인 금액</p>
+      <p className={style.price}>0 원</p>
+    </div>
+    <div className={style.shipping}>
+      <p className={style.title}>배송비</p>
+      <p className={style.price}>0 원</p>
+    </div>
+  </div>
+  <div className={style.total}>
+    <p className={style.title}>총 결제 금액</p>
+    <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
+  </div>
+  <Button
+    name={'결제하기'}
+    isPurple={true}
+    onClick={() => navigate('/payment', { state: checkedItems })}
+  />
+</div>
+
         </>
       ) : (
         <div className={style.empty}>
