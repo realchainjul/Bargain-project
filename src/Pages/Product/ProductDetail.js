@@ -84,41 +84,45 @@ const ProductDetail = () => {
 
   // 장바구니 추가 핸들러
   const handleAddToCart = async () => {
+    if (!product?.pcode) {
+      console.error('Invalid product code');
+      alert('유효하지 않은 상품입니다.');
+      return;
+    }
+  
     try {
-      const productCode = product?.productCode; // 상품 코드
-      const countValue = count; // 구매 수량
+      // FormData 생성 및 데이터 추가
+      const formData = new FormData();
+      formData.append('productCode', product.pcode);
+      formData.append('count', count); // 구매 수량
   
-      if (!productCode) {
-        console.error("상품 코드가 유효하지 않습니다.");
-        alert("유효하지 않은 상품입니다.");
-        return;
-      }
+      console.log('Adding to cart:', Object.fromEntries(formData)); // 디버깅 로그
   
-      console.log("Adding to cart:", { productCode, count: countValue });
+      const response = await axios.post(`https://api.bargainus.kr/products/${product.pcode}/bucket/add`, formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
   
-      // POST 요청
-      const response = await axios.post(
-        `https://api.bargainus.kr/products/${productCode}/bucket/add?count=${countValue}`, // 쿼리 파라미터 포함
-        null, // 요청 본문이 없으므로 null로 설정
-        { withCredentials: true }
-      );
-  
-      if (response.status === 200 && response.data.status) {
-        alert(response.data.message || "장바구니에 상품이 추가되었습니다.");
-        navigate("/cart"); // 장바구니 페이지로 이동
+      if (response.status === 200) {
+        alert(response.data.message || '장바구니에 추가되었습니다.');
+        navigate('/cart'); // 장바구니 페이지로 이동
       }
     } catch (error) {
-      console.error("장바구니 추가 오류:", error);
+      console.error('장바구니 추가 오류:', error);
       if (error.response) {
-        console.error("Response Data:", error.response.data);
-        console.error("Response Status:", error.response.status);
-        alert(error.response.data.message || "장바구니 추가 중 문제가 발생했습니다.");
-      } else {
-        alert("장바구니 추가 중 문제가 발생했습니다.");
+        console.error('Response Data:', error.response.data);
+        console.error('Response Status:', error.response.status);
       }
+      alert('장바구니 추가 중 문제가 발생했습니다.');
     }
   };
   
+  
+  
+  
+
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
