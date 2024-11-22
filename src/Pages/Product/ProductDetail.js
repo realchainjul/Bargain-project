@@ -107,7 +107,7 @@ const ProductDetail = () => {
   
       if (response.status === 200) {
         alert(response.data.message || '장바구니에 추가되었습니다.');
-        navigate('/cart'); // 장바구니 페이지로 이동
+        navigate('/mypage/cart'); // 장바구니 페이지로 이동
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);

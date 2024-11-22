@@ -16,7 +16,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('https://bargainus.kr/bucket/list', {
+        const response = await axios.get('https://api.bargainus.kr/bucket/list', {
           withCredentials: true,
         });
         if (response.status === 200) {
@@ -58,7 +58,7 @@ const Cart = () => {
 
     try {
       for (let productCode of checkedItems) {
-        await axios.delete(`https://bargainus.kr/bucket/${productCode}/remove`, {
+        await axios.delete(`https://api.bargainus.kr/bucket/${productCode}/remove`, {
           withCredentials: true,
         });
       }
@@ -75,7 +75,7 @@ const Cart = () => {
   const handleQuantityUpdate = async (productCode, newCount) => {
     try {
       const response = await axios.put(
-        `https://bargainus.kr/bucket/${productCode}/update?newCount=${newCount}`,
+        `https://api.bargainus.kr/bucket/${productCode}/update?newCount=${newCount}`,
         {},
         { withCredentials: true }
       );
