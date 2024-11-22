@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import style from './Search.module.scss';
 
@@ -8,11 +8,12 @@ const Search = () => {
   const [results, setResults] = useState([]); // 검색 결과
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/search`, {
+        const response = await axios.get(`https://bargainus.kr/search`, {
           params: {
             keyword: query, // 검색 키워드를 파라미터로 전달
           },
@@ -37,6 +38,11 @@ const Search = () => {
     fetchSearchResults();
   }, [query]);
 
+  const handleItemClick = (category, pcode) => {
+    // 카테고리와 pcode를 사용해 상세 페이지로 이동
+    navigate(`/${category.name}/products/${pcode}`);
+  };
+
   if (loading) return <div className={style.loading}>로딩 중...</div>;
   if (error) return <div className={style.error}>{error}</div>;
 
@@ -46,16 +52,16 @@ const Search = () => {
       {results.length > 0 ? (
         <div className={style.results}>
           {results.map((item) => (
-            <div key={item.pcode} className={style.resultItem}>
+            <div
+              key={item.pcode}
+              className={style.resultItem}
+              onClick={() => handleItemClick(item.category, item.pcode)}
+              style={{ cursor: 'pointer' }} // 클릭 가능한 스타일 추가
+            >
               <img src={item.photo || '/images/default.jpg'} alt={item.name} />
               <div className={style.info}>
                 <h2>{item.name}</h2>
-                <p>가격: {Number(item.price).toLocaleString()} 원</p>
-                <p>설명: {item.comment}</p>
-                <p>재고: {item.inventory} 개</p>
-                <Link to={`/products/${item.pcode}`} className={style.detailLink}>
-                  상품 상세 보기
-                </Link>
+                <p>{Number(item.price).toLocaleString()} 원</p>
               </div>
             </div>
           ))}
@@ -63,7 +69,9 @@ const Search = () => {
       ) : (
         <div className={style.noResults}>
           <p>검색 결과가 없습니다.</p>
-          <Link to="/" className={style.homeLink}>홈으로 돌아가기</Link>
+          <button onClick={() => navigate('/')} className={style.homeButton}>
+            홈으로 돌아가기
+          </button>
         </div>
       )}
     </div>
