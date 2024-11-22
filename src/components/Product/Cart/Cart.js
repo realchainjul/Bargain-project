@@ -118,14 +118,20 @@ const Cart = () => {
 
   return (
     <div className={style.cart}>
+      <div className={style.header}>
+        <h1>장바구니</h1>
+      </div>
       {cartItems.length > 0 ? (
         <>
           <div className={style.cartlist}>
-            <input
-              type="checkbox"
-              checked={checkedItems.length === cartItems.length}
-              onChange={(e) => handleAllCheck(e.target.checked)}
-            />
+          <label className={style.selectAll}>
+    <input
+      type="checkbox"
+      checked={checkedItems.length === cartItems.length}
+      onChange={(e) => handleAllCheck(e.target.checked)}
+    />
+    전체 선택
+  </label>
             {cartItems.map((item) => (
               <div key={item.bucketNo} className={style.cartItem}>
                 <input
