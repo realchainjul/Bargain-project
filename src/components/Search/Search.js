@@ -12,10 +12,17 @@ const Search = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await axios.get(`https://api.bargainus.kr/bills/add?query=${query}`, {
-          withCredentials: true,
-        });
-        setResults(response.data); // 검색 결과 저장
+        const response = await axios.post(
+          `https://api.bargainus.kr/bills/add`,
+          { query }, // 본문에 검색어 전달
+          { withCredentials: true }
+        );
+        // API 응답 데이터를 검증 후 상태에 저장
+        if (response.data && response.data.bills) {
+          setResults(response.data.bills);
+        } else {
+          setResults([]);
+        }
       } catch (error) {
         console.error('Error fetching search results:', error);
         setError('검색 결과를 가져오는 데 실패했습니다.');
@@ -53,6 +60,7 @@ const Search = () => {
       ) : (
         <div className={style.noResults}>
           <p>검색 결과가 없습니다.</p>
+          <Link to="/" className={style.homeLink}>홈으로 돌아가기</Link>
         </div>
       )}
     </div>
