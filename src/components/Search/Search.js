@@ -12,7 +12,7 @@ const Search = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await axios.get(`https://bargainus.kr/bills/add?query=${query}`, {
+        const response = await axios.get(`https://api.bargainus.kr/bills/add?query=${query}`, {
           withCredentials: true,
         });
         setResults(response.data); // 검색 결과 저장
