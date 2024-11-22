@@ -23,51 +23,65 @@ public class ProductsController {
 
 	@Autowired
 	private ProductsDAO pDAO;
-	
+
 	// 상품 등록
 	@PostMapping("/mypage/userpage/productadd")
-    public ResponseEntity<Map<String, Object>> addProduct(@Validated @ModelAttribute ProductsAddReq req,
-            @RequestParam(required = false) MultipartFile photo,
-            @RequestParam(required = false) MultipartFile[] commentphoto, HttpSession session) {
+	public ResponseEntity<Map<String, Object>> addProduct(@Validated @ModelAttribute ProductsAddReq req,
+			@RequestParam(required = false) MultipartFile photo,
+			@RequestParam(required = false) MultipartFile[] commentphoto, HttpSession session) {
 
-        String userEmail = (String) session.getAttribute("userEmail");
-        Optional<Users> userOpt = pDAO.getUserByEmail(userEmail);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 사용자 코드"));
-        }
-        Map<String, Object> result = pDAO.addProduct(req, photo, commentphoto, userOpt.get());
-        return ResponseEntity.ok(result);
-    }
-	
+		String userEmail = (String) session.getAttribute("userEmail");
+		Optional<Users> userOpt = pDAO.getUserByEmail(userEmail);
+		if (userOpt.isEmpty()) {
+			return ResponseEntity.status(404).body(Map.of("status", false, "message", "유효하지 않은 사용자 코드"));
+		}
+		Map<String, Object> result = pDAO.addProduct(req, photo, commentphoto, userOpt.get());
+		return ResponseEntity.ok(result);
+	}
+
 	@GetMapping("/mypage/userpage/products")
-    public ResponseEntity<Map<String, Object>> getMyProducts(HttpSession session) {
-        Users loginMember = (Users) session.getAttribute("loginMember");
-        if (loginMember == null) {
-            return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
-        }
-        Map<String, Object> response = pDAO.getProductsBySeller(loginMember);
-        return ResponseEntity.ok(response);
-    }
-	
+	public ResponseEntity<Map<String, Object>> getMyProducts(HttpSession session) {
+		Users loginMember = (Users) session.getAttribute("loginMember");
+		if (loginMember == null) {
+			return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
+		}
+		Map<String, Object> response = pDAO.getProductsBySeller(loginMember);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/mypage/userpage/products/delete")
-    public ResponseEntity<Map<String, Object>> deleteMyProduct(@RequestParam Integer productCode, HttpSession session) {
-        Users user = (Users) session.getAttribute("loginMember");
-        if (user == null) {
-            return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
-        }
-        Map<String, Object> response = pDAO.deleteProductBySeller(user, productCode);
-        return ResponseEntity.ok(response);
-    }
-	
+	public ResponseEntity<Map<String, Object>> deleteMyProduct(@RequestParam Integer productCode, HttpSession session) {
+		Users user = (Users) session.getAttribute("loginMember");
+		if (user == null) {
+			return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
+		}
+		Map<String, Object> response = pDAO.deleteProductBySeller(user, productCode);
+		return ResponseEntity.ok(response);
+	}
+
 	// 찜하기
 	@GetMapping("/products/{productCode}/liked")
-    public ResponseEntity<Map<String, Object>> toggleLikeProduct(@PathVariable Integer productCode, HttpSession session) {
-        Users user = (Users) session.getAttribute("loginMember");
-        if (user == null) {
-            return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
-        }
-        Map<String, Object> response = pDAO.toggleLikeProduct(user, productCode);
-        response.put("likedStatus", response.get("message").equals("찜 목록에 추가되었습니다."));
-        return ResponseEntity.ok(response);
-    }
+	public ResponseEntity<Map<String, Object>> toggleLikeProduct(@PathVariable Integer productCode,
+			HttpSession session) {
+		Users user = (Users) session.getAttribute("loginMember");
+		if (user == null) {
+			return ResponseEntity.status(401).body(Map.of("status", false, "message", "로그인이 필요합니다."));
+		}
+		Map<String, Object> response = pDAO.toggleLikeProduct(user, productCode);
+		response.put("likedStatus", response.get("message").equals("찜 목록에 추가되었습니다."));
+		return ResponseEntity.ok(response);
+	}
+
+	// 상품 검색
+	@GetMapping("/products/search")
+	public ResponseEntity<Map<String, Object>> searchProducts(@RequestParam String keyword, HttpSession session) {
+		if (keyword.length() < 1) {
+			return ResponseEntity.badRequest().body(Map.of("status", false, "message", "검색어는 두 글자 이상 입력해야 합니다."));
+		}
+		{
+			Users loginMember = (Users) session.getAttribute("loginMember");
+			Map<String, Object> response = pDAO.searchProducts(keyword, loginMember);
+			return ResponseEntity.ok(response);
+		}
+	}
 }

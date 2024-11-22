@@ -14,4 +14,5 @@ public interface ProductsRepository extends JpaRepository<Products, Integer> {
     Optional<Products> findProductByCategoryAndPcode(Category category, Integer pcode);
     List<Products> findByCategory(Category category);
     List<Products> findBySeller(Users seller);
+    List<Products> findByNameContainingIgnoreCaseOrCommentContainingIgnoreCase(String nameKeyword, String commentKeyword);;
 }

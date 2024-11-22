@@ -149,37 +149,39 @@ public class ProductsDAO {
 	}
 
 	public List<Products> getProductsByCategoryName(String categoryName, Users user) {
-	    Optional<Category> category = cateRepo.findByName(categoryName);
-	    if (category.isPresent()) {
-	        List<Products> products = prodRepo.findByCategory(category.get());
+		Optional<Category> category = cateRepo.findByName(categoryName);
+		if (category.isPresent()) {
+			List<Products> products = prodRepo.findByCategory(category.get());
 
-	        for (Products product : products) {
-	            // 사진 처리
-	            List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
-	            product.setProductPhotos(productPhotos);
-	            String productImageUrl = product.getPhoto() != null
-	                    ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
-	                    : "";
-	            product.setPhoto(productImageUrl);
+			for (Products product : products) {
+				// 사진 처리
+				List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+				product.setProductPhotos(productPhotos);
+				String productImageUrl = product.getPhoto() != null
+						? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+						: "";
+				product.setPhoto(productImageUrl);
 
-	            for (ProductPhoto productPhoto : productPhotos) {
-	                productPhoto.setPhotoUrl("https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
-	            }
+				for (ProductPhoto productPhoto : productPhotos) {
+					productPhoto.setPhotoUrl(
+							"https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+				}
 
-	            // likedStatus 처리
-	            if (user != null) {
-	                Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(user, product);
-	                boolean likedStatus = likedOptional.isPresent() && Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
-	                product.setLikedStatus(likedStatus);
-	            } else {
-	                product.setLikedStatus(false);
-	            }
-	        }
+				// likedStatus 처리
+				if (user != null) {
+					Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(user, product);
+					boolean likedStatus = likedOptional.isPresent()
+							&& Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
+					product.setLikedStatus(likedStatus);
+				} else {
+					product.setLikedStatus(false);
+				}
+			}
 
-	        return products;
-	    } else {
-	        return new ArrayList<>();
-	    }
+			return products;
+		} else {
+			return new ArrayList<>();
+		}
 	}
 
 	// 카테고리 이름과 상품 코드로 단일 상품 조회
@@ -207,9 +209,50 @@ public class ProductsDAO {
 
 	// 내가 등록한 상품 목록 조회
 	public Map<String, Object> getProductsBySeller(Users seller) {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			List<Products> productsList = prodRepo.findBySeller(seller);
+			for (Products product : productsList) {
+				String productImageUrl = product.getPhoto() != null
+						? "https://file.bargainus.kr/products/images/" + product.getPhoto()
+						: "";
+				product.setPhoto(productImageUrl);
+				List<ProductPhoto> productPhotos = productPhotoRepo.findByProduct(product);
+				for (ProductPhoto productPhoto : productPhotos) {
+					productPhoto.setPhotoUrl(
+							"https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
+				}
+				product.setProductPhotos(productPhotos);
+			}
+			response.put("status", true);
+			response.put("products", productsList);
+		} catch (Exception e) {
+			response.put("status", false);
+			response.put("message", "상품 목록 조회 실패");
+		}
+		return response;
+	}
+
+	// 사용자 코드로 사용자 조회
+	public Optional<Users> getUserByCode(Integer userCode) {
+		return userRepo.findById(userCode);
+	}
+
+	public Optional<Users> getUserByEmail(String email) {
+		return userRepo.findByEmail(email);
+	}
+
+	public Map<String, Object> searchProducts(String keyword, Users user) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<Products> productsList = prodRepo.findBySeller(seller);
+            List<Products> productsList = prodRepo.findByNameContainingIgnoreCaseOrCommentContainingIgnoreCase(keyword, keyword);
+            
+            if (productsList.isEmpty()) {
+                response.put("status", true);
+                response.put("message", "검색 결과 없음");
+                return response;
+            }
+            
             for (Products product : productsList) {
                 String productImageUrl = product.getPhoto() != null
                         ? "https://file.bargainus.kr/products/images/" + product.getPhoto()
@@ -221,24 +264,25 @@ public class ProductsDAO {
                             "https://file.bargainus.kr/productcomment/images/" + productPhoto.getPhotoUrl());
                 }
                 product.setProductPhotos(productPhotos);
+
+                // likedStatus 처리
+                if (user != null) {
+                    Optional<Liked> likedOptional = likedRepo.findByUserAndProduct(user, product);
+                    boolean likedStatus = likedOptional.isPresent() && Boolean.TRUE.equals(likedOptional.get().getLikedStatus());
+                    product.setLikedStatus(likedStatus);
+                } else {
+                    product.setLikedStatus(false);
+                }
             }
             response.put("status", true);
             response.put("products", productsList);
         } catch (Exception e) {
             response.put("status", false);
-            response.put("message", "상품 목록 조회 실패");
+            response.put("message", "상품 검색 실패");
         }
         return response;
     }
 
-	// 사용자 코드로 사용자 조회
-	public Optional<Users> getUserByCode(Integer userCode) {
-		return userRepo.findById(userCode);
-	}
-
-	public Optional<Users> getUserByEmail(String email) {
-		return userRepo.findByEmail(email);
-	}
 
 	// 찜하기
 	@Transactional
