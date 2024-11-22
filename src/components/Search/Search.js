@@ -12,20 +12,19 @@ const Search = () => {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await axios.post(
-          `https://api.bargainus.kr/bills/add`,
-          { query }, // 검색어를 본문으로 전달
-          {
-            // withCredentials를 제거해 비로그인 상태에서도 요청 가능
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        if (response.data && response.data.bills) {
-          setResults(response.data.bills);
+        const response = await axios.get(`https://api.bargainus.kr/products/search`, {
+          params: {
+            keyword: query, // 검색 키워드를 파라미터로 전달
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.data && response.data.length > 0) {
+          setResults(response.data); // 검색 결과 저장
         } else {
-          setResults([]);
+          setResults([]); // 결과가 없을 때 빈 배열로 설정
         }
       } catch (error) {
         console.error('Error fetching search results:', error);
@@ -52,8 +51,7 @@ const Search = () => {
               <div className={style.info}>
                 <h2>{item.productName}</h2>
                 <p>가격: {Number(item.price).toLocaleString()} 원</p>
-                <p>수량: {item.count}</p>
-                <p>총 금액: {Number(item.totalPrice).toLocaleString()} 원</p>
+                <p>설명: {item.description}</p>
                 <Link to={`/products/${item.productCode}`} className={style.detailLink}>
                   상품 상세 보기
                 </Link>

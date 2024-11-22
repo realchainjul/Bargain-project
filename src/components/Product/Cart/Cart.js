@@ -18,15 +18,7 @@ const Cart = () => {
         const response = await axios.get("https://api.bargainus.kr/bucket/list", {
           withCredentials: true,
         });
-        console.log("Fetched cart items:", response.data); // 데이터 확인용 로그
         setCartItems(response.data);
-  
-        // 각 항목의 bucketNo 확인
-        response.data.forEach((item, index) => {
-          if (!item.bucketNo) {
-            console.error(`Item at index ${index} is missing bucketNo:`, item);
-          }
-        });
       } catch (error) {
         console.error("Error fetching cart items:", error);
         alert("장바구니 데이터를 불러오는 데 실패했습니다.");
@@ -34,7 +26,7 @@ const Cart = () => {
         setLoading(false);
       }
     };
-  
+
     fetchCartItems();
   }, []);
 
@@ -56,60 +48,54 @@ const Cart = () => {
     }
   };
 
-  // 선택 삭제
-  const handleDeleteSelected = async () => {
-    if (!window.confirm("선택된 상품을 삭제하시겠습니까?")) return;
-
-    try {
-      for (let bucketNo of checkedItems) {
-        await axios.delete(`https://api.bargainus.kr/bucket/${bucketNo}/remove`, {
-          withCredentials: true,
-        });
-      }
-      setCartItems((prev) => prev.filter((item) => !checkedItems.includes(item.bucketNo)));
-      setCheckedItems([]);
-      alert("선택된 상품이 삭제되었습니다.");
-    } catch (error) {
-      console.error("상품 삭제 오류:", error);
-      alert("상품 삭제 중 문제가 발생했습니다.");
-    }
-  };
-
-  // 수량 업데이트 핸들러
-  const handleQuantityUpdate = async (bucketNo, newCount) => {
-    console.log("Updating quantity for:", { bucketNo, newCount });
-  
-    if (!bucketNo) {
-      console.error("Error: bucketNo is undefined!");
-      alert("장바구니 번호가 유효하지 않습니다.");
-      return;
-    }
-  
-    try {
-      const response = await axios.put(
-        `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
-        {},
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        setCartItems((prev) =>
-          prev.map((item) =>
-            item.bucketNo === bucketNo ? { ...item, bucketCount: newCount } : item
-          )
-        );
-        alert(response.data.message || "수량이 업데이트되었습니다.");
-      }
-    } catch (error) {
-      console.error("수량 업데이트 실패:", error);
-      alert("수량 업데이트 중 문제가 발생했습니다.");
-    }
-  };
-  
   // 총 가격 계산
   const calculateTotalPrice = () => {
     return cartItems
       .filter((item) => checkedItems.includes(item.bucketNo))
       .reduce((total, item) => total + item.price * item.bucketCount, 0);
+  };
+
+  // 결제 요청
+  const handlePayment = async () => {
+    const selectedItems = cartItems.filter((item) =>
+      checkedItems.includes(item.bucketNo)
+    );
+
+    if (selectedItems.length === 0) {
+      alert("결제할 상품을 선택해주세요.");
+      return;
+    }
+
+    const bills = selectedItems.map((item) => ({
+      productCode: item.productCode,
+      totalPrice: item.price * item.bucketCount,
+      price: item.price,
+      count: item.bucketCount,
+      productName: item.productName,
+    }));
+
+    const payload = {
+      userAddress: {
+        address: "사용자 주소", // 사용자의 주소 데이터를 여기에 추가하세요
+        postalCode: "우편번호", // 사용자의 우편번호 데이터를 여기에 추가하세요
+        detailAddress: "상세 주소", // 사용자의 상세 주소 데이터를 여기에 추가하세요
+      },
+      bills,
+    };
+
+    try {
+      const response = await axios.post("https://api.bargainus.kr/bills/add", payload, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        alert("결제가 완료되었습니다!");
+        navigate("/payment", { state: { bills, userAddress: payload.userAddress } }); // 결제 데이터 전달
+      }
+    } catch (error) {
+      console.error("결제 요청 실패:", error);
+      alert("결제 중 문제가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   if (loading) {
@@ -124,14 +110,14 @@ const Cart = () => {
       {cartItems.length > 0 ? (
         <>
           <div className={style.cartlist}>
-          <label className={style.selectAll}>
-            <input
-            type="checkbox"
-            checked={checkedItems.length === cartItems.length}
-            onChange={(e) => handleAllCheck(e.target.checked)}
-            />
-          전체 선택
-          </label>
+            <label className={style.selectAll}>
+              <input
+                type="checkbox"
+                checked={checkedItems.length === cartItems.length}
+                onChange={(e) => handleAllCheck(e.target.checked)}
+              />
+              전체 선택
+            </label>
             {cartItems.map((item) => (
               <div key={item.bucketNo} className={style.cartItem}>
                 <input
@@ -146,31 +132,9 @@ const Cart = () => {
                   <h2>{item.productName}</h2>
                   <p>{Number(item.price).toLocaleString()} 원</p>
                   <div className={style.quantity}>
-                <button
-                  onClick={() => {
-                  console.log("Decreasing quantity for:", item);
-                  handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1));
-                  }}
-                  >
-                  -
-                </button>
-                <span>{item.bucketCount}</span>
-  <button
-    onClick={() => {
-      console.log("Increasing quantity for:", item);
-      handleQuantityUpdate(item.bucketNo, item.bucketCount + 1);
-    }}
-  >
-    +
-  </button>
-</div>
+                    <span>{item.bucketCount}</span>
+                  </div>
                 </div>
-                <button
-                  className={style.deleteButton}
-                  onClick={() => handleDeleteSelected(item.bucketNo)}
-                >
-                  삭제
-                </button>
               </div>
             ))}
           </div>
@@ -181,32 +145,16 @@ const Cart = () => {
                 <p className={style.title}>총 주문 금액</p>
                 <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
               </div>
-              <div className={style.discount}>
-                <p className={style.title}>할인 금액</p>
-                <p className={style.price}>0 원</p>
-              </div>
-              <div className={style.shipping}>
-                <p className={style.title}>배송비</p>
-                <p className={style.price}>0 원</p>
-              </div>
             </div>
-            <div className={style.total}>
-              <p className={style.title}>총 결제 금액</p>
-              <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-            </div>
-            <Button
-              name={"결제하기"}
-              isPurple={true}
-              onClick={() => navigate("/payment", { state: checkedItems })}
-            />
+            <Button name="결제하기" isPurple={true} onClick={handlePayment} />
           </div>
         </>
       ) : (
         <div className={style.empty}>
-          <BsCart2 size="30" title="장바구니" color="#a99773"/>
+          <BsCart2 size="30" title="장바구니" color="#a99773" />
           <p>장바구니가 비었습니다.</p>
           <Button
-            name={"쇼핑하러 가기"}
+            name="쇼핑하러 가기"
             onClick={() => {
               navigate("/");
             }}

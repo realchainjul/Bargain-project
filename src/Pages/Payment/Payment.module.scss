@@ -1,0 +1,61 @@
+.paymentPage {
+    font-family: 'Pretendard-Regular';
+    padding: 2rem;
+  
+    .title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+  
+    .addressSection,
+    .billSection,
+    .paymentMethod {
+      margin-bottom: 1.5rem;
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+      }
+      p {
+        font-size: 1rem;
+        margin: 0.2rem 0;
+      }
+    }
+  
+    .billItem {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      p {
+        margin: 0.3rem 0;
+      }
+    }
+  
+    .methodSelect {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #a99773;
+      border-radius: 5px;
+    }
+  
+    .actions {
+      display: flex;
+      justify-content: center;
+      .paymentButton {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #a99773;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        &:disabled {
+          background-color: #ddd;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
