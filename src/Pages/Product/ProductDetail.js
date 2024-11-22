@@ -39,7 +39,6 @@ const ProductDetail = () => {
         });
         if (response.status === 200) {
           setProduct(response.data); // 데이터 저장
-          console.log("Fetched Product: ", response.data);
         }
       } catch (error) {
         console.error('상품 정보 불러오기 오류:', error);
@@ -47,81 +46,51 @@ const ProductDetail = () => {
         setLoading(false); // 로딩 종료
       }
     };
-  
+
     fetchProduct();
   }, [id]);
 
-  // 찜 버튼 클릭 핸들러
-  const handleLike = async () => {
+  // 장바구니 추가 핸들러
+  const handleAddToCart = async () => {
     if (!isLoggedIn) {
       alert('로그인 후 이용 가능합니다.');
       navigate('/login'); // 로그인 페이지로 이동
       return;
     }
 
-    try {
-      const response = await axios.get(
-        `https://api.bargainus.kr/products/${product.productCode}/liked`,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        const { likedStatus, message } = response.data; // 서버 응답에서 likedStatus와 메시지 추출
-        alert(message); // 서버 메시지 출력
-        setLiked(likedStatus); // 찜 상태 업데이트
-      } else {
-        alert('요청을 처리하지 못했습니다.');
-      }
-    } catch (error) {
-      console.error('찜 요청 오류:', error);
-      if (error.response?.status === 401) {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
-      } else {
-        alert('서버와 연결할 수 없습니다.');
-      }
-    }
-  };
-
-  // 장바구니 추가 핸들러
-  const handleAddToCart = async () => {
     if (!product?.pcode) {
       console.error('Invalid product code');
       alert('유효하지 않은 상품입니다.');
       return;
     }
-  
+
     try {
       // FormData 생성 및 데이터 추가
       const formData = new FormData();
       formData.append('productCode', product.pcode);
       formData.append('count', count); // 구매 수량
-  
-      console.log('Adding to cart:', Object.fromEntries(formData)); // 디버깅 로그
-  
+
       const response = await axios.post(`https://api.bargainus.kr/products/${product.pcode}/bucket/add`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       if (response.status === 200) {
         alert(response.data.message || '장바구니에 추가되었습니다.');
         navigate('/mypage/cart'); // 장바구니 페이지로 이동
       }
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
-      if (error.response) {
-        console.error('Response Data:', error.response.data);
-        console.error('Response Status:', error.response.status);
-      }
       alert('장바구니 추가 중 문제가 발생했습니다.');
     }
   };
-  
-  
-  
-  
+
+  // 구매하기 버튼 핸들러
+  const handleBuyNow = () => {
+    navigate('/mypage/cart'); // 구매하기 클릭 시 장바구니로 이동
+  };
 
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
@@ -143,20 +112,19 @@ const ProductDetail = () => {
           />
           <p className={style.desc}>{product.comment}</p>
           <div className={style.detailImages}>
-  {product.productPhotos && product.productPhotos.length > 0 ? (
-    product.productPhotos.map((photo, index) => (
-      <img
-        key={index} // 고유한 key 설정
-        src={typeof photo === "string" ? photo : photo.photoUrl} // 문자열이면 photo 사용, 객체라면 photoUrl 사용
-        alt={`${product.name} 상세 이미지`}
-        className={style.detailImage}
-      />
-    ))
-  ) : (
-    <p>상세 이미지가 없습니다.</p>
-  )}
-</div>
-
+            {product.productPhotos && product.productPhotos.length > 0 ? (
+              product.productPhotos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={typeof photo === 'string' ? photo : photo.photoUrl}
+                  alt={`${product.name} 상세 이미지`}
+                  className={style.detailImage}
+                />
+              ))
+            ) : (
+              <p>상세 이미지가 없습니다.</p>
+            )}
+          </div>
         </div>
 
         {/* 상품 정보 영역 */}
@@ -189,7 +157,7 @@ const ProductDetail = () => {
             ) : (
               <>
                 <Button name="장바구니" onClick={handleAddToCart} />
-                <Button name="구매하기" isBrown={true} onClick={() => alert('구매 페이지로 이동합니다.')} />
+                <Button name="구매하기" isBrown={true} onClick={handleBuyNow} />
               </>
             )}
           </div>
