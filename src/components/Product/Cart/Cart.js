@@ -5,7 +5,6 @@ import style from './Cart.module.scss';
 import { BsCart2 } from 'react-icons/bs';
 import Button from '../../../components/common/Button';
 
-// Cart Component
 const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 목록
@@ -21,7 +20,7 @@ const Cart = () => {
         });
         if (response.status === 200) {
           setCartItems(response.data); // 장바구니 데이터 저장
-          setCheckedItems(response.data.map((item) => item.productCode)); // 전체 선택 상태 초기화
+          setCheckedItems(response.data.map((item) => item.bucketNo)); // bucketNo로 초기화
         }
       } catch (error) {
         console.error('장바구니 데이터 불러오기 실패:', error);
@@ -37,18 +36,18 @@ const Cart = () => {
   // 전체 선택 및 해제 핸들러
   const handleAllCheck = (isChecked) => {
     if (isChecked) {
-      setCheckedItems(cartItems.map((item) => item.productCode)); // 모든 항목 체크
+      setCheckedItems(cartItems.map((item) => item.pcode)); // 모든 항목 체크
     } else {
       setCheckedItems([]); // 모든 항목 체크 해제
     }
   };
 
   // 개별 체크박스 핸들러
-  const handleCheck = (productCode, isChecked) => {
+  const handleCheck = (pcode, isChecked) => {
     if (isChecked) {
-      setCheckedItems((prev) => [...prev, productCode]);
+      setCheckedItems((prev) => [...prev, pcode]);
     } else {
-      setCheckedItems((prev) => prev.filter((code) => code !== productCode));
+      setCheckedItems((prev) => prev.filter((code) => code !== pcode));
     }
   };
 
@@ -57,12 +56,12 @@ const Cart = () => {
     if (!window.confirm('선택된 상품을 삭제하시겠습니까?')) return;
 
     try {
-      for (let productCode of checkedItems) {
-        await axios.delete(`https://api.bargainus.kr/bucket/${productCode}/remove`, {
+      for (let pcode of checkedItems) {
+        await axios.delete(`https://api.bargainus.kr/bucket/${pcode}/remove`, {
           withCredentials: true,
         });
       }
-      setCartItems((prev) => prev.filter((item) => !checkedItems.includes(item.productCode)));
+      setCartItems((prev) => prev.filter((item) => !checkedItems.includes(item.pcode)));
       setCheckedItems([]);
       alert('선택된 상품이 삭제되었습니다.');
     } catch (error) {
@@ -72,17 +71,17 @@ const Cart = () => {
   };
 
   // 수량 업데이트 핸들러
-  const handleQuantityUpdate = async (productCode, newCount) => {
+  const handleQuantityUpdate = async (bucketNo, newCount) => {
     try {
       const response = await axios.put(
-        `https://api.bargainus.kr/bucket/${productCode}/update?newCount=${newCount}`,
+        `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
         {},
         { withCredentials: true }
       );
       if (response.status === 200) {
         setCartItems((prev) =>
           prev.map((item) =>
-            item.productCode === productCode ? { ...item, bucketCount: newCount } : item
+            item.bucketNo === bucketNo ? { ...item, bucketCount: newCount } : item
           )
         );
         alert(response.data.message || '수량이 업데이트되었습니다.');
@@ -96,7 +95,7 @@ const Cart = () => {
   // 총 가격 계산
   const calculateTotalPrice = () => {
     return cartItems
-      .filter((item) => checkedItems.includes(item.productCode))
+      .filter((item) => checkedItems.includes(item.pcode))
       .reduce((total, item) => total + item.price * item.bucketCount, 0);
   };
 
@@ -112,71 +111,71 @@ const Cart = () => {
       {cartItems.length > 0 ? (
         <>
           <div className={style.cartlist}>
-  {cartItems.map((item) => (
-    <div key={item.pcode} className={style.cartItem}>
-      <input
-        type="checkbox"
-        checked={checkedItems.includes(item.pcode)}
-        onChange={(e) => handleCheck(item.pcode, e.target.checked)}
-      />
-      <div className={style.img}>
-        <img src={item.photoUrl || '/images/default.jpg'} alt={item.productName} />
-      </div>
-      <div className={style.info}>
-        <h2>{item.productName}</h2>
-        <p>{Number(item.price).toLocaleString()} 원</p>
-        <p>수량:</p>
-        <div className={style.quantity}>
-          <button
-            onClick={() =>
-              handleQuantityUpdate(item.pcode, Math.max(item.bucketCount - 1, 1))
-            }
-          >
-            -
-          </button>
-          <span>{item.bucketCount}</span>
-          <button
-            onClick={() => handleQuantityUpdate(item.pcode, item.bucketCount + 1)}
-          >
-            +
-          </button>
-        </div>
-      </div>
-      <button
-        className={style.deleteButton}
-        onClick={() => handleDeleteSelected(item.pcode)}
-      >
-        삭제
-      </button>
-    </div>
-  ))}
-</div>
-<div className={style.cartprice}>
-  <div className={style.calcwrap}>
-    <div className={style.orderprice}>
-      <p className={style.title}>총 주문 금액</p>
-      <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-    </div>
-    <div className={style.discount}>
-      <p className={style.title}>할인 금액</p>
-      <p className={style.price}>0 원</p>
-    </div>
-    <div className={style.shipping}>
-      <p className={style.title}>배송비</p>
-      <p className={style.price}>0 원</p>
-    </div>
-  </div>
-  <div className={style.total}>
-    <p className={style.title}>총 결제 금액</p>
-    <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-  </div>
-  <Button
-    name={'결제하기'}
-    isPurple={true}
-    onClick={() => navigate('/payment', { state: checkedItems })}
-  />
-</div>
+            {cartItems.map((item) => (
+              <div key={item.bucketNo} className={style.cartItem}>
+                <input
+                  type="checkbox"
+                  checked={checkedItems.includes(item.bucketNo)}
+                  onChange={(e) => handleCheck(item.bucketNo, e.target.checked)}
+                />
+                <div className={style.img}>
+                  <img src={item.photoUrl || '/images/default.jpg'} alt={item.productName} />
+                </div>
+                <div className={style.info}>
+                  <h2>{item.productName}</h2>
+                  <p>{Number(item.price).toLocaleString()} 원</p>
+                  <p>수량:</p>
+                  <div className={style.quantity}>
+                    <button
+                      onClick={() =>
+                        handleQuantityUpdate(item.bucketNo, Math.max(item.bucketCount - 1, 1))
+                      }
+                    >
+                      -
+                    </button>
+                    <span>{item.bucketCount}</span>
+                    <button
+                      onClick={() => handleQuantityUpdate(item.bucketNo, item.bucketCount + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <button
+                  className={style.deleteButton}
+                  onClick={() => handleDeleteSelected(item.bucketNo)}
+                >
+                  삭제
+                </button>
+              </div>
+            ))}
+          </div>
 
+          <div className={style.cartprice}>
+            <div className={style.calcwrap}>
+              <div className={style.orderprice}>
+                <p className={style.title}>총 주문 금액</p>
+                <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
+              </div>
+              <div className={style.discount}>
+                <p className={style.title}>할인 금액</p>
+                <p className={style.price}>0 원</p>
+              </div>
+              <div className={style.shipping}>
+                <p className={style.title}>배송비</p>
+                <p className={style.price}>0 원</p>
+              </div>
+            </div>
+            <div className={style.total}>
+              <p className={style.title}>총 결제 금액</p>
+              <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
+            </div>
+            <Button
+              name={'결제하기'}
+              isPurple={true}
+              onClick={() => navigate('/payment', { state: checkedItems })}
+            />
+          </div>
         </>
       ) : (
         <div className={style.empty}>
