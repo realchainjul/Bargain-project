@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import style from './Payment.module.scss';
+
+const { IMP } = window;
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -13,7 +16,7 @@ const Payment = () => {
     address: '',
     postalCode: '',
     detailAddress: '',
-  }); // 사용자 입력 배송 정보
+  });
   const [useDefaultAddress, setUseDefaultAddress] = useState(false); // 기본 배송지 사용 여부
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('카드'); // 기본 결제 방법 설정
@@ -51,26 +54,74 @@ const Payment = () => {
     setUserAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 결제 요청
+  // I'mport 결제 요청 처리
   const handlePayment = async () => {
     setLoading(true);
 
-    const paymentData = {
-      userAddress,
-      paymentMethod,
-      cartItems, // 장바구니에서 전달된 결제 상품 정보
-    };
-
     try {
-      const response = await axios.post('https://api.bargainus.kr/payments/create', paymentData, {
-        withCredentials: true,
-      });
+      // 1단계: Bills 추가 요청 (/bills/add)
+      const billsResponse = await axios.post(
+        'https://api.bargainus.kr/bills/add',
+        { selectedBucketIds: cartItems.map((item) => item.billCode) },
+        { withCredentials: true }
+      );
 
-      if (response.status === 200 && response.data.status) {
-        navigate('/order-success', { state: { message: response.data.message } });
-      } else {
-        alert(response.data.message || '결제 처리 중 문제가 발생했습니다.');
+      if (billsResponse.status !== 200 || !billsResponse.data.status) {
+        alert(billsResponse.data.message || '결제 정보 생성 중 문제가 발생했습니다.');
+        return;
       }
+
+      // 청구서 정보로부터 결제 관련 데이터 추출
+      const billCodes = billsResponse.data.bills.map((bill) => bill.billCode);
+      const merchantUid = 'merchant_' + uuidv4(); // 고유한 주문 번호 생성
+
+      // 2단계: I'mport 결제 모듈 호출
+      IMP.init('imp52521078'); // I'mport 고유 코드로 초기화 (코드 교체 필요)
+
+      IMP.request_pay(
+        {
+          pg: 'html5_inicis', // PG사 선택
+          pay_method: paymentMethod.toLowerCase(), // 결제 방법
+          merchant_uid: merchantUid,
+          name: 'Bargainus - 구매 상품 결제',
+          amount: totalAmount,
+          buyer_name: userAddress.name,
+          buyer_tel: userAddress.phoneNumber,
+          buyer_addr: `${userAddress.address} ${userAddress.detailAddress}`,
+          buyer_postcode: userAddress.postalCode,
+        },
+        async (rsp) => {
+          if (rsp.success) {
+            // 결제가 성공한 경우
+            const paymentData = {
+              impUid: rsp.imp_uid, // I'mport 결제 고유 ID
+              amount: rsp.paid_amount, // 결제된 금액
+              paymentMethod: paymentMethod, // 결제 방법
+              billCodes: billCodes, // 청구서 코드
+            };
+
+            try {
+              const paymentResponse = await axios.post(
+                'https://api.bargainus.kr/payments/create',
+                paymentData,
+                { withCredentials: true }
+              );
+
+              if (paymentResponse.status === 200 && paymentResponse.data.status) {
+                navigate('/order-success', { state: { message: paymentResponse.data.message } });
+              } else {
+                alert(paymentResponse.data.message || '결제 처리 중 문제가 발생했습니다.');
+              }
+            } catch (error) {
+              console.error('결제 요청 실패:', error);
+              alert('결제 요청 중 문제가 발생했습니다. 다시 시도해주세요.');
+            }
+          } else {
+            // 결제가 실패한 경우
+            alert(`결제에 실패하였습니다: ${rsp.error_msg}`);
+          }
+        }
+      );
     } catch (error) {
       console.error('결제 요청 실패:', error);
       alert('결제 요청 중 문제가 발생했습니다. 다시 시도해주세요.');
