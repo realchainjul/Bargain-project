@@ -42,6 +42,13 @@ const Payment = () => {
     );
   };
 
+  // 총 금액 계산 함수
+  const calculateTotalPrice = () => {
+    return cartItems
+      .filter((item) => selectedBucketIds.includes(item.bucketNo))
+      .reduce((total, item) => total + item.price * item.count, 0);
+  };
+
   // Bills 추가 및 결제 요청 처리
   const handlePayment = async () => {
     if (selectedBucketIds.length === 0) {
@@ -70,8 +77,8 @@ const Payment = () => {
         (sum, bill) => sum + bill.totalPrice,
         0
       );
-      const billCodes = billsResponse.data.bills.map(bill => bill.billCode);
-      const impUid = "imp_" + uuidv4(); // 고유한 impUid 생성
+      const billCodes = billsResponse.data.bills.map((bill) => bill.billCode);
+      const impUid = 'imp_' + uuidv4(); // 고유한 impUid 생성
 
       // 결제 요청 데이터 준비
       const paymentData = {
