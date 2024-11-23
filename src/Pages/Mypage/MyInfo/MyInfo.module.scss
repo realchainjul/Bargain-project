@@ -117,12 +117,22 @@
     }
   }
   .btn {
-    display: flex;
     gap: 1rem;
     margin: 0 300px;
     margin-top: 20px;
     button {
-      margin-bottom: 50px;
     }
+    .deleteAccountButton {
+      font-family: 'Pretendard-Regular';
+      background: none;
+      color: #a9a8a8;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 10px;
+      margin-bottom: 80px;
+      margin-left: 43%;
+    }
+    
   }
 }

@@ -16,6 +16,9 @@ import ProductAdd from './Pages/Mypage/ProductAdd/ProductAdd';
 import ProductDetail from './Pages/Product/ProductDetail';
 import ProductDetailG from './Pages/Product/ProductDetailG';
 import ProductDetailV from './Pages/Product/ProductDetailV';
+import MyProducts from './Pages/Mypage/MyProduct/MyProducts';
+import Search from './components/Search/Search';
+import Payment from './Pages/Payment/Payment';
 import axios from 'axios';
 
 function App() {
@@ -62,16 +65,19 @@ function App() {
         <Route path="/category/fruits" element={<FruitsPage />} />
         <Route path="/category/vegetable" element={<VegetablePage />} />
         <Route path="/category/grain" element={<GrainPage />} />
-        <Route path="/mypage/like" element={<LikePage /> }/>
+        <Route path="/mypage/liked" element={<LikePage /> }/>
         <Route path="/fruits/products/:id" element={<ProductDetail />} />
         <Route path="/vegetable/products/:id" element={<ProductDetailV />} />
         <Route path="/grain/products/:id" element={<ProductDetailG />} />
+        <Route path="/search/:query" element={<Search />} />
+        <Route path="/payment" element={<Payment />} /> 
         <Route path="/mypage/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}/>
         <Route path="/mypage/userpage" element={isLoggedIn ? <UserPage /> : <Navigate to="/login" />}>
-          <Route index element={<Navigate to="/mypage/userpage/info" />} />
+          <Route index element={<Navigate to="/mypage/userpage/products" />} />
           <Route path="info" element={<MyInfo />} />
           <Route path="productadd" element={<ProductAdd />} />
           <Route path="liked" element={<LikePage /> }/>
+          <Route path="products" element={<MyProducts /> }/>
         </Route>
 
 

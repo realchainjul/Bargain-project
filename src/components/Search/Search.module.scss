@@ -1,0 +1,89 @@
+.searchPage {
+  padding: 2rem;
+  font-family: 'Pretendard-Regular';
+  margin-right: 15rem;
+  margin-left: 15rem;
+  margin-bottom: 30px;
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #404040;
+    padding-top: 40px;
+  }
+
+  .results {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+
+    .resultItem {
+      display: flex;
+      flex-direction: column;
+
+      img {
+        width: 100%;
+        height: 300px;
+        border-radius: 4px;
+        max-width: 240px;
+        object-fit: cover;
+      }
+
+      .info {
+        margin-top: 0.5rem;
+
+        h2 {
+          font-size: 1rem;
+          font-weight: bold;
+          color: #404040;
+        }
+
+        p {
+          font-size: 1.2rem;
+          font-weight: bold;
+          color: #333;
+        }
+
+        .detailLink {
+          margin-top: 0.5rem;
+          display: inline-block;
+          text-decoration: none;
+          font-size: 0.9rem;
+          color: #a99773;
+          font-weight: bold;
+          transition: color 0.3s;
+
+          &:hover {
+            color: #704d26;
+          }
+        }
+      }
+    }
+  }
+
+  .noResults {
+    text-align: center;
+    margin-top: 2rem;
+
+    p {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #5a5a5a;
+    }
+
+    .homeLink {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      font-size: 1rem;
+      color: #a99773;
+      font-weight: bold;
+
+      &:hover {
+        color: #704d26;
+      }
+    }
+  }
+}

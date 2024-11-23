@@ -64,12 +64,13 @@
 
 
   .search {
-    width: 74vm;
+    font-family: 'Pretendard-Regular';
+    width: 74vw;
     display: flex;
-    justify-content: space-between;
-    display: flex;
-    align-items: center;
     gap: 23rem;
+    justify-content: flex-end;
+    align-items: center;
+    height: 2.6rem;
 
     a {
       display: flex;

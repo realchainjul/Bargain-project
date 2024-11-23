@@ -1,0 +1,67 @@
+.mainProduct {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4rem;
+
+  .container {
+    width: 74vw;
+    display: flex;
+    flex-direction: column; // 세로 정렬
+    align-items: center;
+
+    .header {
+      width: 100%;
+      text-align: center;
+    }
+
+    .row {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      .swiper {
+        width: 100%;
+        padding: 20px 0; // 상하 여백
+        .swiper-slide {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+  }
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: 'Pretendard-Regular';
+  .productContent {
+    font-family: 'Pretendard-Regular';
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .productImage {
+      width: 260px;
+      height: 364px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .productInfo {
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: #555;
+      }
+    }
+  }
+}

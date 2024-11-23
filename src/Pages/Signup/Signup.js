@@ -8,7 +8,7 @@ import axios from 'axios';
 const MAX_PROFILE_IMAGE_SIZE = 1024 * 1024;
 
 export default function Signup() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // useNavigate 훅 선언
   const [inputs, setInputs] = useState({
     email: '',
     pw: '',
@@ -139,31 +139,30 @@ export default function Signup() {
   const handleSubmitSignup = async (event) => {
     event.preventDefault();
 
-    // 입력 필드 유효성 검사
-  if (!inputs.email || !isConfirmEmail) {
-    alert('이메일 중복 확인을 완료해주세요.');
-    return;
-  }
+    if (!inputs.email || !isConfirmEmail) {
+      alert('이메일 중복 확인을 완료해주세요.');
+      return;
+    }
 
-  if (!inputs.nickname || !isConfirmNickname) {
-    alert('닉네임 중복 확인을 완료해주세요.');
-    return;
-  }
+    if (!inputs.nickname || !isConfirmNickname) {
+      alert('닉네임 중복 확인을 완료해주세요.');
+      return;
+    }
 
-  if (!inputs.pw || !isConfirmPassword) {
-    alert('비밀번호는 8자 이상이어야 합니다.');
-    return;
-  }
+    if (!inputs.pw || !isConfirmPassword) {
+      alert('비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
 
-  if (!inputs.checkPassword || !isConfirmCheckPassword) {
-    alert('비밀번호가 일치하지 않습니다.');
-    return;
-  }
+    if (!inputs.checkPassword || !isConfirmCheckPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
 
-  if (!inputs.name || !inputs.phoneNumber || !inputs.postalCode || !inputs.address) {
-    alert('모든 필수 입력 사항을 입력해주세요.');
-    return;
-  }
+    if (!inputs.name || !inputs.phoneNumber || !inputs.postalCode || !inputs.address) {
+      alert('모든 필수 입력 사항을 입력해주세요.');
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -182,16 +181,18 @@ export default function Signup() {
 
       const response = await axios.post('https://api.bargainus.kr/join', formData);
 
-      if (response.data === '회원가입 성공') {
-        alert('회원가입이 완료되었습니다.');
-         window.location.href = '/login';
-      } else {
-        alert(response.data);
-      }
-    } catch (error) {
-      alert('회원가입 중 오류가 발생했습니다.');
+      // 응답 데이터를 기반으로 처리
+    if (response.data === '가입 성공') { // 백엔드에서 "가입 성공" 반환 시
+      alert('회원가입이 완료되었습니다.');
+      navigate('/login'); // "/login" 페이지로 이동
+    } else {
+      alert(response.data || '회원가입에 실패했습니다.'); // 실패 메시지 처리
     }
-  };
+  } catch (error) {
+    console.error('회원가입 중 오류 발생:', error);
+    alert('회원가입 중 오류가 발생했습니다.');
+  }
+};
 
   return (
     <div className={style.signup}>
@@ -336,7 +337,7 @@ export default function Signup() {
             </figure>
           </article>
         </section>
-        <Button name="가입하기" form="signup" type="submit" isBrown={true}/>
+        <Button name="가입하기" form="signup" type="submit" isBrown={true} />
       </form>
     </div>
   );

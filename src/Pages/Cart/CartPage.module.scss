@@ -1,0 +1,22 @@
+.cart {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+.container {
+    width: 80%;
+}
+.header {
+    font-family: 'Pretendard-Regular';
+    border-bottom: 2px solid rgb(51, 51, 51);
+    padding-bottom: 1rem;
+    z-index: 200;
+    
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: rgb(51, 51, 51);
+    }
+  }
+}

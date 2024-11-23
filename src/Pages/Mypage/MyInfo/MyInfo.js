@@ -45,6 +45,28 @@ const MyInfo = () => {
     fetchUserInfo();
   }, []);
 
+// 회원탈퇴 API 호출
+const handleDeleteAccount = async () => {
+  if (!window.confirm('정말로 회원탈퇴 하시겠습니까?')) return;
+
+  try {
+    const response = await axios.get('https://api.bargainus.kr/mypage/userpage/delete', {
+      withCredentials: true,
+    });
+
+    if (response.status === 200 && response.data.status) {
+      alert(response.data.message || '회원 탈퇴가 완료되었습니다.');
+      // 로그아웃 또는 메인 페이지로 이동
+      window.location.href = '/'; // 로그아웃 처리
+    } else {
+      alert(response.data.message || '회원 탈퇴에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('회원 탈퇴 오류:', error.response?.data || error.message);
+    alert('서버 연결에 실패했습니다. 다시 시도해주세요.');
+  }
+};
+
   // 입력 변경 처리
   const handleChangeInputs = (event) => {
     const { value, name } = event.target;
@@ -216,7 +238,11 @@ const MyInfo = () => {
         </section>
         <section className={style.btn}>
           <Button name="회원정보 수정" form="MyInfoModify" type="submit" isBrown={true} />
+          <button onClick={handleDeleteAccount} className={style.deleteAccountButton}>
+            회원탈퇴
+          </button>
         </section>
+        
       </form>
     </div>
   );

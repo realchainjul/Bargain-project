@@ -8,9 +8,10 @@ export default function MypageNavbar() {
       <h1>마이페이지</h1>
       <nav className={style.mypageNav}>
         <ul>
-            <NavbarItem page={'/mypage/userpage/info'} title={'개인 정보 수정'} />
-            <NavbarItem page={'/mypage/userpage/like'} title={'찜한 상품'} />
+            <NavbarItem page={'/mypage/userpage/liked'} title={'찜한 상품'} />
             <NavbarItem page={'/mypage/userpage/productadd'} title={'상품 등록'} />
+            <NavbarItem page={'/mypage/userpage/products'} title={'내 상품'} />
+            <NavbarItem page={'/mypage/userpage/info'} title={'개인 정보 수정'} />
         </ul>
       </nav>
     </div>
