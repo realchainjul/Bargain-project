@@ -1,197 +1,147 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import style from './Cart.module.scss';
-import { BsCart2 } from 'react-icons/bs';
-import Button from '../../../components/common/Button';
+import style from './Payment.module.scss';
 
-const Cart = () => {
+const Payment = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 목록
-  const [checkedItems, setCheckedItems] = useState([]); // 체크된 항목의 bucketNo
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [userAddress, setUserAddress] = useState({}); // 사용자 주소 정보
+  const location = useLocation();
+  const { bills } = location.state || []; // `Cart`에서 전달된 bills 데이터
+  const [userAddress, setUserAddress] = useState(null); // 사용자 정보 저장
+  const [paymentMethod, setPaymentMethod] = useState('카드'); // 결제 방법
+  const [loading, setLoading] = useState(false);
 
-  // 장바구니 목록 및 사용자 정보 가져오기
+  // 사용자 정보 불러오기
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserInfo = async () => {
       try {
-        const [cartResponse, userResponse] = await Promise.all([
-          axios.get('https://api.bargainus.kr/bucket/list', { withCredentials: true }),
-          axios.get('https://api.bargainus.kr/info', { withCredentials: true }),
-        ]);
-
-        setCartItems(cartResponse.data);
-        setUserAddress(userResponse.data);
+        const response = await axios.get('https://api.bargainus.kr/info', {
+          withCredentials: true,
+        });
+        if (response.status === 200 && response.data) {
+          setUserAddress(response.data); // 사용자 주소 정보 저장
+        } else {
+          throw new Error('Failed to fetch user address');
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
-        alert('데이터를 불러오는 데 실패했습니다.');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching user address:', error);
+        alert('사용자 정보를 불러오는 데 실패했습니다. 다시 로그인해주세요.');
+        navigate('/login');
       }
     };
 
-    fetchData();
-  }, []);
+    fetchUserInfo();
+  }, [navigate]);
 
-  // 전체 선택 및 해제 핸들러
-  const handleAllCheck = (isChecked) => {
-    if (isChecked) {
-      setCheckedItems(cartItems.map((item) => item.bucketNo)); // 모든 항목 체크
-    } else {
-      setCheckedItems([]); // 모든 항목 체크 해제
-    }
-  };
-
-  // 개별 체크박스 핸들러
-  const handleCheck = (bucketNo, isChecked) => {
-    if (isChecked) {
-      setCheckedItems((prev) => [...prev, bucketNo]);
-    } else {
-      setCheckedItems((prev) => prev.filter((no) => no !== bucketNo));
-    }
-  };
-
-  // 수량 업데이트 핸들러
-  const handleQuantityUpdate = async (bucketNo, newCount) => {
-    if (newCount < 1) return;
-
-    try {
-      const response = await axios.put(
-        `https://api.bargainus.kr/bucket/${bucketNo}/update?newCount=${newCount}`,
-        {},
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        setCartItems((prev) =>
-          prev.map((item) =>
-            item.bucketNo === bucketNo ? { ...item, bucketCount: newCount } : item
-          )
-        );
-      }
-    } catch (error) {
-      console.error('수량 업데이트 실패:', error);
-      alert('수량 업데이트 중 문제가 발생했습니다.');
-    }
-  };
-
-  // 총 가격 계산
+  // 총 결제 금액 계산
   const calculateTotalPrice = () => {
-    return cartItems
-      .filter((item) => checkedItems.includes(item.bucketNo))
-      .reduce((total, item) => total + item.price * item.bucketCount, 0);
+    return bills.reduce((total, bill) => total + bill.totalPrice, 0);
   };
 
-  // 결제 요청
+  // 결제 요청 처리
   const handlePayment = async () => {
-    const selectedItems = cartItems.filter((item) => checkedItems.includes(item.bucketNo));
-
-    if (selectedItems.length === 0) {
-      alert('결제할 상품을 선택해주세요.');
+    if (!bills || bills.length === 0) {
+      alert('결제할 상품이 없습니다.');
       return;
     }
 
-    const bills = selectedItems.map((item) => ({
-      billCode: item.bucketNo,
-      productName: item.productName,
-      count: item.bucketCount,
-      price: item.price,
-      totalPrice: item.price * item.bucketCount,
+    setLoading(true);
+
+    const paymentData = bills.map((bill) => ({
+      billCode: bill.billCode,
+      productName: bill.productName,
+      count: bill.count,
+      price: bill.price,
+      totalPrice: bill.totalPrice,
     }));
 
-    const payload = {
-      userAddress: {
-        name: userAddress.name,
-        phoneNumber: userAddress.phoneNumber,
-        address: userAddress.address,
-        postalCode: userAddress.postalCode,
-        detailAddress: userAddress.detailAddress,
-      },
-      bills,
-    };
+    const params = new URLSearchParams({
+      postalCode: userAddress.postalCode,
+      address: userAddress.address,
+      detailAddress: userAddress.detailAddress,
+    });
 
     try {
-      await axios.post('https://api.bargainus.kr/bills/add', payload, { withCredentials: true });
-      navigate('/payment', { state: { bills, userAddress: payload.userAddress } }); // 결제 데이터 전달
+      const response = await axios.put(
+        `https://api.bargainus.kr/bills/update?${params.toString()}`,
+        paymentData,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200 && response.data.status) {
+        navigate('/order-success', { state: { message: response.data.message } });
+      } else {
+        throw new Error('Payment failed');
+      }
     } catch (error) {
-      console.error('결제 요청 실패:', error);
+      console.error('Payment failed:', error);
       alert('결제 중 문제가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <div className={style.loading}>로딩 중...</div>;
+  if (!bills || !userAddress) {
+    return <div className={style.loading}>결제 정보를 불러오는 중...</div>;
   }
 
   return (
-    <div className={style.cart}>
-      <div className={style.header}>
-        <h1>장바구니</h1>
-      </div>
-      {cartItems.length > 0 ? (
-        <>
-          <div className={style.cartlist}>
-            <label className={style.selectAll}>
-              <input
-                type="checkbox"
-                checked={checkedItems.length === cartItems.length}
-                onChange={(e) => handleAllCheck(e.target.checked)}
-              />
-              전체 선택
-            </label>
-            {cartItems.map((item) => (
-              <div key={item.bucketNo} className={style.cartItem}>
-                <input
-                  type="checkbox"
-                  checked={checkedItems.includes(item.bucketNo)}
-                  onChange={(e) => handleCheck(item.bucketNo, e.target.checked)}
-                />
-                <div className={style.img}>
-                  <img src={item.photoUrl || '/images/default.jpg'} alt={item.productName} />
-                </div>
-                <div className={style.info}>
-                  <h2>{item.productName}</h2>
-                  <p>{Number(item.price).toLocaleString()} 원</p>
-                  <div className={style.quantity}>
-                    <button onClick={() => handleQuantityUpdate(item.bucketNo, item.bucketCount - 1)}>
-                      -
-                    </button>
-                    <span>{item.bucketCount}</span>
-                    <button onClick={() => handleQuantityUpdate(item.bucketNo, item.bucketCount + 1)}>
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className={style.paymentPage}>
+      <h1 className={style.title}>결제 페이지</h1>
 
-          <div className={style.cartprice}>
-            <div className={style.calcwrap}>
-              <div className={style.orderprice}>
-                <p className={style.title}>총 주문 금액</p>
-                <p className={style.price}>{calculateTotalPrice().toLocaleString()} 원</p>
-              </div>
-            </div>
-            <Button name="결제하기" isPurple={true} onClick={handlePayment} />
+      {/* 배송 정보 */}
+      <section className={style.addressSection}>
+        <h2>배송 정보</h2>
+        <p>이름: {userAddress.name}</p>
+        <p>전화번호: {userAddress.phoneNumber}</p>
+        <p>주소: {userAddress.address}, {userAddress.detailAddress}</p>
+        <p>우편번호: {userAddress.postalCode}</p>
+      </section>
+
+      {/* 결제 상품 정보 */}
+      <section className={style.billSection}>
+        <h2>결제 상품 정보</h2>
+        {bills.map((bill) => (
+          <div key={bill.billCode} className={style.billItem}>
+            <p>상품명: {bill.productName}</p>
+            <p>수량: {bill.count}</p>
+            <p>총 금액: {bill.totalPrice.toLocaleString()} 원</p>
           </div>
-        </>
-      ) : (
-        <div className={style.empty}>
-          <div className={style.bs}>
-            <BsCart2 size="30" title="장바구니" color="#a99773" />
-          </div>
-          <p>장바구니가 비었습니다.</p>
-          <Button
-            name="쇼핑하러 가기"
-            onClick={() => {
-              navigate('/');
-            }}
-          />
-        </div>
-      )}
+        ))}
+      </section>
+
+      {/* 총 금액 */}
+      <section className={style.totalPriceSection}>
+        <h2>총 결제 금액</h2>
+        <p className={style.totalPrice}>{calculateTotalPrice().toLocaleString()} 원</p>
+      </section>
+
+      {/* 결제 방법 선택 */}
+      <section className={style.paymentMethod}>
+        <h2>결제 방법</h2>
+        <select
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          className={style.methodSelect}
+        >
+          <option value="카드">카드</option>
+          <option value="계좌이체">계좌이체</option>
+          <option value="휴대폰 결제">휴대폰 결제</option>
+        </select>
+      </section>
+
+      {/* 결제 버튼 */}
+      <div className={style.actions}>
+        <button
+          className={style.paymentButton}
+          onClick={handlePayment}
+          disabled={loading}
+        >
+          {loading ? '결제 진행 중...' : '결제하기'}
+        </button>
+      </div>
     </div>
   );
 };
 
-export default Cart;
+export default Payment;
