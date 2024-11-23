@@ -84,41 +84,43 @@ const Cart = () => {
 
   // 결제 요청
   const handlePayment = async () => {
-    const selectedItems = cartItems.filter((item) => checkedItems.includes(item.bucketNo));
-
-    if (selectedItems.length === 0) {
+    if (checkedItems.length === 0) {
       alert('결제할 상품을 선택해주세요.');
       return;
     }
-
-    const bills = selectedItems.map((item) => ({
-      billCode: item.bucketNo,
-      productName: item.productName,
-      count: item.bucketCount,
-      price: item.price,
-      totalPrice: item.price * item.bucketCount,
-    }));
-
+  
+    // 서버가 요구하는 payload 형식
     const payload = {
-      userAddress: {
-        name: userAddress.name,
-        phoneNumber: userAddress.phoneNumber,
-        address: userAddress.address,
-        postalCode: userAddress.postalCode,
-        detailAddress: userAddress.detailAddress,
-      },
-      bills,
+      selectedBucketIds: checkedItems, // 선택된 bucketNo 배열
     };
-
+  
     try {
-      await axios.post('https://api.bargainus.kr/bills/add', payload, { withCredentials: true });
-      navigate('/payment', { state: { bills, userAddress: payload.userAddress } }); // 결제 데이터 전달
+      console.log('Payload:', JSON.stringify(payload, null, 2)); // 디버깅용 로그
+  
+      const response = await axios.post('https://api.bargainus.kr/bills/add', payload, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (response.status === 200 && response.data.bills) {
+        console.log('Response:', response.data); // 디버깅용 로그
+  
+        // bills와 사용자 정보를 결제 페이지로 전달
+        navigate('/payment', {
+          state: {
+            bills: response.data.bills, // 서버 응답에서 받은 결제 정보
+            userAddress, // 사용자 주소 정보
+          },
+        });
+      } else {
+        alert(response.data.message || '결제 요청 중 문제가 발생했습니다.');
+      }
     } catch (error) {
       console.error('결제 요청 실패:', error);
-      alert('결제 중 문제가 발생했습니다. 다시 시도해주세요.');
+      alert('결제 요청에 실패했습니다. 다시 시도해주세요.');
     }
   };
-
+  
   if (loading) {
     return <div className={style.loading}>로딩 중...</div>;
   }
