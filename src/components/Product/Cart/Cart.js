@@ -105,7 +105,12 @@ const Cart = () => {
   
       if (response.status === 200 && response.data.status) {
         const { bills } = response.data;
-        navigate('/payment', { state: { cartItems: bills } }); // bills를 cartItems로 전달
+        navigate('/payment', {
+          state: {
+            cartItems: bills, // 결제 상품 정보
+            totalAmount: calculateTotalPrice(), // 총 금액
+          },
+        });
       } else {
         alert(response.data.message || '결제 처리 중 문제가 발생했습니다.');
       }
